@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!-- 
+  TaskMaster — Frontend
+  Couvre : HTML sémantique (2.1), RGAA accessibilité (2.5),
+  Sécurité XSS (2.4), RGPD (cookies)
+-->
+<html lang="fr"> <!-- RGAA : toujours déclarer la langue -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TaskMaster — Gestionnaire de tâches collaboratif">
+  <!-- CSP : Content Security Policy — protège contre les injections de scripts -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; script-src 'self'; style-src 'self'">
+  <title>TaskMaster — Gestion de tâches</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 
+    RGAA : Lien d'évitement pour navigation au clavier 
+    Permet aux utilisateurs de lecteurs d'écran de sauter au contenu
+  -->
+  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
+  <!-- RGAA : bandeau cookies RGPD -->
+  <div id="cookie-banner" class="cookie-banner" role="alert" aria-live="polite" hidden>
+    <p>
+      Ce site utilise des cookies strictement nécessaires au fonctionnement.
+      Aucun cookie publicitaire ni traceur.
+      <a href="#" aria-label="En savoir plus sur notre politique de cookies">En savoir plus</a>
+    </p>
+    <button onclick="acceptCookies()" class="btn btn-sm">Accepter</button>
+    <button onclick="refuseCookies()" class="btn btn-sm btn-secondary">Refuser</button>
+  </div>
+
+  <!-- HEADER sémantique -->
+  <header role="banner">
+    <nav aria-label="Navigation principale">
+      <div class="nav-brand">
+        <h1>TaskMaster</h1>
+      </div>
+      <ul class="nav-links" role="menubar">
+        <li role="none"><a href="#" role="menuitem" aria-current="page">Tâches</a></li>
+        <li role="none"><a href="#" role="menuitem">Profil</a></li>
+        <li role="none">
+          <button id="logout-btn" class="btn btn-sm btn-secondary" aria-label="Se déconnecter">
+            Déconnexion
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main id="main-content" role="main">
+    <!-- Section connexion (affichée si non connecté) -->
+    <section id="login-section" class="auth-section" aria-labelledby="login-heading">
+      <div class="auth-card">
+        <h2 id="login-heading">Connexion</h2>
+        <!-- PAS de action= ni method= car on gère en JS avec fetch -->
+        <div role="form" aria-labelledby="login-heading">
+          <div class="form-group">
+            <!-- RGAA : chaque champ a un label explicitement lié -->
+            <label for="login-email">Adresse email</label>
+            <input type="email" id="login-email" name="email" 
+                   autocomplete="email"
+                   required
+                   aria-required="true"
+                   placeholder="votre@email.com">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Mot de passe</label>
+            <input type="password" id="login-password" name="password"
+                   autocomplete="current-password"
+                   required
+                   aria-required="true"
+                   minlength="8"
+                   placeholder="Minimum 8 caractères">
+          </div>
+          <!-- Zone d'erreur accessible -->
+          <div id="login-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+          <button id="login-submit" class="btn btn-primary btn-full" type="button">
+            Se connecter
+          </button>
+          <p class="auth-switch">
+            Pas de compte ?
+            <button id="show-register" class="link-btn" type="button">Créer un compte</button>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section inscription (cachée par défaut) -->
+    <section id="register-section" class="auth-section" aria-labelledby="register-heading" hidden>
+      <div class="auth-card">
+        <h2 id="register-heading">Inscription</h2>
+        <div role="form" aria-labelledby="register-heading">
+          <div class="form-group">
+            <label for="reg-firstname">Prénom</label>
+            <input type="text" id="reg-firstname" required aria-required="true">
+          </div>
+          <div class="form-group">
+            <label for="reg-lastname">Nom</label>
+            <input type="text" id="reg-lastname" required aria-required="true">
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" required aria-required="true" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Mot de passe</label>
+            <input type="password" id="reg-password" required aria-required="true"
+                   autocomplete="new-password" minlength="8"
+                   aria-describedby="password-hint">
+            <small id="password-hint" class="hint">Minimum 8 caractères, 1 majuscule, 1 chiffre</small>
+          </div>
+          <div id="register-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+          <button id="register-submit" class="btn btn-primary btn-full" type="button">
+            Créer mon compte
+          </button>
+          <p class="auth-switch">
+            Déjà inscrit ?
+            <button id="show-login" class="link-btn" type="button">Se connecter</button>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section tâches (affichée après connexion) -->
+    <section id="tasks-section" aria-labelledby="tasks-heading" hidden>
+      <div class="tasks-header">
+        <h2 id="tasks-heading">Mes tâches</h2>
+        <button id="add-task-btn" class="btn btn-primary" aria-label="Ajouter une nouvelle tâche">
+          + Nouvelle tâche
+        </button>
+      </div>
+
+      <!-- Filtres accessibles -->
+      <div class="filters" role="search" aria-label="Filtrer les tâches">
+        <div class="form-group">
+          <label for="filter-status">Statut</label>
+          <select id="filter-status">
+            <option value="">Tous</option>
+            <option value="todo">À faire</option>
+            <option value="in_progress">En cours</option>
+            <option value="done">Terminé</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="filter-priority">Priorité</label>
+          <select id="filter-priority">
+            <option value="">Toutes</option>
+            <option value="high">Haute</option>
+            <option value="medium">Moyenne</option>
+            <option value="low">Basse</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Liste de tâches — RGAA : structure de liste pour les lecteurs d'écran -->
+      <div id="tasks-list" role="list" aria-label="Liste des tâches">
+        <!-- Les tâches sont injectées ici par JavaScript -->
+      </div>
+
+      <!-- Pagination accessible -->
+      <nav id="pagination" aria-label="Pagination des tâches" hidden>
+        <button id="prev-page" class="btn btn-sm" aria-label="Page précédente">Précédent</button>
+        <span id="page-info" aria-live="polite"></span>
+        <button id="next-page" class="btn btn-sm" aria-label="Page suivante">Suivant</button>
+      </nav>
+    </section>
+
+    <!-- Modal ajout de tâche -->
+    <div id="task-modal" class="modal-overlay" role="dialog" 
+         aria-labelledby="modal-heading" aria-modal="true" hidden>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-heading">Nouvelle tâche</h3>
+          <button id="close-modal" class="close-btn" aria-label="Fermer">&times;</button>
+        </div>
+        <div role="form">
+          <div class="form-group">
+            <label for="task-title">Titre</label>
+            <input type="text" id="task-title" required aria-required="true" maxlength="255">
+          </div>
+          <div class="form-group">
+            <label for="task-desc">Description</label>
+            <textarea id="task-desc" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="task-priority">Priorité</label>
+              <select id="task-priority">
+                <option value="low">Basse</option>
+                <option value="medium" selected>Moyenne</option>
+                <option value="high">Haute</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="task-due">Échéance</label>
+              <input type="date" id="task-due">
+            </div>
+          </div>
+          <div id="task-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+          <button id="save-task" class="btn btn-primary btn-full" type="button">
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER sémantique -->
+  <footer role="contentinfo">
+    <p>&copy; 2024 TaskMaster — Application de démonstration CDA</p>
+    <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

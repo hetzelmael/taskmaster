@@ -1,0 +1,174 @@
+# === ci.yml — Pipeline CI/CD GitHub Actions ===
+# Couvre : CI/CD (CP 11.1), Tests automatisés (CP 9.4)
+# 
+# Ce pipeline se déclenche à chaque push ou pull request
+# Il exécute : lint → tests unitaires → tests intégration → build Docker
+
+name: TaskMaster CI/CD
+
+# DÉCLENCHEURS : quand le pipeline se lance
+on:
+  push:
+    branches: [main, develop]   # À chaque push sur main ou develop
+  pull_request:
+    branches: [main]             # À chaque PR vers main
+
+# VARIABLES D'ENVIRONNEMENT partagées entre tous les jobs
+env:
+  NODE_VERSION: '20'
+  DB_HOST: localhost
+  DB_PORT: 5432
+  DB_NAME: taskmaster_test
+  DB_USER: postgres
+  DB_PASSWORD: test_password
+  JWT_SECRET: ci-test-secret-key
+  REDIS_HOST: localhost
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: test_redis
+
+# JOBS : les étapes du pipeline
+jobs:
+
+  # ==========================================
+  # JOB 1 : Lint (vérification qualité du code)
+  # ==========================================
+  lint:
+    name: Lint & qualité de code
+    runs-on: ubuntu-latest       # Machine virtuelle Ubuntu fournie par GitHub
+
+    steps:
+      # Étape 1 : Récupérer le code source
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      # Étape 2 : Installer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      # Étape 3 : Installer les dépendances
+      - name: Installer les dépendances
+        working-directory: backend
+        run: npm ci              # ci = install à partir du lock file
+
+      # Étape 4 : Lancer le linter
+      - name: Exécuter ESLint
+        working-directory: backend
+        run: npm run lint
+
+  # ==========================================
+  # JOB 2 : Tests unitaires
+  # ==========================================
+  test-unit:
+    name: Tests unitaires
+    runs-on: ubuntu-latest
+    needs: lint                  # S'exécute seulement si le lint passe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Installer les dépendances
+        working-directory: backend
+        run: npm ci
+
+      - name: Exécuter les tests unitaires avec couverture
+        working-directory: backend
+        run: npm test -- --coverage --testPathPattern=unit
+
+      # Étape bonus : uploader le rapport de couverture
+      - name: Archiver le rapport de couverture
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: backend/coverage/
+          retention-days: 7
+
+  # ==========================================
+  # JOB 3 : Tests d'intégration (avec vraie BDD)
+  # ==========================================
+  test-integration:
+    name: Tests d'intégration
+    runs-on: ubuntu-latest
+    needs: lint
+
+    # Services : conteneurs lancés automatiquement pour les tests
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Installer les dépendances
+        working-directory: backend
+        run: npm ci
+
+      - name: Exécuter les tests d'intégration
+        working-directory: backend
+        env:
+          NODE_ENV: test
+        run: npm test -- --testPathPattern=integration
+
+  # ==========================================
+  # JOB 4 : Build Docker (vérifier que l'image se construit)
+  # ==========================================
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]  # Après les tests
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build de l'image Docker
+        working-directory: backend
+        run: docker build -t taskmaster-api:${{ github.sha }} .
+
+      - name: Vérifier que le conteneur démarre
+        run: |
+          docker run -d --name test-container \
+            -e NODE_ENV=production \
+            -e JWT_SECRET=test \
+            -e DB_HOST=localhost \
+            taskmaster-api:${{ github.sha }}
+          sleep 5
+          docker logs test-container
+          docker stop test-container

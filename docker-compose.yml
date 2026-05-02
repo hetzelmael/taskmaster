@@ -1,0 +1,95 @@
+# === docker-compose.yml — Orchestration multi-services ===
+# Couvre : Docker Compose (CP 11.2), Environnements (CP 10.1)
+# Lance 4 services qui communiquent entre eux :
+#   1. backend  (Node.js/Express API)
+#   2. db       (PostgreSQL 16)
+#   3. cache    (Redis 7)
+#   4. frontend (Nginx servant les fichiers statiques)
+
+version: '3.8'
+
+services:
+  # --- Base de données PostgreSQL ---
+  db:
+    image: postgres:16-alpine
+    container_name: taskmaster-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-taskmaster}
+      POSTGRES_USER: ${DB_ADMIN_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persistance des données (survit au redémarrage du conteneur)
+      - pgdata:/var/lib/postgresql/data
+      # Script d'initialisation (créé les tables et l'utilisateur applicatif)
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_ADMIN_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Cache Redis ---
+  cache:
+    image: redis:7-alpine
+    container_name: taskmaster-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_secret}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secret}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # --- Backend API ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskmaster-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: db          # Nom du service Docker, pas localhost !
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-taskmaster}
+      DB_USER: ${DB_APP_USER:-taskmaster_app}
+      DB_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
+      REDIS_HOST: cache
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_secret}
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+    depends_on:
+      db:
+        condition: service_healthy  # Attend que la BDD soit prête
+      cache:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # --- Frontend (servi par Nginx) ---
+  frontend:
+    image: nginx:alpine
+    container_name: taskmaster-front
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
+# Volume nommé pour la persistance PostgreSQL
+volumes:
+  pgdata:
+    driver: local
