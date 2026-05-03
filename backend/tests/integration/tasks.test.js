@@ -55,9 +55,8 @@ describe('POST /api/tasks', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.task).toBeDefined();
-    expect(res.body.task.title).toBe('Tâche de test intégration');
-    expect(res.body.task.userId).toBe(testUserId);
+    expect(res.body.title).toBe('Tâche de test intégration');
+    expect(res.body.userId).toBe(testUserId);
   });
 
   test('doit refuser sans token — statut 401', async () => {
