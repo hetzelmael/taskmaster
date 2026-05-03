@@ -83,7 +83,7 @@ jobs:
 
       - name: Exécuter les tests unitaires avec couverture
         working-directory: backend
-        run: npm test -- --coverage --testPathPattern=unit
+        run: npm run test:unit -- --coverage
 
       # Étape bonus : uploader le rapport de couverture
       - name: Archiver le rapport de couverture
@@ -141,11 +141,19 @@ jobs:
         working-directory: backend
         run: npm ci
 
+      - name: Migrer la base de données
+        working-directory: backend
+        env:
+          NODE_ENV: test
+        run: npx sequelize-cli db:migrate
+
       - name: Exécuter les tests d'intégration
         working-directory: backend
         env:
           NODE_ENV: test
-        run: npm test -- --testPathPattern=integration
+          DATABASE_URL: postgres://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.DB_NAME }}
+          REDIS_PASSWORD: ${{ env.REDIS_PASSWORD }}
+        run: npm run test:integration
 
   # ==========================================
   # JOB 4 : Build Docker (vérifier que l'image se construit)
