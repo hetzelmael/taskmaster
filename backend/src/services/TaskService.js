@@ -3,7 +3,7 @@
 // Couvre : CRUD sécurisé (8.1), Transactions (8.3), Style défensif (3.1)
 
 const { Task, User, Version } = require('../models');
-const { Sequelize, Op } = require('sequelize');
+const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
 class TaskService {
@@ -54,9 +54,9 @@ class TaskService {
     } else {
       where.status = { [Op.ne]: 'archived' };
     }
-    if (priority)  where.priority  = priority;
-    if (versionId) where.versionId = parseInt(versionId);
-    if (projectId) where.projectId = parseInt(projectId);
+    if (priority)  { where.priority  = priority; }
+    if (versionId) { where.versionId = parseInt(versionId); }
+    if (projectId) { where.projectId = parseInt(projectId); }
 
     const offset = (Math.max(1, page) - 1) * Math.min(limit, 100);
 
@@ -101,7 +101,7 @@ class TaskService {
     const allowed = ['title', 'description', 'priority', 'status', 'dueDate', 'versionId'];
     const safeUpdates = {};
     for (const key of allowed) {
-      if (updates[key] !== undefined) safeUpdates[key] = updates[key];
+      if (updates[key] !== undefined) { safeUpdates[key] = updates[key]; }
     }
 
     // Horodatage automatique des transitions de statut
@@ -114,7 +114,7 @@ class TaskService {
       if (safeUpdates.status === 'done') {
         safeUpdates.completedAt = now;
         // Conserver startedAt si déjà défini, sinon enregistrer maintenant
-        if (!task.startedAt) safeUpdates.startedAt = now;
+        if (!task.startedAt) { safeUpdates.startedAt = now; }
       }
       if (safeUpdates.status === 'todo') {
         safeUpdates.startedAt   = null;

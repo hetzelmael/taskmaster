@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
   const user = await User.findByPk(req.userId);
-  if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
 
   await user.destroy();
   return res.status(204).send();
