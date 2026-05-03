@@ -47,11 +47,13 @@ taskmaster/
 ## CP1.1 — IDE et outils de dev [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
-- [ ] J'ai VS Code installé avec au moins ESLint, Prettier, GitLens
-- [ ] Je sais ouvrir un terminal intégré et lancer `npm install`, `npm run`
-- [ ] Je connais 5 raccourcis (Ctrl+P, Ctrl+Shift+P, Ctrl+/, F2 rename, F12 go to definition)
+
+- [x] J'ai VS Code installé avec au moins ESLint, Prettier, GitLens
+- [x] Je sais ouvrir un terminal intégré et lancer `npm install`, `npm run`
+- [x] Je connais 5 raccourcis (Ctrl+P, Ctrl+Shift+P, Ctrl+/, F2 rename, F12 go to definition)
 
 ### Pré-rempli pour vous : `package.json` du backend
+
 ```json
 {
   "name": "taskmaster-backend",
@@ -93,12 +95,15 @@ Nodemon redémarre automatiquement le serveur quand on modifie un fichier. Il es
 ## CP1.2 — Gestion de versions Git [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
-- [ ] Je sais initialiser un repo, faire des commits, push, pull
-- [ ] Je sais créer une branche, fusionner, gérer un conflit
-- [ ] Je connais `git stash`, `git rebase`, `git revert`
+
+- [x] Je sais initialiser un repo, faire des commits, push, pull
+- [x] Je sais créer une branche, fusionner, gérer un conflit
+- [x] Je connais `git stash`, `git rebase`, `git revert`
 
 ### Convention de commits dans TaskMaster
+
 On utilise **Conventional Commits** :
+
 - `feat:` nouvelle fonctionnalité
 - `fix:` correction bug
 - `docs:` documentation
@@ -121,6 +126,7 @@ Merge crée un commit de fusion qui garde l'historique des deux branches. Rebase
 **Le problème que Docker résout** : "Ça marche sur ma machine !" Sans Docker, votre app dépend de la version de Node sur votre PC, des bibliothèques système, etc. En production, c'est différent → ça plante. Avec Docker, vous emballez l'app + tout son environnement dans une image, et cette image fonctionne partout pareil.
 
 **Concepts clés** :
+
 - **Image** : modèle figé qui contient OS + app + dépendances. Comme une classe en POO.
 - **Conteneur** : instance d'image qui tourne. Comme un objet en POO.
 - **Dockerfile** : recette pour construire une image
@@ -129,6 +135,7 @@ Merge crée un commit de fusion qui garde l'historique des deux branches. Rebase
 - **Network** : réseau virtuel pour que les conteneurs communiquent
 
 **Cycle de vie** :
+
 1. Écrire un `Dockerfile`
 2. `docker build -t taskmaster .` → crée l'image
 3. `docker run taskmaster` → lance un conteneur
@@ -187,54 +194,100 @@ EXPOSE est purement documentaire — il dit "ce conteneur écoute sur le port 30
 ## CP2.1 — HTML/CSS responsive [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
-- [ ] Je connais les balises sémantiques : `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`
-- [ ] Je maîtrise Flexbox et CSS Grid
-- [ ] Je sais utiliser les media queries (`@media (max-width: 768px)`)
+
+- [x] Je connais les balises sémantiques : `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`
+- [x] Je maîtrise Flexbox et CSS Grid
+- [x] Je sais utiliser les media queries (`@media (max-width: 768px)`)
 
 ### Pré-rempli : `frontend/index.html` + `frontend/style.css`
 
 ```html
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskMaster — Mes tâches</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>TaskMaster</h1>
-    <nav><button id="logout">Déconnexion</button></nav>
-  </header>
-  <main>
-    <section aria-label="Nouvelle tâche">
-      <form id="task-form">
-        <label for="title">Titre</label>
-        <input id="title" name="title" type="text" required>
-        <button type="submit">Ajouter</button>
-      </form>
-    </section>
-    <section aria-label="Liste des tâches">
-      <ul id="task-list"></ul>
-    </section>
-  </main>
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskMaster — Mes tâches</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>TaskMaster</h1>
+      <nav><button id="logout">Déconnexion</button></nav>
+    </header>
+    <main>
+      <section aria-label="Nouvelle tâche">
+        <form id="task-form">
+          <label for="title">Titre</label>
+          <input id="title" name="title" type="text" required />
+          <button type="submit">Ajouter</button>
+        </form>
+      </section>
+      <section aria-label="Liste des tâches">
+        <ul id="task-list"></ul>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
 </html>
 ```
 
 ```css
-:root { --primary: #3266ad; --bg: #f7f7f5; --text: #1a1a1a; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
-header { display: flex; justify-content: space-between; padding: 1rem 2rem; background: white; border-bottom: 1px solid #ddd; }
-main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-section { background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; }
-form { display: grid; gap: 0.5rem; }
-input, button { padding: 0.6rem; font-size: 1rem; border-radius: 4px; border: 1px solid #ccc; }
-button { background: var(--primary); color: white; cursor: pointer; border: none; }
-@media (max-width: 600px) { main { padding: 0 0.5rem; } }
+:root {
+  --primary: #3266ad;
+  --bg: #f7f7f5;
+  --text: #1a1a1a;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+section {
+  background: white;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+form {
+  display: grid;
+  gap: 0.5rem;
+}
+input,
+button {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+button {
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+@media (max-width: 600px) {
+  main {
+    padding: 0 0.5rem;
+  }
+}
 ```
 
 **Question** : Quelle balise sémantique pour la liste de tâches : `<section>` ou `<aside>` ?
@@ -250,26 +303,28 @@ button { background: var(--primary); color: white; cursor: pointer; border: none
 ### Rappel ciblé (10 min)
 
 **Sélectionner et manipuler le DOM** :
+
 ```js
-const form = document.querySelector('#task-form');     // un élément
-const items = document.querySelectorAll('.task');      // tous (NodeList)
-form.addEventListener('submit', handler);              // écouteur d'événement
-element.classList.add('done');                          // CSS classes
-element.textContent = 'Hello';                          // texte (sécurisé)
-element.innerHTML = '<b>x</b>';                         // HTML (DANGEREUX, voir CP2.4)
+const form = document.querySelector("#task-form"); // un élément
+const items = document.querySelectorAll(".task"); // tous (NodeList)
+form.addEventListener("submit", handler); // écouteur d'événement
+element.classList.add("done"); // CSS classes
+element.textContent = "Hello"; // texte (sécurisé)
+element.innerHTML = "<b>x</b>"; // HTML (DANGEREUX, voir CP2.4)
 ```
 
 **Async/await + fetch** :
+
 ```js
 async function getTasks() {
   try {
-    const res = await fetch('/api/tasks', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const res = await fetch("/api/tasks", {
+      headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.error('Échec:', err);
+    console.error("Échec:", err);
     return [];
   }
 }
@@ -280,35 +335,35 @@ async function getTasks() {
 ### Code dans TaskMaster : `frontend/app.js`
 
 ```js
-const API = 'http://localhost:3000/api';
-const token = localStorage.getItem('token');
+const API = "http://localhost:3000/api";
+const token = localStorage.getItem("token");
 
-const form = document.querySelector('#task-form');
-const list = document.querySelector('#task-list');
+const form = document.querySelector("#task-form");
+const list = document.querySelector("#task-list");
 
 async function loadTasks() {
   const res = await fetch(`${API}/tasks`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   const tasks = await res.json();
-  list.innerHTML = '';
-  tasks.forEach(t => {
-    const li = document.createElement('li');
-    li.textContent = t.title;  // textContent, pas innerHTML — voir CP2.4
+  list.innerHTML = "";
+  tasks.forEach((t) => {
+    const li = document.createElement("li");
+    li.textContent = t.title; // textContent, pas innerHTML — voir CP2.4
     list.appendChild(li);
   });
 }
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const title = form.title.value;
   await fetch(`${API}/tasks`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ title })
+    body: JSON.stringify({ title }),
   });
   form.reset();
   loadTasks();
@@ -330,9 +385,10 @@ Sans cela, le navigateur soumet le formulaire de manière classique (rechargemen
 ## CP2.3 — API REST côté front [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
-- [ ] Je connais les codes HTTP : 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 500 Server Error
-- [ ] Je sais que GET = lire, POST = créer, PUT/PATCH = modifier, DELETE = supprimer
-- [ ] Je sais ajouter des headers (Authorization, Content-Type)
+
+- [x] Je connais les codes HTTP : 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 500 Server Error
+- [x] Je sais que GET = lire, POST = créer, PUT/PATCH = modifier, DELETE = supprimer
+- [x] Je sais ajouter des headers (Authorization, Content-Type)
 
 **Question** : Différence entre 401 et 403 ?
 
@@ -354,17 +410,20 @@ Sans cela, le navigateur soumet le formulaire de manière classique (rechargemen
 **CSRF (Cross-Site Request Forgery)** : un attaquant vous fait visiter un site malveillant qui envoie une requête à votre app où vous êtes déjà connecté (cookies envoyés automatiquement). Il peut faire un transfert d'argent à votre nom.
 
 **Parades** :
+
 - Token CSRF : un jeton unique généré côté serveur, inséré dans chaque formulaire, vérifié à chaque requête
 - SameSite cookie : `Set-Cookie: token=xyz; SameSite=Strict` empêche l'envoi du cookie depuis un autre site
 - Utiliser des en-têtes `Authorization: Bearer <JWT>` en localStorage plutôt que des cookies (immunisé au CSRF, mais sensible au XSS)
 
 **RGPD côté front** :
+
 - Bandeau de consentement cookies (avant tout dépôt de cookies non essentiels)
 - Mentions légales accessibles
 - Politique de confidentialité claire
 - Droit à l'effacement implémenté
 
 **CSP (Content Security Policy)** : en-tête HTTP qui dit au navigateur quelles sources sont autorisées :
+
 ```
 Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.example.com
 ```
@@ -373,13 +432,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.examp
 
 ```js
 function escapeHtml(text) {
-  const div = document.createElement('div');
+  const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
 
 function renderTask(task) {
-  const li = document.createElement('li');
+  const li = document.createElement("li");
   // OK — textContent échappe automatiquement
   li.textContent = task.title;
   // SI vraiment besoin de HTML :
@@ -389,9 +448,10 @@ function renderTask(task) {
 ```
 
 Backend : ajout de **helmet** dans `app.js` (déjà dans package.json) :
+
 ```js
-const helmet = require('helmet');
-app.use(helmet());  // ajoute CSP, X-Frame-Options, etc.
+const helmet = require("helmet");
+app.use(helmet()); // ajoute CSP, X-Frame-Options, etc.
 ```
 
 ### Mini-exercice (15 min)
@@ -424,12 +484,14 @@ Il empêche le cookie d'être envoyé sur les requêtes initiées depuis un autr
 Le **RGAA** (Référentiel Général d'Amélioration de l'Accessibilité) est obligatoire pour les sites publics français et fortement recommandé pour le privé. Il garantit que les personnes en situation de handicap (visuel, moteur, cognitif, auditif) peuvent utiliser votre site.
 
 **Les 4 principes WCAG** (sur lesquels le RGAA est basé) :
+
 1. **Perceptible** : tout contenu non textuel a un équivalent textuel
 2. **Utilisable** : tout est accessible au clavier
 3. **Compréhensible** : labels clairs, langue déclarée
 4. **Robuste** : compatible avec les technologies d'assistance
 
 **Règles essentielles** (couvre 80% des cas) :
+
 - `<img alt="...">` pour toutes les images informatives, `alt=""` pour décoratives
 - `<label for="id">` lié à chaque champ de formulaire
 - Contraste minimum 4.5:1 (texte normal) ou 3:1 (gros texte)
@@ -440,6 +502,7 @@ Le **RGAA** (Référentiel Général d'Amélioration de l'Accessibilité) est ob
 - Attributs ARIA quand nécessaire : `aria-label`, `aria-live`, `role`
 
 **Outils de test** :
+
 - **Lighthouse** dans Chrome DevTools → onglet Accessibility (audit gratuit)
 - **axe DevTools** (extension Chrome/Firefox)
 - **NVDA** (lecteur d'écran gratuit Windows)
@@ -448,11 +511,11 @@ Le **RGAA** (Référentiel Général d'Amélioration de l'Accessibilité) est ob
 
 ```html
 <!-- Mauvais : pas de label, juste un placeholder -->
-<input type="text" placeholder="Titre">
+<input type="text" placeholder="Titre" />
 
 <!-- Bon : label explicite -->
 <label for="title">Titre de la tâche</label>
-<input id="title" type="text" required aria-required="true">
+<input id="title" type="text" required aria-required="true" />
 
 <!-- Pour les messages d'erreur dynamiques -->
 <div id="error-zone" role="alert" aria-live="polite"></div>
@@ -466,11 +529,24 @@ Le **RGAA** (Référentiel Général d'Amélioration de l'Accessibilité) est ob
 
 ```css
 /* Style focus visible (jamais le supprimer !) */
-button:focus, input:focus { outline: 2px solid #185FA5; outline-offset: 2px; }
+button:focus,
+input:focus {
+  outline: 2px solid #185fa5;
+  outline-offset: 2px;
+}
 
 /* Skip link pour aller au contenu principal */
-.skip-link { position: absolute; left: -9999px; }
-.skip-link:focus { left: 0; top: 0; padding: 1rem; background: white; z-index: 100; }
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+  padding: 1rem;
+  background: white;
+  z-index: 100;
+}
 ```
 
 ### Mini-exercice (20 min)
@@ -500,6 +576,7 @@ Le placeholder disparaît dès qu'on commence à taper. Il n'est pas lu par tous
 ## CP3.1 — POO et style défensif [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je distingue classe / instance, attribut / méthode, héritage / composition
 - [ ] J'utilise try/catch et je throw des erreurs explicites
 - [ ] Je valide les entrées (typeof, length, regex)
@@ -513,11 +590,11 @@ class TaskService {
   }
 
   async create(userId, data) {
-    if (!data.title || typeof data.title !== 'string') {
-      throw new Error('Titre invalide');
+    if (!data.title || typeof data.title !== "string") {
+      throw new Error("Titre invalide");
     }
     if (data.title.length > 200) {
-      throw new Error('Titre trop long (max 200)');
+      throw new Error("Titre trop long (max 200)");
     }
     return this.taskModel.create({
       userId,
@@ -547,6 +624,7 @@ Pour ne jamais faire confiance au client. Même si le formulaire trim côté fro
 ### Cours (30 min)
 
 **Hachage vs chiffrement** :
+
 - **Hachage** (à sens unique) : on ne peut pas retrouver le mot de passe original. Utilisé pour stocker les passwords. Algorithmes : bcrypt, argon2 (jamais MD5 ou SHA1 seuls).
 - **Chiffrement** (réversible) : on peut déchiffrer avec la clé. Pour les données sensibles à relire (ex: numéro de carte).
 
@@ -563,19 +641,22 @@ Structure d'un JWT : `header.payload.signature` (3 parties Base64 séparées par
 ### Code dans TaskMaster : `backend/src/controllers/AuthController.js`
 
 ```js
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
 
 const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES = '24h';
+const JWT_EXPIRES = "24h";
 
 exports.registerValidators = [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 8 })
-    .matches(/[A-Z]/).withMessage('Au moins 1 majuscule')
-    .matches(/[0-9]/).withMessage('Au moins 1 chiffre'),
+  body("email").isEmail().normalizeEmail(),
+  body("password")
+    .isLength({ min: 8 })
+    .matches(/[A-Z]/)
+    .withMessage("Au moins 1 majuscule")
+    .matches(/[0-9]/)
+    .withMessage("Au moins 1 chiffre"),
 ];
 
 exports.register = async (req, res) => {
@@ -592,10 +673,12 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ where: { email } });
-  if (!user || !await bcrypt.compare(password, user.passwordHash)) {
-    return res.status(401).json({ error: 'Identifiants invalides' });
+  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    return res.status(401).json({ error: "Identifiants invalides" });
   }
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES,
+  });
   res.json({ token });
 };
 ```
@@ -603,20 +686,20 @@ exports.login = async (req, res) => {
 ### Code dans TaskMaster : `backend/src/middleware/auth.js`
 
 ```js
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
   const header = req.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Token manquant' });
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Token manquant" });
   }
-  const token = header.split(' ')[1];
+  const token = header.split(" ")[1];
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = payload.userId;
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Token invalide' });
+    return res.status(401).json({ error: "Token invalide" });
   }
 };
 ```
@@ -654,6 +737,7 @@ Il peut générer des tokens valides pour n'importe quel utilisateur (en falsifi
 ### Cours (25 min)
 
 **Pyramide des tests** :
+
 - Unitaires (70%) : testent une fonction/classe isolée. Rapides.
 - Intégration (20%) : testent la combinaison de plusieurs unités (route + DB).
 - E2E (10%) : testent le système complet du point de vue utilisateur.
@@ -665,6 +749,7 @@ Il peut générer des tokens valides pour n'importe quel utilisateur (en falsifi
 **Coverage** : pourcentage du code couvert par les tests. Viser 80%+ sur la logique métier.
 
 **TDD** (Test-Driven Development) : Red → Green → Refactor.
+
 1. Écrire un test qui échoue (Red)
 2. Écrire le code minimal pour le faire passer (Green)
 3. Refactorer en gardant les tests verts
@@ -672,9 +757,9 @@ Il peut générer des tokens valides pour n'importe quel utilisateur (en falsifi
 ### Code dans TaskMaster : `backend/src/tests/taskService.test.js`
 
 ```js
-const TaskService = require('../services/TaskService');
+const TaskService = require("../services/TaskService");
 
-describe('TaskService', () => {
+describe("TaskService", () => {
   let taskModel;
   let service;
 
@@ -687,34 +772,36 @@ describe('TaskService', () => {
     service = new TaskService(taskModel);
   });
 
-  describe('create', () => {
-    test('crée une tâche valide', async () => {
-      taskModel.create.mockResolvedValue({ id: 1, title: 'Test' });
-      const result = await service.create(42, { title: 'Test' });
+  describe("create", () => {
+    test("crée une tâche valide", async () => {
+      taskModel.create.mockResolvedValue({ id: 1, title: "Test" });
+      const result = await service.create(42, { title: "Test" });
       expect(taskModel.create).toHaveBeenCalledWith({
         userId: 42,
-        title: 'Test',
+        title: "Test",
         done: false,
       });
       expect(result.id).toBe(1);
     });
 
-    test('rejette un titre vide', async () => {
-      await expect(service.create(42, { title: '' }))
-        .rejects.toThrow('Titre invalide');
+    test("rejette un titre vide", async () => {
+      await expect(service.create(42, { title: "" })).rejects.toThrow(
+        "Titre invalide",
+      );
     });
 
-    test('rejette un titre trop long', async () => {
-      const long = 'a'.repeat(201);
-      await expect(service.create(42, { title: long }))
-        .rejects.toThrow('Titre trop long');
+    test("rejette un titre trop long", async () => {
+      const long = "a".repeat(201);
+      await expect(service.create(42, { title: long })).rejects.toThrow(
+        "Titre trop long",
+      );
     });
 
-    test('trim les espaces du titre', async () => {
+    test("trim les espaces du titre", async () => {
       taskModel.create.mockResolvedValue({});
-      await service.create(42, { title: '  Hello  ' });
+      await service.create(42, { title: "  Hello  " });
       expect(taskModel.create).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Hello' })
+        expect.objectContaining({ title: "Hello" }),
       );
     });
   });
@@ -750,6 +837,7 @@ Pour isoler la logique testée. Les tests doivent être rapides (millisecondes) 
 ## CP3.4 — Design patterns [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je connais MVC, Repository, Singleton, Factory, Observer
 - [ ] J'ai déjà refactorisé du code procédural en POO
 
@@ -771,6 +859,7 @@ Le Singleton est un pattern où la classe elle-même garantit qu'une seule insta
 ## CP4.1 — Méthodes Agile/Scrum [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Je connais les rôles : PO, Scrum Master, Dev Team
 - [ ] Je connais les cérémonies : Sprint Planning, Daily, Review, Retro
 - [ ] Je sais estimer en story points (Fibonacci : 1, 2, 3, 5, 8, 13)
@@ -779,6 +868,7 @@ Le Singleton est un pattern où la classe elle-même garantit qu'une seule insta
 
 <parameter name="file_text"><details><summary>Réponse</summary>
 Scrum impose un cadre temporel (sprints de durée fixe, rôles définis, cérémonies). Kanban est continu, sans sprint, focalisé sur le flux de travail (limit WIP, cycle time). Scrum convient aux projets en construction, Kanban à la maintenance ou au support.
+
 </details>
 
 ---
@@ -786,6 +876,7 @@ Scrum impose un cadre temporel (sprints de durée fixe, rôles définis, cérém
 ## CP4.2 — Outils collaboratifs [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Je sais créer une issue, une pull request, un projet GitHub
 - [ ] Je connais le workflow GitFlow (main, develop, feature, hotfix)
 
@@ -800,6 +891,7 @@ Pour s'imposer une revue de code (relecture à froid), pour conserver un histori
 ## CP4.3 — Communication écrite [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je structure un compte rendu : participants / sujet / décisions / actions / prochaine étape
 - [ ] Je rédige des descriptions d'issues claires (contexte / problème / résultat attendu)
 
@@ -811,6 +903,7 @@ Pour s'imposer une revue de code (relecture à froid), pour conserver un histori
 Application de gestion de tâches collaborative.
 
 ## Stack
+
 - Backend : Node.js 20, Express, Sequelize, PostgreSQL, Redis
 - Frontend : HTML/CSS/JS vanilla
 - Tests : Jest, Supertest, Cypress
@@ -819,25 +912,29 @@ Application de gestion de tâches collaborative.
 ## Démarrage rapide
 
 ### Prérequis
+
 - Docker Desktop
 - Node.js 20+
 
 ### Installation
+
 \`\`\`bash
 git clone https://github.com/<vous>/taskmaster.git
 cd taskmaster
-cp .env.example .env  # éditer les valeurs
+cp .env.example .env # éditer les valeurs
 docker-compose up -d
 \`\`\`
 
 L'application est disponible sur http://localhost:3000.
 
 ## Tests
+
 \`\`\`bash
 cd backend && npm test
 \`\`\`
 
 ## Architecture
+
 Voir docs/ARCHITECTURE.md
 ```
 
@@ -850,6 +947,7 @@ Voir docs/ARCHITECTURE.md
 ### Rappel ciblé (10 min)
 
 **Méthode pour décortiquer un CDC** :
+
 1. Identifier les **acteurs** (utilisateurs, systèmes externes)
 2. Lister les **fonctionnalités** (verbe + objet : "créer une tâche")
 3. Identifier les **règles de gestion** (un utilisateur ne voit que ses tâches)
@@ -861,6 +959,7 @@ Voir docs/ARCHITECTURE.md
 
 **Acteurs** : utilisateur connecté, administrateur (admin)
 **Fonctionnalités** :
+
 - F1 : créer un compte (email + mot de passe)
 - F2 : se connecter / se déconnecter
 - F3 : créer / lister / modifier / supprimer ses tâches
@@ -868,6 +967,7 @@ Voir docs/ARCHITECTURE.md
 - F5 : (admin) consulter la liste des utilisateurs
 
 **Règles de gestion** :
+
 - RG1 : un utilisateur ne voit que ses propres tâches
 - RG2 : le mot de passe doit avoir 8 caractères, 1 maj, 1 chiffre
 - RG3 : le titre d'une tâche fait 1 à 200 caractères
@@ -885,6 +985,7 @@ Fonctionnelle = ce que le système fait (créer une tâche, envoyer un email). N
 ## CP5.2 — Use cases / user stories [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Format : "En tant que X, je veux Y, afin de Z"
 - [ ] Critères d'acceptation : Given / When / Then (Gherkin)
 
@@ -892,21 +993,26 @@ Fonctionnelle = ce que le système fait (créer une tâche, envoyer un email). N
 
 ```markdown
 ## US-01 : Inscription
+
 En tant que **visiteur**, je veux **créer un compte avec mon email**, afin de **pouvoir gérer mes tâches**.
 
 ### Critères d'acceptation
+
 - Given je suis sur la page d'inscription
 - When je saisis un email valide et un mot de passe respectant les règles
 - Then mon compte est créé et je suis redirigé vers la page de connexion
 
 ### Critères de refus
+
 - Email déjà utilisé → message "Cet email est déjà associé à un compte"
 - Mot de passe faible → message listant les règles non respectées
 
 ## US-02 : Création de tâche
+
 En tant qu'**utilisateur connecté**, je veux **créer une tâche avec un titre**, afin de **mémoriser ce que j'ai à faire**.
 
 ### Critères d'acceptation
+
 - Given je suis connecté sur ma liste de tâches
 - When je saisis un titre et clique "Ajouter"
 - Then la tâche apparaît immédiatement en haut de ma liste avec le statut "à faire"
@@ -923,6 +1029,7 @@ Pour garder l'utilisateur au centre du raisonnement. Le but n'est pas la fonctio
 ## CP5.3 — Maquettage [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je connais Figma (ou Adobe XD, Penpot)
 - [ ] Je sais faire un wireframe basse fidélité avant le design
 - [ ] Je relie les écrans entre eux (flow)
@@ -939,6 +1046,7 @@ Pour garder l'utilisateur au centre du raisonnement. Le but n'est pas la fonctio
 ## CP6.1 — Architecture multicouche [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je distingue les couches : Présentation / Métier / Accès aux données
 - [ ] Je sais qu'une couche ne communique qu'avec la suivante
 
@@ -973,23 +1081,28 @@ Parce qu'il violerait la séparation des couches. Si la BDD change (ex: passage 
 ## CP6.2 — Frameworks & ORM [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Je sais ce qu'est un framework MVC, comment ses composants communiquent
 - [ ] J'ai utilisé un ORM (Sequelize, Prisma, Hibernate, Eloquent…)
 
 ### Pré-rempli : `backend/src/models/Task.js`
 
 ```js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const Task = sequelize.define('Task', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  userId: { type: DataTypes.INTEGER, allowNull: false },
-  title: { type: DataTypes.STRING(200), allowNull: false },
-  done: { type: DataTypes.BOOLEAN, defaultValue: false },
-}, {
-  timestamps: true,  // ajoute createdAt, updatedAt automatiquement
-});
+const Task = sequelize.define(
+  "Task",
+  {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+    title: { type: DataTypes.STRING(200), allowNull: false },
+    done: { type: DataTypes.BOOLEAN, defaultValue: false },
+  },
+  {
+    timestamps: true, // ajoute createdAt, updatedAt automatiquement
+  },
+);
 
 module.exports = Task;
 ```
@@ -1007,18 +1120,21 @@ Avantages : code plus lisible, sécurité (requêtes paramétrées par défaut �
 ### Cours (25 min)
 
 **DICP** — les 4 piliers de la sécurité selon l'ANSSI :
+
 - **D**isponibilité : le système répond quand on le sollicite (uptime, redondance, sauvegarde)
 - **I**ntégrité : les données ne sont pas altérées (checksums, transactions, journalisation)
 - **C**onfidentialité : seuls les autorisés y accèdent (authentification, chiffrement)
 - **P**reuve / traçabilité : on peut prouver qui a fait quoi (logs, signatures)
 
 **Patterns de sécurité** :
+
 - **Defense in depth** (sécurité en profondeur) : plusieurs couches de protection. Si une faille → les autres bloquent.
 - **Least privilege** (moindre privilège) : chaque composant n'a que les droits strictement nécessaires.
 - **Fail secure** : en cas d'erreur, refuser plutôt qu'autoriser.
 - **Zero trust** : ne jamais faire confiance, toujours vérifier (même les requêtes internes).
 
 **Recommandations ANSSI clés** pour le développement web :
+
 - HTTPS partout (certificat Let's Encrypt gratuit)
 - Headers de sécurité : HSTS, CSP, X-Frame-Options, X-Content-Type-Options (gérés par helmet)
 - Pas de secret en dur dans le code (utiliser variables d'environnement)
@@ -1032,42 +1148,49 @@ Avantages : code plus lisible, sécurité (requêtes paramétrées par défaut �
 
 ```js
 // app.js
-const express = require('express');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
 // 1. Headers de sécurité
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
-    }
-  }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+      },
+    },
+  }),
+);
 
 // 2. Rate limiting global
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 minutes
-  max: 100,                   // 100 requêtes par IP
-}));
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requêtes par IP
+  }),
+);
 
 // 3. Rate limiting strict sur l'auth
-app.use('/auth/login', rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,                     // 5 tentatives de login par 15 min
-}));
+app.use(
+  "/auth/login",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // 5 tentatives de login par 15 min
+  }),
+);
 
 // 4. Body parser avec limite de taille
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: "10kb" }));
 
 // 5. CORS strict (autorise seulement votre frontend)
-const cors = require('cors');
-app.use(cors({ origin: 'https://taskmaster.example.com' }));
+const cors = require("cors");
+app.use(cors({ origin: "https://taskmaster.example.com" }));
 ```
 
 ### Mini-exercice (20 min)
@@ -1098,21 +1221,23 @@ Refuser l'accès (HTTP 503 ou 500) plutôt que de "laisser passer par défaut". 
 
 **Monolithe vs microservices** :
 
-| Aspect | Monolithe | Microservices |
-|--------|-----------|---------------|
-| Déploiement | Une seule app | N services indépendants |
-| Communication | Fonctions internes | API REST/gRPC/messages |
-| Données | Une BDD | Une BDD par service |
-| Scaling | Tout ensemble | Service par service |
-| Complexité | Simple au début | Réseau, observabilité, traces |
-| Quand utiliser | <10 développeurs | Grandes équipes, gros trafic |
+| Aspect         | Monolithe          | Microservices                 |
+| -------------- | ------------------ | ----------------------------- |
+| Déploiement    | Une seule app      | N services indépendants       |
+| Communication  | Fonctions internes | API REST/gRPC/messages        |
+| Données        | Une BDD            | Une BDD par service           |
+| Scaling        | Tout ensemble      | Service par service           |
+| Complexité     | Simple au début    | Réseau, observabilité, traces |
+| Quand utiliser | <10 développeurs   | Grandes équipes, gros trafic  |
 
 **Avantages microservices** :
+
 - Découplage : une équipe peut déployer son service sans bloquer les autres
 - Scaling fin : on scale uniquement le service surchargé
 - Tolérance aux pannes : un service down n'écroule pas tout
 
 **Inconvénients** :
+
 - Complexité opérationnelle (Kubernetes, monitoring, traces distribuées)
 - Latence réseau entre services
 - Gestion de la cohérence des données (transactions distribuées difficiles)
@@ -1120,6 +1245,7 @@ Refuser l'accès (HTTP 503 ou 500) plutôt que de "laisser passer par défaut". 
 **SaaS (Software as a Service)** : modèle où le logiciel est hébergé dans le cloud et accessible via un navigateur. Pas d'installation, paiement à l'usage. Exemples : Gmail, Salesforce, GitHub, Notion.
 
 **Modèles cloud** :
+
 - IaaS (Infrastructure) : AWS EC2, OVH VPS — vous gérez l'OS
 - PaaS (Platform) : Heroku, Render — vous gérez juste l'app
 - SaaS : vous utilisez un produit fini
@@ -1127,6 +1253,7 @@ Refuser l'accès (HTTP 503 ou 500) plutôt que de "laisser passer par défaut". 
 ### Application : TaskMaster monolithe → microservices
 
 TaskMaster est un **monolithe** : un seul backend qui fait tout. Si on devait passer en microservices :
+
 - Service Auth (gestion users, login, JWT)
 - Service Tasks (CRUD tâches)
 - Service Notifications (emails, push)
@@ -1153,6 +1280,7 @@ Oui, par nature : application accessible via navigateur, sans installation, héb
 ## CP7.1 — Modélisation MCD/MLD/MPD [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Je sais lire / dessiner un MCD (entités, associations, cardinalités)
 - [ ] Je traduis MCD → MLD (clés primaires/étrangères, tables associatives pour N:N)
 
@@ -1170,6 +1298,7 @@ Oui, par nature : application accessible via navigateur, sans installation, héb
 ```
 
 **MLD** :
+
 - `users(id PK, email UNIQUE, password_hash, created_at, updated_at)`
 - `tasks(id PK, user_id FK→users.id, title, done, created_at, updated_at)`
 
@@ -1178,6 +1307,7 @@ Oui, par nature : application accessible via navigateur, sans installation, héb
 ## CP7.2 — SQL DDL [MAÎTRISÉ — 75%]
 
 ### Vérification rapide
+
 - [ ] Je sais créer une table avec PK, FK, NOT NULL, UNIQUE, CHECK
 - [ ] Je sais créer un INDEX et je comprends quand c'est utile
 
@@ -1222,6 +1352,7 @@ Quand on supprime un utilisateur, toutes ses tâches sont automatiquement suppri
 **Principe du moindre privilège** : votre application ne doit JAMAIS se connecter à la BDD avec un compte admin (root/postgres). Créer un compte dédié avec uniquement les droits nécessaires.
 
 **GRANT / REVOKE** :
+
 ```sql
 -- Créer un utilisateur
 CREATE USER taskmaster_app WITH PASSWORD 'strong_password_here';
@@ -1235,6 +1366,7 @@ REVOKE ALL ON tasks FROM taskmaster_app;
 ```
 
 **Bonnes pratiques** :
+
 - Un compte par environnement (dev, test, prod)
 - Un compte par micro-service si applicable
 - Mots de passe complexes, stockés dans variables d'env
@@ -1243,6 +1375,7 @@ REVOKE ALL ON tasks FROM taskmaster_app;
 - Données sensibles chiffrées au repos (PostgreSQL : `pgcrypto`)
 
 **Politique de mots de passe** (pour les utilisateurs de l'app) :
+
 - Min 8 caractères, mix maj/min/chiffres/spéciaux
 - Vérifier contre liste de mots de passe connus (haveibeenpwned API)
 - Hachage bcrypt/argon2 (jamais en clair !)
@@ -1259,11 +1392,12 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO taskmaste
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO taskmaster_app;
 
 -- Pour les futures tables
-ALTER DEFAULT PRIVILEGES IN SCHEMA public 
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO taskmaster_app;
 ```
 
 `backend/.env` :
+
 ```
 DATABASE_URL=postgres://taskmaster_app:strong_pwd@localhost:5432/taskmaster
 ```
@@ -1289,16 +1423,19 @@ Ni l'un ni l'autre — vous ne devez PAS stocker de numéros de carte (complianc
 ### Rappel ciblé (10 min)
 
 **Stratégie 3-2-1** (recommandée) :
+
 - 3 copies des données
 - Sur 2 types de supports différents
 - Dont 1 hors-site (cloud, autre lieu)
 
 **Types de sauvegardes** :
+
 - **Full** : tout à chaque fois (lourd)
 - **Différentielle** : changements depuis le dernier full (moyen)
 - **Incrémentale** : changements depuis la dernière sauvegarde (léger, mais restauration plus lente)
 
 **PostgreSQL** :
+
 ```bash
 # Dump (export)
 pg_dump -U taskmaster_app -d taskmaster -F c -f backup_$(date +%Y%m%d).dump
@@ -1358,46 +1495,54 @@ const sql = `SELECT * FROM users WHERE email = '${req.body.email}'`;
 ```
 
 **Parade : requêtes paramétrées** :
+
 ```js
 // AVEC SEQUELIZE (paramétré automatiquement)
 User.findOne({ where: { email: req.body.email } });
 
 // AVEC SQL BRUT (utiliser des paramètres, JAMAIS de concaténation)
-sequelize.query('SELECT * FROM users WHERE email = :email', {
-  replacements: { email: req.body.email }
+sequelize.query("SELECT * FROM users WHERE email = :email", {
+  replacements: { email: req.body.email },
 });
 ```
 
 **Règles d'or** :
+
 1. JAMAIS de concaténation de chaînes pour construire du SQL
 2. Toujours utiliser un ORM ou des requêtes préparées
 3. Validation des entrées AVANT la requête (express-validator)
 4. Échapper les sorties (déjà couvert dans CP2.4)
 
 **Validation des entrées** :
-```js
-const { body, validationResult } = require('express-validator');
 
-router.post('/tasks',
-  body('title').isString().trim().isLength({ min: 1, max: 200 }),
-  body('done').optional().isBoolean(),
+```js
+const { body, validationResult } = require("express-validator");
+
+router.post(
+  "/tasks",
+  body("title").isString().trim().isLength({ min: 1, max: 200 }),
+  body("done").optional().isBoolean(),
   (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
     // ... créer la tâche
-  }
+  },
 );
 ```
 
 ### Code dans TaskMaster : `backend/src/controllers/TaskController.js`
 
 ```js
-const { body, validationResult } = require('express-validator');
-const Task = require('../models/Task');
+const { body, validationResult } = require("express-validator");
+const Task = require("../models/Task");
 
 exports.createValidators = [
-  body('title').isString().trim().isLength({ min: 1, max: 200 })
-    .withMessage('Titre requis (1-200 caractères)'),
+  body("title")
+    .isString()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("Titre requis (1-200 caractères)"),
 ];
 
 exports.create = async (req, res) => {
@@ -1416,21 +1561,21 @@ exports.create = async (req, res) => {
 
 exports.list = async (req, res) => {
   const tasks = await Task.findAll({
-    where: { userId: req.userId },  // RG1 : un user voit que ses tâches
-    order: [['createdAt', 'DESC']],
+    where: { userId: req.userId }, // RG1 : un user voit que ses tâches
+    order: [["createdAt", "DESC"]],
   });
   res.json(tasks);
 };
 
 exports.update = async (req, res) => {
   const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.status(400).json({ error: 'ID invalide' });
-  
+  if (isNaN(id)) return res.status(400).json({ error: "ID invalide" });
+
   const task = await Task.findOne({
-    where: { id, userId: req.userId },  // protection IDOR
+    where: { id, userId: req.userId }, // protection IDOR
   });
-  if (!task) return res.status(404).json({ error: 'Tâche introuvable' });
-  
+  if (!task) return res.status(404).json({ error: "Tâche introuvable" });
+
   if (req.body.title !== undefined) task.title = req.body.title;
   if (req.body.done !== undefined) task.done = req.body.done;
   await task.save();
@@ -1442,7 +1587,8 @@ exports.remove = async (req, res) => {
   const deleted = await Task.destroy({
     where: { id, userId: req.userId },
   });
-  if (deleted === 0) return res.status(404).json({ error: 'Tâche introuvable' });
+  if (deleted === 0)
+    return res.status(404).json({ error: "Tâche introuvable" });
   res.status(204).send();
 };
 ```
@@ -1450,7 +1596,7 @@ exports.remove = async (req, res) => {
 ### Mini-exercice (30 min)
 
 1. Implémentez le CRUD complet sur une mini-app avec une route `/items`
-2. Testez avec Postman : 
+2. Testez avec Postman :
    - POST sans token → 401
    - POST avec titre vide → 400
    - GET avec token user A puis tentative de modif d'une tâche de user B → 404 (pas 403)
@@ -1480,11 +1626,13 @@ Insecure Direct Object Reference. Un attaquant accède à des ressources qui ne 
 **Trigger** : code SQL exécuté automatiquement avant/après un événement (INSERT, UPDATE, DELETE).
 
 **Quand les utiliser** :
+
 - Logique très liée aux données (validation complexe, audit)
 - Performance critique (éviter les allers-retours réseau)
 - Garantie d'exécution (un trigger ne peut pas être contourné par l'app)
 
 **Quand éviter** :
+
 - Logique métier complexe (préférer le code applicatif, plus testable)
 - Portabilité (chaque SGBD a sa syntaxe)
 
@@ -1540,64 +1688,68 @@ BEFORE INSERT s'exécute avant l'insertion : on peut modifier les valeurs (NEW.t
 **Transaction** : groupe d'opérations qui doivent toutes réussir ou toutes échouer. Garantit la cohérence des données.
 
 **Propriétés ACID** :
+
 - **A**tomicité : tout ou rien
 - **C**ohérence : la BDD reste valide (contraintes respectées)
 - **I**solation : une transaction ne voit pas les changements d'une autre en cours
 - **D**urabilité : une fois validée, c'est gravé (résistant à un crash)
 
 **Niveaux d'isolation** (du plus permissif au plus strict) :
+
 - READ UNCOMMITTED : peut lire des données non commitées (rare)
 - READ COMMITTED : ne lit que les données commitées (défaut PostgreSQL)
 - REPEATABLE READ : la même requête donne le même résultat dans la transaction
 - SERIALIZABLE : transactions complètement isolées (lent)
 
 **Anomalies de concurrence** :
+
 - **Lost update** : 2 transactions écrivent en même temps, une écrase l'autre
 - **Dirty read** : on lit des données non commitées
 - **Phantom read** : nouvelle ligne apparaît au milieu d'une transaction
 
 **Solutions** :
+
 - **Verrous pessimistes** (`SELECT ... FOR UPDATE`) : on bloque la ligne pour les autres
 - **Verrous optimistes** (versioning) : on vérifie que la ligne n'a pas changé avant d'écrire
 
 ### Code dans TaskMaster : transfert de tâche entre 2 listes
 
 ```js
-const { sequelize } = require('../models');
+const { sequelize } = require("../models");
 
 exports.transferTask = async (req, res) => {
   const t = await sequelize.transaction();
   try {
     const task = await Task.findByPk(req.params.id, {
-      lock: t.LOCK.UPDATE,  // verrou pessimiste
+      lock: t.LOCK.UPDATE, // verrou pessimiste
       transaction: t,
     });
     if (!task) {
       await t.rollback();
-      return res.status(404).json({ error: 'Tâche introuvable' });
+      return res.status(404).json({ error: "Tâche introuvable" });
     }
-    
+
     // Décrémenter compteur de l'ancienne liste
-    await List.decrement('taskCount', {
+    await List.decrement("taskCount", {
       where: { id: task.listId },
       transaction: t,
     });
-    
+
     // Incrémenter compteur de la nouvelle liste
-    await List.increment('taskCount', {
+    await List.increment("taskCount", {
       where: { id: req.body.targetListId },
       transaction: t,
     });
-    
+
     // Déplacer la tâche
     task.listId = req.body.targetListId;
     await task.save({ transaction: t });
-    
-    await t.commit();  // tout valider
+
+    await t.commit(); // tout valider
     res.json(task);
   } catch (err) {
-    await t.rollback();  // tout annuler
-    res.status(500).json({ error: 'Échec du transfert' });
+    await t.rollback(); // tout annuler
+    res.status(500).json({ error: "Échec du transfert" });
   }
 };
 ```
@@ -1631,21 +1783,23 @@ Toutes les lignes verrouillées restent inaccessibles aux autres requêtes → l
 
 **SQL vs NoSQL** :
 
-| Critère | SQL (relationnel) | NoSQL (MongoDB par ex) |
-|---------|-------------------|------------------------|
-| Schéma | Strict, fixe | Flexible, par document |
-| Relations | Jointures | Embedding ou références |
-| Scaling | Vertical (gros serveur) | Horizontal (clusters) |
+| Critère     | SQL (relationnel)                 | NoSQL (MongoDB par ex)                    |
+| ----------- | --------------------------------- | ----------------------------------------- |
+| Schéma      | Strict, fixe                      | Flexible, par document                    |
+| Relations   | Jointures                         | Embedding ou références                   |
+| Scaling     | Vertical (gros serveur)           | Horizontal (clusters)                     |
 | Cas d'usage | Données structurées, transactions | Volumes énormes, données semi-structurées |
-| Cohérence | Forte (ACID) | Souvent éventuelle (BASE) |
+| Cohérence   | Forte (ACID)                      | Souvent éventuelle (BASE)                 |
 
 **Types de bases NoSQL** :
+
 - **Documents** (MongoDB, CouchDB) : JSON-like
 - **Clé-valeur** (Redis, DynamoDB) : ultra-rapide, cache
 - **Colonnes** (Cassandra) : volumes massifs
 - **Graphes** (Neo4j) : réseaux sociaux, recommandations
 
 **Quand choisir NoSQL** :
+
 - Données peu structurées ou évolutives
 - Très gros volumes en lecture
 - Besoin de scaling horizontal
@@ -1656,13 +1810,13 @@ Toutes les lignes verrouillées restent inaccessibles aux autres requêtes → l
 ### Code dans TaskMaster : `backend/src/config/redis.js`
 
 ```js
-const { createClient } = require('redis');
+const { createClient } = require("redis");
 
 const client = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  url: process.env.REDIS_URL || "redis://localhost:6379",
 });
 
-client.on('error', (err) => console.error('Redis error', err));
+client.on("error", (err) => console.error("Redis error", err));
 client.connect();
 
 module.exports = client;
@@ -1670,21 +1824,21 @@ module.exports = client;
 
 ```js
 // utilisation : cache des résultats fréquents
-const redis = require('../config/redis');
+const redis = require("../config/redis");
 
 exports.list = async (req, res) => {
   const cacheKey = `tasks:user:${req.userId}`;
-  
+
   // 1. Tenter le cache
   const cached = await redis.get(cacheKey);
   if (cached) return res.json(JSON.parse(cached));
-  
+
   // 2. Sinon BDD
   const tasks = await Task.findAll({ where: { userId: req.userId } });
-  
+
   // 3. Mettre en cache 60s
   await redis.set(cacheKey, JSON.stringify(tasks), { EX: 60 });
-  
+
   res.json(tasks);
 };
 ```
@@ -1717,6 +1871,7 @@ SQL relationnel. Les transactions ACID garantissent qu'on ne réserve pas la mê
 ## CP9.1 — Plan de tests [MAÎTRISÉ — 100%]
 
 ### Vérification rapide
+
 - [ ] Je structure mon plan : cas nominaux / limites / erreur
 - [ ] Je documente les résultats attendus
 
@@ -1726,19 +1881,23 @@ SQL relationnel. Les transactions ACID garantissent qu'on ne réserve pas la mê
 ## Plan de tests TaskMaster
 
 ### TC-01 : Création de tâche (cas nominal)
+
 - Précondition : utilisateur connecté avec token valide
 - Action : POST /api/tasks { title: "Faire les courses" }
 - Résultat attendu : 201 Created, tâche créée en BDD avec done=false
 
 ### TC-02 : Création avec titre vide (cas erreur)
+
 - Action : POST /api/tasks { title: "" }
 - Résultat attendu : 400 Bad Request, message "Titre requis"
 
 ### TC-03 : Création avec titre 200 caractères (cas limite)
+
 - Action : POST /api/tasks { title: "a".repeat(200) }
 - Résultat attendu : 201 Created
 
 ### TC-04 : Création avec titre 201 caractères (cas erreur limite)
+
 - Action : POST /api/tasks { title: "a".repeat(201) }
 - Résultat attendu : 400 Bad Request
 ```
@@ -1750,6 +1909,7 @@ SQL relationnel. Les transactions ACID garantissent qu'on ne réserve pas la mê
 ### Cours (30 min)
 
 Différence cruciale :
+
 - **Unitaire** : isole une unité (fonction, classe). Mock des dépendances externes (BDD, API).
 - **Intégration** : combine plusieurs unités (route HTTP + service + BDD réelle).
 
@@ -1758,11 +1918,11 @@ Différence cruciale :
 ### Code dans TaskMaster : `backend/src/tests/integration/tasks.test.js`
 
 ```js
-const request = require('supertest');
-const app = require('../../app');
-const { sequelize, User, Task } = require('../../models');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const request = require("supertest");
+const app = require("../../app");
+const { sequelize, User, Task } = require("../../models");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 let token;
 let userId;
@@ -1771,8 +1931,8 @@ beforeAll(async () => {
   // BDD de test (config différente)
   await sequelize.sync({ force: true });
   const user = await User.create({
-    email: 'test@example.com',
-    passwordHash: await bcrypt.hash('Test123!', 10),
+    email: "test@example.com",
+    passwordHash: await bcrypt.hash("Test123!", 10),
   });
   userId = user.id;
   token = jwt.sign({ userId }, process.env.JWT_SECRET);
@@ -1782,52 +1942,50 @@ afterAll(async () => {
   await sequelize.close();
 });
 
-describe('POST /api/tasks', () => {
-  test('crée une tâche valide', async () => {
+describe("POST /api/tasks", () => {
+  test("crée une tâche valide", async () => {
     const res = await request(app)
-      .post('/api/tasks')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ title: 'Test task' });
-    
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ title: "Test task" });
+
     expect(res.status).toBe(201);
-    expect(res.body.title).toBe('Test task');
+    expect(res.body.title).toBe("Test task");
     expect(res.body.userId).toBe(userId);
-    
+
     const task = await Task.findByPk(res.body.id);
     expect(task).not.toBeNull();
   });
 
-  test('rejette sans authentification', async () => {
-    const res = await request(app)
-      .post('/api/tasks')
-      .send({ title: 'Test' });
+  test("rejette sans authentification", async () => {
+    const res = await request(app).post("/api/tasks").send({ title: "Test" });
     expect(res.status).toBe(401);
   });
 
-  test('rejette un titre vide', async () => {
+  test("rejette un titre vide", async () => {
     const res = await request(app)
-      .post('/api/tasks')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ title: '' });
+      .post("/api/tasks")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ title: "" });
     expect(res.status).toBe(400);
   });
 });
 
-describe('GET /api/tasks', () => {
-  test('retourne uniquement les tâches du user authentifié', async () => {
+describe("GET /api/tasks", () => {
+  test("retourne uniquement les tâches du user authentifié", async () => {
     // Créer une tâche pour un autre user
     const otherUser = await User.create({
-      email: 'other@example.com',
-      passwordHash: 'x',
+      email: "other@example.com",
+      passwordHash: "x",
     });
-    await Task.create({ userId: otherUser.id, title: 'Pas la mienne' });
-    
+    await Task.create({ userId: otherUser.id, title: "Pas la mienne" });
+
     const res = await request(app)
-      .get('/api/tasks')
-      .set('Authorization', `Bearer ${token}`);
-    
+      .get("/api/tasks")
+      .set("Authorization", `Bearer ${token}`);
+
     expect(res.status).toBe(200);
-    expect(res.body.every(t => t.userId === userId)).toBe(true);
+    expect(res.body.every((t) => t.userId === userId)).toBe(true);
   });
 });
 ```
@@ -1862,16 +2020,19 @@ Pour partir d'une BDD vide à chaque exécution des tests. force: true drop puis
 **Tests de charge** : simuler beaucoup d'utilisateurs simultanés pour mesurer la performance et trouver le point de rupture.
 
 **Outils** :
+
 - **k6** (recommandé) : moderne, scripts JS, gratuit (open source)
 - **JMeter** : référence historique, GUI lourde, en Java
 - **Locust** : Python, scriptable
 
 **Métriques importantes** :
+
 - **Throughput** : requêtes/seconde
 - **Latence p50, p95, p99** : 50%/95%/99% des requêtes répondent en moins de X ms
 - **Error rate** : % de requêtes en erreur
 
 **Tests de sécurité** :
+
 - **SAST** (Static Application Security Testing) : analyse du code source. Outils : SonarQube, Snyk Code, ESLint security plugin.
 - **DAST** (Dynamic Application Security Testing) : test de l'app en cours d'exécution. Outils : OWASP ZAP, Burp Suite.
 - **Dependency scanning** : `npm audit`, Snyk, Dependabot.
@@ -1880,29 +2041,30 @@ Pour partir d'une BDD vide à chaque exécution des tests. force: true drop puis
 ### Code dans TaskMaster : `tests/load/login.js` (k6)
 
 ```js
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },   // monte à 20 users
-    { duration: '1m', target: 20 },    // tient 1 minute
-    { duration: '30s', target: 0 },    // descend
+    { duration: "30s", target: 20 }, // monte à 20 users
+    { duration: "1m", target: 20 }, // tient 1 minute
+    { duration: "30s", target: 0 }, // descend
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'],  // 95% < 500ms
-    http_req_failed: ['rate<0.01'],    // < 1% d'échecs
+    http_req_duration: ["p(95)<500"], // 95% < 500ms
+    http_req_failed: ["rate<0.01"], // < 1% d'échecs
   },
 };
 
 export default function () {
-  const res = http.post('http://localhost:3000/auth/login',
-    JSON.stringify({ email: 'test@example.com', password: 'Test123!' }),
-    { headers: { 'Content-Type': 'application/json' } }
+  const res = http.post(
+    "http://localhost:3000/auth/login",
+    JSON.stringify({ email: "test@example.com", password: "Test123!" }),
+    { headers: { "Content-Type": "application/json" } },
   );
   check(res, {
-    'status 200': (r) => r.status === 200,
-    'has token': (r) => r.json('token') !== undefined,
+    "status 200": (r) => r.status === 200,
+    "has token": (r) => r.json("token") !== undefined,
   });
   sleep(1);
 }
@@ -1939,15 +2101,18 @@ p50 = médiane = 50% des requêtes répondent en moins de cette valeur. p99 = 99
 ### Cours (15 min)
 
 **Tests E2E (End-to-End)** : pilotent un vrai navigateur pour tester comme un utilisateur. Outils :
+
 - **Cypress** (recommandé pour débuter) : moderne, gratuit, excellente DX
 - **Playwright** : multi-browser, performant
 - **Selenium** : référence historique, plus verbeux
 
 **Différence avec les tests d'intégration** :
+
 - Intégration : on teste l'API HTTP avec Supertest (pas de navigateur)
 - E2E : on teste l'UI complète avec un vrai navigateur
 
 **Bonnes pratiques** :
+
 - Tests E2E uniquement sur les parcours critiques (login, achat, création)
 - Données de test isolées (chaque test crée et nettoie ses données)
 - Lancement dans la CI sur chaque PR
@@ -1955,32 +2120,32 @@ p50 = médiane = 50% des requêtes répondent en moins de cette valeur. p99 = 99
 ### Code dans TaskMaster : `cypress/e2e/login.cy.js`
 
 ```js
-describe('Login flow', () => {
+describe("Login flow", () => {
   beforeEach(() => {
-    cy.visit('/login.html');
+    cy.visit("/login.html");
   });
 
-  it('connecte un utilisateur valide', () => {
-    cy.get('#email').type('test@example.com');
-    cy.get('#password').type('Test123!');
+  it("connecte un utilisateur valide", () => {
+    cy.get("#email").type("test@example.com");
+    cy.get("#password").type("Test123!");
     cy.get('button[type="submit"]').click();
-    
-    cy.url().should('include', '/index.html');
-    cy.get('#task-list').should('be.visible');
+
+    cy.url().should("include", "/index.html");
+    cy.get("#task-list").should("be.visible");
   });
 
-  it('affiche une erreur sur identifiants invalides', () => {
-    cy.get('#email').type('wrong@example.com');
-    cy.get('#password').type('wrong');
+  it("affiche une erreur sur identifiants invalides", () => {
+    cy.get("#email").type("wrong@example.com");
+    cy.get("#password").type("wrong");
     cy.get('button[type="submit"]').click();
-    
-    cy.get('#error-zone').should('contain', 'Identifiants invalides');
+
+    cy.get("#error-zone").should("contain", "Identifiants invalides");
   });
 
-  it('est accessible au clavier', () => {
-    cy.get('#email').focus().type('test@example.com');
-    cy.realPress('Tab');
-    cy.focused().should('have.id', 'password');
+  it("est accessible au clavier", () => {
+    cy.get("#email").focus().type("test@example.com");
+    cy.realPress("Tab");
+    cy.focused().should("have.id", "password");
   });
 });
 ```
@@ -2007,12 +2172,12 @@ Non, anti-pattern. Les délais fixes rendent les tests lents (toujours 5s même 
 
 **Les 4 environnements classiques** :
 
-| Env | Rôle | Données | Accès |
-|-----|------|---------|-------|
-| DEV | Développement local | Bidons, libres | Dev seulement |
-| SIT (Test) | Tests d'intégration auto | Anonymisées ou bidons | Dev + QA |
-| UAT (Recette) | Validation utilisateur final | Copie anonymisée prod | Client + QA |
-| PROD | Utilisateurs finaux | Réelles | Public, restreint admin |
+| Env           | Rôle                         | Données               | Accès                   |
+| ------------- | ---------------------------- | --------------------- | ----------------------- |
+| DEV           | Développement local          | Bidons, libres        | Dev seulement           |
+| SIT (Test)    | Tests d'intégration auto     | Anonymisées ou bidons | Dev + QA                |
+| UAT (Recette) | Validation utilisateur final | Copie anonymisée prod | Client + QA             |
+| PROD          | Utilisateurs finaux          | Réelles               | Public, restreint admin |
 
 **Variables d'environnement** : ce qui change entre environnements (URL BDD, secrets, niveau de log) doit être dans des variables, pas dans le code.
 
@@ -2023,6 +2188,7 @@ backend/.env.production      → prod (jamais commité, géré par hébergeur)
 ```
 
 **Hébergeurs débutants-friendly** :
+
 - **Render** (gratuit pour démarrer) : 1 clic, supporte Node, Postgres, Docker
 - **Railway** : similaire, gratuit
 - **Heroku** : référence historique
@@ -2033,12 +2199,15 @@ backend/.env.production      → prod (jamais commité, géré par hébergeur)
 
 ```js
 // backend/src/config/database.js
-const { Sequelize } = require('sequelize');
+const { Sequelize } = require("sequelize");
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 const configs = {
-  development: { url: 'postgres://localhost/taskmaster_dev', logging: console.log },
-  test: { url: 'postgres://localhost/taskmaster_test', logging: false },
+  development: {
+    url: "postgres://localhost/taskmaster_dev",
+    logging: console.log,
+  },
+  test: { url: "postgres://localhost/taskmaster_test", logging: false },
   production: { url: process.env.DATABASE_URL, logging: false, ssl: true },
 };
 
@@ -2084,6 +2253,7 @@ Un **script de déploiement** = automatisation de ces étapes.
 **Idéal** : tout est scripté, on ne fait que `./deploy.sh`. Procédure écrite = secours en cas de défaillance du script.
 
 **Structure type d'un déploiement** :
+
 1. Build (compiler/transpiler si besoin)
 2. Tests
 3. Push de l'image Docker vers un registry
@@ -2099,6 +2269,7 @@ Un **script de déploiement** = automatisation de ces étapes.
 ## Procédure de déploiement TaskMaster en production
 
 ### Prérequis
+
 - Accès SSH au serveur de production
 - Variables d'env configurées sur Render
 - Tests verts sur main
@@ -2106,32 +2277,40 @@ Un **script de déploiement** = automatisation de ces étapes.
 ### Étapes
 
 1. Vérifier que la branche main est à jour
-   ```
-   git checkout main && git pull
-   ```
+```
+
+git checkout main && git pull
+
+```
 
 2. Lancer les tests localement
-   ```
-   cd backend && npm test
-   ```
+```
+
+cd backend && npm test
+
+```
 
 3. Tagger la version
-   ```
-   git tag v1.2.0
-   git push origin v1.2.0
-   ```
+```
+
+git tag v1.2.0
+git push origin v1.2.0
+
+```
 
 4. Le pipeline GitHub Actions se déclenche automatiquement
-   - Build de l'image Docker
-   - Tests d'intégration
-   - Migration de la BDD via Render
-   - Déploiement
+- Build de l'image Docker
+- Tests d'intégration
+- Migration de la BDD via Render
+- Déploiement
 
 5. Vérifier le déploiement
-   ```
-   curl https://taskmaster.onrender.com/health
-   ```
-   Attendu : `{"status":"ok","version":"1.2.0"}`
+```
+
+curl https://taskmaster.onrender.com/health
+
+```
+Attendu : `{"status":"ok","version":"1.2.0"}`
 
 6. En cas d'échec : rollback via dashboard Render → "Rollback to previous"
 ```
@@ -2190,6 +2369,7 @@ Sans set -e, si une commande échoue, le script continue. Avec set -e, le script
 **Outils** : Sequelize-CLI, Knex, Flyway, Liquibase.
 
 **Règles** :
+
 - Une migration = un fichier daté
 - Toujours fournir un `up` (apply) ET un `down` (rollback)
 - Une migration ne se modifie jamais une fois appliquée en prod (on en crée une nouvelle)
@@ -2198,28 +2378,29 @@ Sans set -e, si une commande échoue, le script continue. Avec set -e, le script
 ### Code dans TaskMaster : `backend/migrations/20240120-add-priority-to-tasks.js`
 
 ```js
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('tasks', 'priority', {
-      type: Sequelize.ENUM('low', 'medium', 'high'),
-      defaultValue: 'medium',
+    await queryInterface.addColumn("tasks", "priority", {
+      type: Sequelize.ENUM("low", "medium", "high"),
+      defaultValue: "medium",
       allowNull: false,
     });
-    await queryInterface.addIndex('tasks', ['user_id', 'priority'], {
-      name: 'idx_tasks_user_priority',
+    await queryInterface.addIndex("tasks", ["user_id", "priority"], {
+      name: "idx_tasks_user_priority",
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeIndex('tasks', 'idx_tasks_user_priority');
-    await queryInterface.removeColumn('tasks', 'priority');
+    await queryInterface.removeIndex("tasks", "idx_tasks_user_priority");
+    await queryInterface.removeColumn("tasks", "priority");
   },
 };
 ```
 
 Commandes Sequelize CLI :
+
 ```bash
 # Créer une migration
 npx sequelize-cli migration:generate --name add-priority-to-tasks
@@ -2254,15 +2435,18 @@ Pour les rollbacks d'urgence. Si une migration provoque des bugs en prod, on doi
 **CI (Continuous Integration)** : à chaque push, automatiquement compiler, tester, vérifier la qualité. Détecte tôt les bugs.
 
 **CD (Continuous Delivery/Deployment)** :
+
 - Delivery : déploiement prêt en 1 clic (validation manuelle)
 - Deployment : déploiement automatique en prod si tests verts
 
 **Pipeline classique** :
+
 ```
 Push → Lint → Test unitaires → Build → Test intégration → Push image → Deploy staging → Tests E2E → Deploy prod
 ```
 
 **Outils** :
+
 - **GitHub Actions** : intégré GitHub, gratuit (limites généreuses)
 - **GitLab CI** : intégré GitLab, .gitlab-ci.yml
 - **Jenkins** : open source, très flexible, complexe
@@ -2284,50 +2468,50 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:16
         env:
           POSTGRES_PASSWORD: test
           POSTGRES_DB: taskmaster_test
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: backend/package-lock.json
-      
+
       - name: Install dependencies
         working-directory: backend
         run: npm ci
-      
+
       - name: Lint
         working-directory: backend
         run: npm run lint
-      
+
       - name: Run tests
         working-directory: backend
         env:
           DATABASE_URL: postgres://postgres:test@localhost:5432/taskmaster_test
           JWT_SECRET: test_secret_for_ci
         run: npm test -- --coverage
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           files: backend/coverage/lcov.info
-  
+
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main'
@@ -2370,6 +2554,7 @@ Pour ne déployer qu'à partir de la branche main, jamais depuis une PR ou une f
 **Kubernetes (k8s)** : orchestrateur pour des dizaines/milliers de conteneurs en production. Concepts : Pods, Deployments, Services, Ingress. Beaucoup plus complexe — pas nécessaire pour le CDA mais bon de savoir que ça existe.
 
 **Concepts Docker Compose** :
+
 - **Service** : un conteneur (ou un groupe de réplicas)
 - **Volume** : stockage persistant
 - **Network** : réseau virtuel partagé entre services
@@ -2378,7 +2563,7 @@ Pour ne déployer qu'à partir de la branche main, jamais depuis une PR ou une f
 ### Code dans TaskMaster : `docker-compose.yml`
 
 ```yaml
-version: '3.9'
+version: "3.9"
 
 services:
   backend:
@@ -2441,6 +2626,7 @@ networks:
 ```
 
 Commandes :
+
 ```bash
 docker compose up -d           # lance tout en arrière-plan
 docker compose logs -f backend # voir les logs du backend
@@ -2468,6 +2654,7 @@ Dans le réseau Docker, chaque service a un DNS basé sur son nom dans docker-co
 
 <parameter name="path">/home/claude/cours_part2.md<details><summary>Réponse</summary>
 Le backend démarre avant que PostgreSQL soit prêt à accepter les connexions, plante au démarrage. Avec `service_healthy`, Docker attend que le healthcheck pg_isready réussisse. Alternative : retry de connexion côté code (plus robuste car gère aussi les pertes de connexion en cours d'exécution).
+
 </details>
 
 ---
@@ -2477,16 +2664,19 @@ Le backend démarre avant que PostgreSQL soit prêt à accepter les connexions, 
 ### Rappel ciblé (15 min)
 
 **Linters** : analysent le code pour trouver erreurs et mauvaises pratiques sans l'exécuter.
+
 - **ESLint** (JS/TS) : standard
 - **Pylint / flake8** (Python)
 - **PHPStan** (PHP)
 - **SonarQube** : multi-langage, analyse de qualité globale
 
 **Formatters** : standardisent le style automatiquement.
+
 - **Prettier** (JS/TS/CSS/HTML/JSON) : populaire
 - **Black** (Python)
 
 **Métriques de qualité** :
+
 - **Coverage** : % de code couvert par les tests
 - **Complexité cyclomatique** : nombre de branches dans une fonction (idéal <10)
 - **Duplication** : copier-coller à éviter
@@ -2512,6 +2702,7 @@ Le backend démarre avant que PostgreSQL soit prêt à accepter les connexions, 
 ```
 
 `backend/.prettierrc.json` :
+
 ```json
 {
   "semi": true,
@@ -2523,6 +2714,7 @@ Le backend démarre avant que PostgreSQL soit prêt à accepter les connexions, 
 ```
 
 Hook pre-commit avec **husky + lint-staged** :
+
 ```bash
 npm install --save-dev husky lint-staged
 npx husky init
@@ -2530,6 +2722,7 @@ echo "npx lint-staged" > .husky/pre-commit
 ```
 
 `package.json` :
+
 ```json
 "lint-staged": {
   "*.js": ["eslint --fix", "prettier --write"]
@@ -2551,6 +2744,7 @@ echo "npx lint-staged" > .husky/pre-commit
 ## Communiquer en français et en anglais
 
 ### Vérification rapide
+
 - [ ] Niveau B1 anglais en lecture/écriture (lire la doc Stack Overflow, écrire un commit message en anglais)
 - [ ] Niveau A2 anglais oral (présenter en 3 min un projet basique)
 
@@ -2559,6 +2753,7 @@ echo "npx lint-staged" > .husky/pre-commit
 ## Mettre en oeuvre une démarche de résolution de problème
 
 ### Méthode universelle
+
 1. **Reproduire** le bug de manière fiable
 2. **Isoler** : minimiser le cas qui le provoque
 3. **Hypothèses** : lister les causes possibles
@@ -2569,6 +2764,7 @@ echo "npx lint-staged" > .husky/pre-commit
 ## Apprendre en continu
 
 ### Sources recommandées
+
 - **Docs officielles** (toujours en premier !)
 - **Stack Overflow** (avec esprit critique)
 - **MDN Web Docs** pour le web
@@ -2585,12 +2781,14 @@ Compte tenu de votre profil, voici le séquencement optimal :
 ## Jour 1 — Sécurité, tests, déploiement (lacunes critiques)
 
 **Matin (4h)**
+
 - 1h : CP3.2 Sécurité serveur (auth, hash, JWT) — le plus structurant pour le DP
 - 1h : CP6.3 Sécurité architecturale (DICP, ANSSI, headers)
 - 1h : CP8.1 CRUD sécurisé (injections, IDOR, validation)
 - 1h : CP2.4 Sécurité front (XSS, CSRF, RGPD) + CP7.3 Sécurité BDD
 
 **Après-midi (4h)**
+
 - 1.5h : CP3.3 + CP9.2 Tests unitaires & intégration (Jest + Supertest)
 - 1h : CP9.3 Tests sécurité et charge (k6, npm audit) + CP9.4 E2E (Cypress)
 - 0.5h : CP2.5 Accessibilité RGAA (Lighthouse audit)
@@ -2601,18 +2799,21 @@ Compte tenu de votre profil, voici le séquencement optimal :
 ## Jour 2 — DevOps, déploiement, finalisation
 
 **Matin (4h)**
+
 - 1h : CP1.3 Docker (Dockerfile, build, run) + CP11.2 Docker Compose
 - 1h : CP11.1 CI/CD (GitHub Actions YAML) + CP11.3 Qualité code (ESLint, Prettier)
 - 1h : CP10.1 Environnements + CP10.2 Procédures et scripts
 - 1h : CP10.3 Migrations BDD + CP6.4 Microservices/SaaS
 
 **Après-midi (4h)** : RÉDACTION INTENSIVE
+
 - Fiches AT1 : CP1, CP2, CP3, CP4
 - Fiches AT2 : CP5, CP6, CP7, CP8
 - Fiches AT3 : CP9, CP10, CP11
 - Pour chaque CP, mentionner systématiquement : outils, méthodes, sécurité, tests, documentation
 
 **Soir (1-2h)**
+
 - Relecture complète, vérification cohérence
 - Tableau des titres/diplômes
 - Déclaration sur l'honneur
@@ -2637,17 +2838,17 @@ Compte tenu de votre profil, voici le séquencement optimal :
 
 ## Vocabulaire à maîtriser pour l'oral
 
-| Terme | Signification courte |
-|-------|---------------------|
-| Idempotent | Une opération qui donne le même résultat même si appelée plusieurs fois |
-| Stateless | Le serveur ne stocke rien sur la session — tout est dans la requête (JWT) |
-| Healthcheck | Endpoint qui répond OK si l'app est en bonne santé (pour load balancer) |
-| Race condition | Bug dû à 2 processus accédant en même temps à la même ressource |
-| Memoization | Mise en cache d'une fonction pure pour éviter de la recalculer |
-| Eager / Lazy loading | Charger immédiatement vs à la demande |
-| N+1 problem | Faire 1 requête principale + N requêtes pour les relations (anti-pattern) |
-| Refactoring | Améliorer le code sans changer son comportement externe |
-| Tech debt | Compromis temporaires qu'il faudra rembourser plus tard |
+| Terme                | Signification courte                                                      |
+| -------------------- | ------------------------------------------------------------------------- |
+| Idempotent           | Une opération qui donne le même résultat même si appelée plusieurs fois   |
+| Stateless            | Le serveur ne stocke rien sur la session — tout est dans la requête (JWT) |
+| Healthcheck          | Endpoint qui répond OK si l'app est en bonne santé (pour load balancer)   |
+| Race condition       | Bug dû à 2 processus accédant en même temps à la même ressource           |
+| Memoization          | Mise en cache d'une fonction pure pour éviter de la recalculer            |
+| Eager / Lazy loading | Charger immédiatement vs à la demande                                     |
+| N+1 problem          | Faire 1 requête principale + N requêtes pour les relations (anti-pattern) |
+| Refactoring          | Améliorer le code sans changer son comportement externe                   |
+| Tech debt            | Compromis temporaires qu'il faudra rembourser plus tard                   |
 
 ## Check-list finale du DP
 

@@ -1,26 +1,31 @@
 const { body, param, validationResult } = require('express-validator');
-const Task = require('../models/Task');
+const taskService = require('../services/TaskService');
 
 exports.createValidators = [
   body('title').isString().trim()
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Titre requis (1 à 200 caractères)'),
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Titre requis (1 à 255 caractères)'),
+  body('description').optional().isString().trim(),
   body('priority').optional().isIn(['low', 'medium', 'high']),
+  body('dueDate').optional({ nullable: true }).isISO8601().withMessage('Date invalide'),
 ];
 
 exports.updateValidators = [
   param('id').isInt({ min: 1 }),
-  body('title').optional().isString().trim().isLength({ min: 1, max: 200 }),
-  body('done').optional().isBoolean(),
+  body('title').optional().isString().trim().isLength({ min: 1, max: 255 }),
+  body('status').optional().isIn(['todo', 'in_progress', 'done', 'archived']),
   body('priority').optional().isIn(['low', 'medium', 'high']),
+  body('description').optional().isString().trim(),
+  body('dueDate').optional({ nullable: true }).isISO8601(),
+  body('versionId').optional({ nullable: true }).isInt({ min: 1 }),
 ];
 
 exports.list = async (req, res) => {
-  const tasks = await Task.findAll({
-    where: { userId: req.userId },
-    order: [['createdAt', 'DESC']],
+  const { status, priority, versionId, projectId, page = 1, limit = 20 } = req.query;
+  const result = await taskService.getTasksByUser(req.userId, {
+    status, priority, versionId, projectId, page: parseInt(page), limit: parseInt(limit),
   });
-  return res.json(tasks);
+  return res.json(result);
 };
 
 exports.create = async (req, res) => {
@@ -28,12 +33,7 @@ exports.create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const task = await Task.create({
-    userId: req.userId,
-    title: req.body.title,
-    priority: req.body.priority || 'medium',
-    done: false,
-  });
+  const task = await taskService.createTask(req.body, req.userId);
   return res.status(201).json(task);
 };
 
@@ -42,25 +42,11 @@ exports.update = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const task = await Task.findOne({
-    where: { id: req.params.id, userId: req.userId },
-  });
-  if (!task) {
-    return res.status(404).json({ error: 'Tâche introuvable' });
-  }
-  if (req.body.title !== undefined) task.title = req.body.title;
-  if (req.body.done !== undefined) task.done = req.body.done;
-  if (req.body.priority !== undefined) task.priority = req.body.priority;
-  await task.save();
+  const task = await taskService.updateTask(req.params.id, req.userId, req.body);
   return res.json(task);
 };
 
 exports.remove = async (req, res) => {
-  const deleted = await Task.destroy({
-    where: { id: req.params.id, userId: req.userId },
-  });
-  if (deleted === 0) {
-    return res.status(404).json({ error: 'Tâche introuvable' });
-  }
+  await taskService.deleteTask(req.params.id, req.userId);
   return res.status(204).send();
 };

@@ -16,6 +16,15 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS versions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -25,7 +34,10 @@ CREATE TABLE IF NOT EXISTS tasks (
     priority VARCHAR(10) NOT NULL DEFAULT 'medium'
         CHECK (priority IN ('low', 'medium', 'high')),
     due_date DATE,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,    -- Clé étrangère avec CASCADE
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    version_id INTEGER REFERENCES versions(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -56,7 +68,7 @@ $$;
 -- PAS de CREATE TABLE, DROP, ALTER (principe du moindre privilège)
 GRANT CONNECT ON DATABASE taskmaster TO taskmaster_app;
 GRANT USAGE ON SCHEMA public TO taskmaster_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON users, tasks TO taskmaster_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON users, tasks, versions TO taskmaster_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO taskmaster_app;
 
 -- Interdire la suppression de tables
@@ -153,13 +165,42 @@ $$;
 -- =============================================
 -- 6. JEU D'ESSAI (CP 7.1 — données de test)
 -- =============================================
--- Mot de passe haché pour "Test1234!" avec bcrypt
--- En vrai, on ne met JAMAIS de mots de passe dans un script SQL
--- Ceci est uniquement pour l'environnement de développement
+-- Données de démonstration pour l'environnement de développement UNIQUEMENT
+-- Mot de passe du compte demo : Test1234!  (hash bcrypt 12 rounds)
+-- NE JAMAIS insérer de comptes réels dans un script SQL versionné
 
--- INSERT INTO users (email, password, first_name, last_name)
--- VALUES ('demo@taskmaster.dev',
---   '$2b$12$LJ3m4ys8Xyb3Q9K5Vf9P9.abc123fakehash', -- hash bcrypt
---   'Demo', 'User');
+INSERT INTO users (email, password, first_name, last_name)
+VALUES
+  ('demo@taskmaster.dev',
+   '$2b$12$ej/uWtghjyWgq/GKlN1bYOyWW8iV7dRWLekOw8BlQyzZyUBS.CkZW',
+   'Demo', 'User'),
+  ('alice@taskmaster.dev',
+   '$2b$12$ej/uWtghjyWgq/GKlN1bYOyWW8iV7dRWLekOw8BlQyzZyUBS.CkZW',
+   'Alice', 'Martin')
+ON CONFLICT (email) DO NOTHING;
+
+INSERT INTO tasks (title, description, status, priority, due_date, user_id)
+VALUES
+  ('Configurer Docker',
+   'Mettre en place docker-compose avec PostgreSQL et Redis',
+   'done', 'high', CURRENT_DATE - 5,
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Implémenter l''authentification JWT',
+   'Créer les routes /auth/register et /auth/login avec bcrypt',
+   'done', 'high', CURRENT_DATE - 3,
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Ajouter le rate limiting',
+   'Protéger les endpoints avec express-rate-limit',
+   'in_progress', 'medium', CURRENT_DATE + 2,
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Rédiger les tests d''intégration',
+   'Couvrir les routes /api/tasks avec Supertest',
+   'todo', 'medium', CURRENT_DATE + 7,
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Préparer la documentation de déploiement',
+   'Compléter DEPLOYMENT.md avec les procédures de rollback',
+   'todo', 'low', CURRENT_DATE + 14,
+   (SELECT id FROM users WHERE email = 'alice@taskmaster.dev'))
+ON CONFLICT DO NOTHING;
 
 DO $$ BEGIN RAISE NOTICE 'Base TaskMaster initialisée avec succès'; END $$;

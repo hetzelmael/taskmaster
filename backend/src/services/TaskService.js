@@ -2,7 +2,7 @@
 // Couche service : logique métier isolée de la couche contrôleur
 // Couvre : CRUD sécurisé (8.1), Transactions (8.3), Style défensif (3.1)
 
-const { Task, User } = require('../models');
+const { Task, User, Version } = require('../models');
 const { Sequelize, Op } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -36,7 +36,9 @@ class TaskService {
       priority: data.priority || 'medium',
       dueDate: data.dueDate || null,
       status: 'todo',
-      userId, // Associé à l'utilisateur authentifié
+      userId,
+      versionId: data.versionId || null,
+      projectId: data.projectId || null,
     });
   }
 
@@ -44,19 +46,27 @@ class TaskService {
    * Récupérer les tâches d'un utilisateur avec filtres et pagination
    * Protection IDOR : on ne retourne que les tâches du userId
    */
-  async getTasksByUser(userId, { status, priority, page = 1, limit = 20 }) {
-    const where = { userId }; // IDOR : filtre par userId TOUJOURS
+  async getTasksByUser(userId, { status, priority, versionId, projectId, page = 1, limit = 20 }) {
+    const where = { userId };
 
-    if (status) where.status = status;
-    if (priority) where.priority = priority;
+    if (status) {
+      where.status = status;
+    } else {
+      where.status = { [Op.ne]: 'archived' };
+    }
+    if (priority)  where.priority  = priority;
+    if (versionId) where.versionId = parseInt(versionId);
+    if (projectId) where.projectId = parseInt(projectId);
 
     const offset = (Math.max(1, page) - 1) * Math.min(limit, 100);
 
     const { rows, count } = await Task.findAndCountAll({
       where,
+      include: [{ model: Version, attributes: ['id', 'name'], required: false }],
       order: [['createdAt', 'DESC']],
-      limit: Math.min(limit, 100), // Limite max 100 pour éviter les abus
+      limit: Math.min(limit, 100),
       offset,
+      distinct: true,
     });
 
     return {
@@ -88,12 +98,27 @@ class TaskService {
   async updateTask(taskId, userId, updates) {
     const task = await this.getTaskById(taskId, userId);
 
-    // On ne permet de modifier que certains champs (whitelist)
-    const allowed = ['title', 'description', 'priority', 'status', 'dueDate'];
+    const allowed = ['title', 'description', 'priority', 'status', 'dueDate', 'versionId'];
     const safeUpdates = {};
     for (const key of allowed) {
-      if (updates[key] !== undefined) {
-        safeUpdates[key] = updates[key];
+      if (updates[key] !== undefined) safeUpdates[key] = updates[key];
+    }
+
+    // Horodatage automatique des transitions de statut
+    if (safeUpdates.status && safeUpdates.status !== task.status) {
+      const now = new Date();
+      if (safeUpdates.status === 'in_progress') {
+        safeUpdates.startedAt = now;
+        safeUpdates.completedAt = null;
+      }
+      if (safeUpdates.status === 'done') {
+        safeUpdates.completedAt = now;
+        // Conserver startedAt si déjà défini, sinon enregistrer maintenant
+        if (!task.startedAt) safeUpdates.startedAt = now;
+      }
+      if (safeUpdates.status === 'todo') {
+        safeUpdates.startedAt   = null;
+        safeUpdates.completedAt = null;
       }
     }
 

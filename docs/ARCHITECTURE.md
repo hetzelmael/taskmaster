@@ -72,6 +72,46 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 | CI/CD | GitHub Actions | Intégré à GitHub, gratuit |
 | Lint | ESLint | Qualité de code automatisée |
 
+## Modèle Conceptuel de Données (MCD)
+
+### Entités et attributs
+
+```
+┌─────────────────────────────────┐         ┌──────────────────────────────────────┐
+│             USERS               │         │               TASKS                  │
+├─────────────────────────────────┤         ├──────────────────────────────────────┤
+│ PK  id           SERIAL         │         │ PK  id           SERIAL              │
+│     email        VARCHAR(255)   │ 1     N │     title        VARCHAR(255)        │
+│     password     VARCHAR(255)   │─────────│     description  TEXT                │
+│     first_name   VARCHAR(100)   │ possède │     status       VARCHAR(20)         │
+│     last_name    VARCHAR(100)   │         │       ∈ {todo, in_progress,          │
+│     created_at   TIMESTAMP      │         │          done, archived}             │
+│     updated_at   TIMESTAMP      │         │     priority     VARCHAR(10)         │
+└─────────────────────────────────┘         │       ∈ {low, medium, high}         │
+                                            │     due_date     DATE                │
+                                            │ FK  user_id      INTEGER → users(id) │
+                                            │     created_at   TIMESTAMP           │
+                                            │     updated_at   TIMESTAMP           │
+                                            └──────────────────────────────────────┘
+```
+
+### Règles de gestion
+
+- Un utilisateur possède **0 ou plusieurs** tâches (`1,N`)
+- Une tâche appartient à **exactement un** utilisateur (`1,1`)
+- La suppression d'un utilisateur entraîne la suppression en cascade de ses tâches (`ON DELETE CASCADE`)
+- Le statut et la priorité sont contraints par des `CHECK` SQL
+- Le champ `updated_at` est mis à jour automatiquement par un trigger PostgreSQL
+
+### Modèle Logique de Données (MLD)
+
+```
+users(id, email, password, first_name, last_name, created_at, updated_at)
+tasks(id, title, description, status, priority, due_date, #user_id, created_at, updated_at)
+```
+
+`#user_id` = clé étrangère référençant `users(id)`
+
 ## Écoconception
 
 - Images Docker Alpine (taille minimale)

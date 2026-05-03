@@ -5,8 +5,10 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const sequelize = require('./config/database');
-const authRoutes = require('./routes/auth');
-const taskRoutes = require('./routes/tasks');
+const authRoutes    = require('./routes/auth');
+const taskRoutes    = require('./routes/tasks');
+const versionRoutes = require('./routes/versions');
+const projectRoutes = require('./routes/projects');
 
 const app = express();
 
@@ -41,7 +43,7 @@ const loginLimiter = rateLimit({
   max: 5,
   message: { error: 'Trop de tentatives, réessayez dans 15 minutes' },
 });
-app.use('/auth/login', loginLimiter);
+app.use('/api/auth/login', loginLimiter);
 
 app.get('/health', (_req, res) => {
   res.json({
@@ -51,8 +53,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/versions', versionRoutes);
+app.use('/api/projects', projectRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

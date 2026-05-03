@@ -8,6 +8,32 @@ const Task = sequelize.define('Task', {
     autoIncrement: true,
     primaryKey: true,
   },
+  title: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    validate: { notEmpty: true, len: [1, 255] },
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  status: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    defaultValue: 'todo',
+    validate: { isIn: [['todo', 'in_progress', 'done', 'archived']] },
+  },
+  priority: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    defaultValue: 'medium',
+    validate: { isIn: [['low', 'medium', 'high']] },
+  },
+  dueDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+    field: 'due_date',
+  },
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -15,29 +41,34 @@ const Task = sequelize.define('Task', {
     references: { model: 'users', key: 'id' },
     onDelete: 'CASCADE',
   },
-  title: {
-    type: DataTypes.STRING(200),
-    allowNull: false,
-    validate: { notEmpty: true, len: [1, 200] },
+  startedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'started_at',
   },
-  done: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
+  completedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'completed_at',
   },
-  priority: {
-    type: DataTypes.ENUM('low', 'medium', 'high'),
-    allowNull: false,
-    defaultValue: 'medium',
+  versionId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'version_id',
+    references: { model: 'versions', key: 'id' },
+    onDelete: 'SET NULL',
+  },
+  projectId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'project_id',
+    references: { model: 'projects', key: 'id' },
+    onDelete: 'CASCADE',
   },
 }, {
   tableName: 'tasks',
   underscored: true,
   timestamps: true,
-  indexes: [
-    { fields: ['user_id'] },
-    { fields: ['user_id', 'priority'] },
-  ],
 });
 
 User.hasMany(Task, { foreignKey: 'userId', onDelete: 'CASCADE' });

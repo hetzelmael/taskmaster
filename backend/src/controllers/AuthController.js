@@ -7,6 +7,8 @@ const SALT_ROUNDS = 12;
 const JWT_EXPIRES = '24h';
 
 exports.registerValidators = [
+  body('firstName').isString().trim().notEmpty().withMessage('Prénom requis'),
+  body('lastName').isString().trim().notEmpty().withMessage('Nom requis'),
   body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
   body('password')
     .isLength({ min: 8 }).withMessage('Au moins 8 caractères')
@@ -25,15 +27,15 @@ exports.register = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   const existing = await User.findOne({ where: { email } });
   if (existing) {
     return res.status(409).json({ error: 'Email déjà utilisé' });
   }
 
-  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ email, passwordHash });
+  const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+  const user = await User.create({ email, password: hashed, firstName, lastName });
 
   return res.status(201).json({ id: user.id, email: user.email });
 };
@@ -44,16 +46,19 @@ exports.login = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { email, password } = req.body;
+
   const user = await User.findOne({ where: { email } });
   if (!user) {
     return res.status(401).json({ error: 'Identifiants invalides' });
   }
-  const valid = await bcrypt.compare(password, user.passwordHash);
+
+  const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     return res.status(401).json({ error: 'Identifiants invalides' });
   }
+
   const token = jwt.sign(
-    { userId: user.id, role: user.role },
+    { userId: user.id, role: 'user' },
     process.env.JWT_SECRET,
     { expiresIn: JWT_EXPIRES }
   );
