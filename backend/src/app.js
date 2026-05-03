@@ -5,6 +5,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const sequelize = require('./config/database');
+const { connectRedis } = require('./config/redis');
 const authRoutes    = require('./routes/auth');
 const taskRoutes    = require('./routes/tasks');
 const versionRoutes = require('./routes/versions');
@@ -45,11 +46,17 @@ const loginLimiter = rateLimit({
 });
 app.use('/api/auth/login', loginLimiter);
 
-app.get('/health', (_req, res) => {
+app.get('/health', async (_req, res) => {
+  const { client } = require('./config/redis');
+  let redisStatus = 'disconnected';
+  try {
+    if (client.isOpen) { await client.ping(); redisStatus = 'ok'; }
+  } catch (_e) { /* Redis optionnel en dev */ }
   res.json({
     status: 'ok',
     version: process.env.npm_package_version || '1.0.0',
     timestamp: new Date().toISOString(),
+    redis: redisStatus,
   });
 });
 
@@ -67,8 +74,14 @@ const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
   sequelize.authenticate()
-    .then(() => {
+    .then(async () => {
       console.log('Database connected');
+      try {
+        await connectRedis();
+        console.log('Redis connected');
+      } catch (err) {
+        console.warn('Redis unavailable (non-fatal):', err.message);
+      }
       app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
     .catch((err) => {

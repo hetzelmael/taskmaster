@@ -16,6 +16,15 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS projects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS versions (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -37,16 +46,19 @@ CREATE TABLE IF NOT EXISTS tasks (
     started_at TIMESTAMP,
     completed_at TIMESTAMP,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
     version_id INTEGER REFERENCES versions(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Index pour accélérer les requêtes fréquentes
-CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id    ON tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_version_id ON tasks(version_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_status     ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority   ON tasks(priority);
+CREATE INDEX IF NOT EXISTS idx_users_email      ON users(email);
 
 -- =============================================
 -- 2. SÉCURITÉ BDD : Utilisateur applicatif (CP 7.3)
@@ -68,7 +80,7 @@ $$;
 -- PAS de CREATE TABLE, DROP, ALTER (principe du moindre privilège)
 GRANT CONNECT ON DATABASE taskmaster TO taskmaster_app;
 GRANT USAGE ON SCHEMA public TO taskmaster_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON users, tasks, versions TO taskmaster_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON users, projects, tasks, versions TO taskmaster_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO taskmaster_app;
 
 -- Interdire la suppression de tables

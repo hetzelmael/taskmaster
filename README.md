@@ -125,10 +125,18 @@ docker compose down -v      # arrêter + supprimer volumes
 |---------|-----|------|-------------|
 | POST | `/auth/register` | non | Créer un compte |
 | POST | `/auth/login` | non | Se connecter, reçoit un JWT |
-| GET | `/api/tasks` | oui | Lister mes tâches |
+| GET | `/api/tasks` | oui | Lister mes tâches (filtres : statut, priorité, version, projet, page) |
 | POST | `/api/tasks` | oui | Créer une tâche |
 | PUT | `/api/tasks/:id` | oui | Modifier une tâche |
 | DELETE | `/api/tasks/:id` | oui | Supprimer une tâche |
+| GET | `/api/projects` | oui | Lister mes projets (avec stats de tâches par statut) |
+| POST | `/api/projects` | oui | Créer un projet |
+| PUT | `/api/projects/:id` | oui | Modifier un projet |
+| DELETE | `/api/projects/:id` | oui | Supprimer un projet |
+| GET | `/api/versions` | oui | Lister mes versions |
+| POST | `/api/versions` | oui | Créer une version |
+| DELETE | `/api/versions/:id` | oui | Supprimer une version |
+| DELETE | `/api/auth/me` | oui | Supprimer son compte (RGPD) |
 | GET | `/health` | non | Healthcheck |
 
 ## Sécurité — mesures implémentées

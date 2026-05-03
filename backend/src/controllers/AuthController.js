@@ -64,3 +64,11 @@ exports.login = async (req, res) => {
   );
   return res.json({ token, user: { id: user.id, email: user.email } });
 };
+
+exports.deleteAccount = async (req, res) => {
+  const user = await User.findByPk(req.userId);
+  if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+
+  await user.destroy();
+  return res.status(204).send();
+};

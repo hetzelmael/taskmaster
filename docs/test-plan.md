@@ -51,6 +51,17 @@
 | I05 | /api/tasks?priority=high | GET | Valide | 200 + filtre appliqué |
 | I06 | /api/tasks/:id | GET | Valide, autre user | 404 (protection IDOR) |
 | I07 | /health | GET | Aucun | 200 {status: "ok"} |
+| I08 | /api/projects | POST | Valide | 201 + projet créé |
+| I09 | /api/projects | POST | Absent | 401 Unauthorized |
+| I10 | /api/projects | POST | Valide, nom vide | 400 Bad Request |
+| I11 | /api/projects | GET | Valide | 200 + liste projets (uniquement les siens) |
+| I12 | /api/projects/:id | DELETE | Valide, autre user | 404 (protection IDOR) |
+| I13 | /api/versions | POST | Valide | 201 + version créée |
+| I14 | /api/versions | POST | Absent | 401 Unauthorized |
+| I15 | /api/versions | GET | Valide | 200 + liste versions depuis cache Redis ou PG |
+| I16 | /api/versions/:id | DELETE | Valide, autre user | 404 (protection IDOR) |
+| I17 | /api/auth/me | DELETE | Valide | 204 + compte supprimé (RGPD) |
+| I18 | /api/auth/me | DELETE | Absent | 401 Unauthorized |
 
 ## 4. Tests de sécurité (CP 9.3)
 
