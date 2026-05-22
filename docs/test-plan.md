@@ -76,6 +76,8 @@
 
 ## 5. Tests de charge (CP 9.3)
 
+Note : les scripts Cypress (E2E) et k6 (tests de charge) sont prévus dans la stratégie, mais **ne sont pas fournis dans ce dépôt**. La CI actuelle exécute les tests unitaires et d'intégration (Jest + Supertest). Pour ajouter ces suites, ajouter les dossiers `cypress/` et `tests/load/` et intégrer leur exécution dans `.github/workflows/ci.yml`.
+
 Outil : k6
 
 ```javascript

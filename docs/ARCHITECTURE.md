@@ -20,31 +20,36 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 ```
 
 ### Couche Présentation
+
 - `frontend/index.html` — Structure HTML5 sémantique (3 vues : liste, kanban, synthèse)
 - `frontend/style.css` — Mise en page responsive (WCAG AA)
 - `frontend/app.js` — Logique client, appels API REST, gestion des vues et du drag & drop
 
 ### Couche Métier (Backend)
+
 - **Routes** (`src/routes/`) — Définissent les endpoints API (auth, tasks, projects, versions)
 - **Controllers** (`src/controllers/`) — Reçoivent les requêtes, valident les entrées
 - **Services** (`src/services/`) — Contiennent la logique métier pure (TaskService)
 - **Middleware** (`src/middleware/`) — Auth JWT, validation, rate limiting
 
 ### Couche Données
+
 - **Models** (`src/models/`) — Mappent les tables via Sequelize (User, Task, Project, Version)
 - **PostgreSQL** — Base relationnelle principale
 - **Redis** — Cache de sessions et données fréquentes
+- **Note de synchronisation** : les contraintes `CHECK` (status, priority) et la fonction/trigger `update_updated_at` sont présentes dans `db/init.sql` et ont été ajoutées aux migrations Sequelize (voir `backend/migrations/20240103000000-add-checks-triggers.js`) afin d'assurer la cohérence entre initialisation Docker et migrations.
 
 ## Sécurité (DICP)
 
-| Critère | Mesure appliquée |
-|---------|-----------------|
-| **Disponibilité** | Healthchecks Docker, restart automatique, rate limiting |
-| **Intégrité** | Validation des entrées (express-validator), contraintes SQL CHECK |
-| **Confidentialité** | JWT signé, bcrypt 12 rounds, HTTPS, CSP headers, CORS, IDOR |
-| **Preuve** | Logs structurés, timestamps sur chaque entité (created_at, updated_at) |
+| Critère             | Mesure appliquée                                                       |
+| ------------------- | ---------------------------------------------------------------------- |
+| **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting                |
+| **Intégrité**       | Validation des entrées (express-validator), contraintes SQL CHECK      |
+| **Confidentialité** | JWT signé, bcrypt 12 rounds, HTTPS, CSP headers, CORS, IDOR            |
+| **Preuve**          | Logs structurés, timestamps sur chaque entité (created_at, updated_at) |
 
 ### Conformité OWASP Top 10
+
 - **Injection SQL** → Requêtes préparées via Sequelize ORM
 - **XSS** → textContent côté front, Helmet CSP côté back
 - **CSRF** → JWT Bearer token (pas de cookies de session)
@@ -52,6 +57,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 - **Auth cassée** → bcrypt + JWT avec expiration 24h
 
 ### Conformité ANSSI
+
 - Utilisateur applicatif PostgreSQL avec droits restreints (pas de root)
 - Conteneur Docker en utilisateur non-root
 - Variables sensibles dans .env (hors Git)
@@ -59,18 +65,18 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 
 ## Technologies utilisées
 
-| Composant | Technologie | Justification |
-|-----------|------------|---------------|
-| Runtime | Node.js 20 | Léger, async, large écosystème |
-| Framework | Express 4 | Standard de fait, middleware flexible |
-| ORM | Sequelize 6 | Abstraction SQL, migrations, relations |
-| BDD | PostgreSQL 16 | Robuste, ACID, open source |
-| Cache | Redis 7 | Rapide, sessions, invalidation cache |
-| Auth | JWT + bcrypt | Stateless, standard, sécurisé |
-| Tests | Jest + Supertest | Unitaires + intégration, couverture |
-| Conteneurs | Docker + Compose | Reproductibilité, isolation |
-| CI/CD | GitHub Actions | Intégré à GitHub, gratuit |
-| Lint | ESLint | Qualité de code automatisée |
+| Composant  | Technologie      | Justification                          |
+| ---------- | ---------------- | -------------------------------------- |
+| Runtime    | Node.js 20       | Léger, async, large écosystème         |
+| Framework  | Express 4        | Standard de fait, middleware flexible  |
+| ORM        | Sequelize 6      | Abstraction SQL, migrations, relations |
+| BDD        | PostgreSQL 16    | Robuste, ACID, open source             |
+| Cache      | Redis 7          | Rapide, sessions, invalidation cache   |
+| Auth       | JWT + bcrypt     | Stateless, standard, sécurisé          |
+| Tests      | Jest + Supertest | Unitaires + intégration, couverture    |
+| Conteneurs | Docker + Compose | Reproductibilité, isolation            |
+| CI/CD      | GitHub Actions   | Intégré à GitHub, gratuit              |
+| Lint       | ESLint           | Qualité de code automatisée            |
 
 ## Modèle Conceptuel de Données (MCD)
 
@@ -152,6 +158,7 @@ Toutes les tables ont une clé primaire (`id` auto-incrémenté) et chaque attri
 Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas exister de dépendance partielle. Le schéma est en 2NF par construction.
 
 **3NF — Pas de dépendance transitive**
+
 - `tasks` : `title`, `status`, `priority`, `due_date`, `started_at`, `completed_at` dépendent directement de `id`. Les clés étrangères (`user_id`, `project_id`, `version_id`) référencent des entités distinctes, pas d'attribut qui dépendrait d'un non-clé.
 - `projects` : `name`, `description` dépendent de `id`. `user_id` lie à `users` sans redondance (le nom de l'utilisateur n'est pas copié dans `projects`).
 - `versions` : identique à `projects`, pas de transitivité.
@@ -159,12 +166,12 @@ Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas ex
 
 ## Vues frontend
 
-| Vue | Description |
-|-----|-------------|
-| **Projets** | Grille de cartes avec stats de tâches par statut (todo/in_progress/done) |
-| **Liste** | Tableau paginé avec filtres (statut, priorité, version) |
-| **Kanban** | 3 colonnes drag & drop, transitions de statut contraintes |
-| **Synthèse** | Analyse sur période : compteurs animés, temps moyen de complétion |
+| Vue          | Description                                                              |
+| ------------ | ------------------------------------------------------------------------ |
+| **Projets**  | Grille de cartes avec stats de tâches par statut (todo/in_progress/done) |
+| **Liste**    | Tableau paginé avec filtres (statut, priorité, version)                  |
+| **Kanban**   | 3 colonnes drag & drop, transitions de statut contraintes                |
+| **Synthèse** | Analyse sur période : compteurs animés, temps moyen de complétion        |
 
 ## Diagramme de déploiement
 
@@ -206,4 +213,4 @@ Flux réseau :
 - Pagination des requêtes (pas de chargement de toutes les données)
 - Cache Redis pour éviter les requêtes BDD répétitives
 - Index SQL pour optimiser les performances
-- Compression des réponses HTTP (Helmet)
+- Compression des réponses HTTP (gzip via Express `compression` middleware ou Nginx)

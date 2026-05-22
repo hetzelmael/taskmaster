@@ -10,7 +10,7 @@
 
 | Environnement | URL | Base de données | Usage |
 |--------------|-----|-----------------|-------|
-| DEV | localhost:3000 | taskmaster_dev | Développement local |
+| DEV | localhost:3000 | taskmaster (par défaut via `.env.example`) | Développement local |
 | SIT | sit.taskmaster.dev | taskmaster_sit | Tests d'intégration système |
 | UAT | uat.taskmaster.dev | taskmaster_uat | Validation par le client |
 | PROD | taskmaster.dev | taskmaster_prod | Production |

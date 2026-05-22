@@ -3,33 +3,41 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 
 const sequelize = require('./config/database');
 const { connectRedis } = require('./config/redis');
-const authRoutes    = require('./routes/auth');
-const taskRoutes    = require('./routes/tasks');
+const authRoutes = require('./routes/auth');
+const taskRoutes = require('./routes/tasks');
 const versionRoutes = require('./routes/versions');
 const projectRoutes = require('./routes/projects');
 
 const app = express();
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:'],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:'],
+      },
     },
-  },
-}));
+  })
+);
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:8080',
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: '10kb' }));
+
+// Compression gzip des réponses HTTP
+app.use(compression());
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -50,8 +58,13 @@ app.get('/health', async (_req, res) => {
   const { client } = require('./config/redis');
   let redisStatus = 'disconnected';
   try {
-    if (client.isOpen) { await client.ping(); redisStatus = 'ok'; }
-  } catch (_e) { /* Redis optionnel en dev */ }
+    if (client.isOpen) {
+      await client.ping();
+      redisStatus = 'ok';
+    }
+  } catch (_e) {
+    /* Redis optionnel en dev */
+  }
   res.json({
     status: 'ok',
     version: process.env.npm_package_version || '1.0.0',
@@ -73,7 +86,8 @@ app.use((err, _req, res, _next) => {
 const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
-  sequelize.authenticate()
+  sequelize
+    .authenticate()
     .then(async () => {
       console.log('Database connected');
       try {

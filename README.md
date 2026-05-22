@@ -80,7 +80,6 @@ taskmaster/
 │   └── .eslintrc.json
 ├── frontend/
 │   ├── index.html
-│   ├── login.html
 │   ├── style.css
 │   └── app.js
 ├── db/
