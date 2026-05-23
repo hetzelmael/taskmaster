@@ -102,6 +102,25 @@ describe('GET /api/tasks', () => {
 // Tests de sécurité IDOR — GET /api/tasks/:id
 // ==========================================
 describe('GET /api/tasks/:id — protection IDOR', () => {
+  test("doit retourner une tâche appartenant à l'utilisateur — statut 200", async () => {
+    const ownedTask = await Task.create({
+      title: 'Tâche propriétaire',
+      userId: testUserId,
+      status: 'todo',
+      priority: 'medium',
+    });
+
+    const res = await request(app)
+      .get(`/api/tasks/${ownedTask.id}`)
+      .set('Authorization', `Bearer ${authToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.id).toBe(ownedTask.id);
+    expect(res.body.userId).toBe(testUserId);
+
+    await ownedTask.destroy();
+  });
+
   test("ne doit PAS exposer la tâche d'un autre utilisateur", async () => {
     // Créer une tâche appartenant à un AUTRE utilisateur
     const otherUser = await User.create({

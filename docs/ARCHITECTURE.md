@@ -103,7 +103,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 └──────────────────┘        │    title             │
          │                  │    description TEXT  │
          │ 1                │    status            │
-         │ crée             │      ∈ {todo,        │
+         │ génère           │      ∈ {todo,        │
          │ N                │         in_progress, │
 ┌──────────────────┐        │         done,        │
 │     VERSIONS     │  1   N │         archived}    │

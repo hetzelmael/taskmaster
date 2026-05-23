@@ -54,7 +54,9 @@ const loginLimiter = rateLimit({
   max: 5,
   message: { error: 'Trop de tentatives, réessayez dans 15 minutes' },
 });
-app.use('/api/auth/login', loginLimiter);
+if (process.env.DISABLE_LOGIN_RATE_LIMIT !== 'true') {
+  app.use('/api/auth/login', loginLimiter);
+}
 
 app.get('/health', async (_req, res) => {
   const { client } = require('./config/redis');

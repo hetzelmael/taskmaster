@@ -11,6 +11,7 @@
     "test:integration": "node tests/run-integration.js",
     "test:e2e": "cypress run --config baseUrl=http://localhost:3000",
     "test:load": "k6 run tests/load/login.js",
+    "test:load:heavy": "k6 run tests/load/heavy.js",
     "lint": "eslint src/ tests/",
     "lint:fix": "eslint src/ tests/ --fix",
     "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\""
