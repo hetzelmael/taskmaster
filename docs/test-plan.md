@@ -2,14 +2,14 @@
 
 ## 1. Stratégie de tests
 
-| Type de test  | Outil      | Couverture cible            | Automatisé |
-| ------------- | ---------- | --------------------------- | ---------- |
-| Unitaire      | Jest       | > 80%                       | Oui (CI)   |
-| Intégration   | Supertest  | Routes API critiques        | Oui (CI)   |
-| E2E           | Cypress    | Parcours utilisateur        | Oui (CI)   |
-| Sécurité      | OWASP ZAP  | Top 10 OWASP                | Semi-auto  |
-| Charge        | k6         | 100 utilisateurs simultanés | Oui (CI optional) |
-| Accessibilité | Lighthouse | Score > 90                  | Manuel     |
+| Type de test  | Outil      | Couverture cible            | Automatisé  |
+| ------------- | ---------- | --------------------------- | ----------- |
+| Unitaire      | Jest       | > 80%                       | Oui (CI)    |
+| Intégration   | Supertest  | Routes API critiques        | Oui (CI)    |
+| E2E           | Cypress    | Parcours utilisateur        | Non (local) |
+| Sécurité      | OWASP ZAP  | Top 10 OWASP                | Semi-auto   |
+| Charge        | k6         | 100 utilisateurs simultanés | Non (local) |
+| Accessibilité | Lighthouse | Score > 90                  | Manuel      |
 
 ## 2. Tests unitaires
 
@@ -77,7 +77,7 @@
 ## 5. Tests de charge (CP 9.3)
 
 Note : les scripts Cypress (E2E) et k6 (tests de charge) sont fournis dans ce dépôt sous `backend/cypress/` et `backend/tests/load/`.
-La CI (`.github/workflows/ci.yml`) intègre l'exécution des tests E2E (Cypress) et des tests de charge (k6) dans des jobs dédiés. Pour lancer localement :
+Ils sont conservés comme contrôles locaux et ponctuels, mais ne bloquent pas la CI afin de garder le pipeline court et lisible. Pour lancer localement :
 
 ```bash
 # Cypress (E2E)
