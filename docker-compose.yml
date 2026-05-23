@@ -57,6 +57,11 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # Enable test/debug flags via environment substitution
+      DISABLE_LOGIN_RATE_LIMIT: ${DISABLE_LOGIN_RATE_LIMIT:-false}
+      DISABLE_GLOBAL_RATE_LIMIT: ${DISABLE_GLOBAL_RATE_LIMIT:-false}
+      DEBUG_AUTH_RAW: ${DEBUG_AUTH_RAW:-false}
+      SALT_ROUNDS: ${SALT_ROUNDS:-12}
       DB_HOST: db # Nom du service Docker, pas localhost !
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-taskmaster}
