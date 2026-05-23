@@ -21,7 +21,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 
 ### Couche Présentation
 
-- `frontend/index.html` — Structure HTML5 sémantique (3 vues : liste, kanban, synthèse)
+- `frontend/index.html` — Structure HTML5 sémantique (4 vues : projets, liste, kanban, synthèse)
 - `frontend/style.css` — Mise en page responsive (WCAG AA)
 - `frontend/app.js` — Logique client, appels API REST, gestion des vues et du drag & drop
 
@@ -36,7 +36,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 
 - **Models** (`src/models/`) — Mappent les tables via Sequelize (User, Task, Project, Version)
 - **PostgreSQL** — Base relationnelle principale
-- **Redis** — Cache de sessions et données fréquentes
+- **Redis** — Cache NoSQL (utilisé principalement pour le cache des `versions`; peut être étendu aux sessions)
 - **Note de synchronisation** : les contraintes `CHECK` (status, priority) et la fonction/trigger `update_updated_at` sont présentes dans `db/init.sql` et ont été ajoutées aux migrations Sequelize (voir `backend/migrations/20240103000000-add-checks-triggers.js`) afin d'assurer la cohérence entre initialisation Docker et migrations.
 
 ## Sécurité (DICP)
@@ -45,7 +45,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 | ------------------- | ---------------------------------------------------------------------- |
 | **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting                |
 | **Intégrité**       | Validation des entrées (express-validator), contraintes SQL CHECK      |
-| **Confidentialité** | JWT signé, bcrypt 12 rounds, HTTPS, CSP headers, CORS, IDOR            |
+| **Confidentialité** | JWT signé, bcryptjs (configurable rounds), TLS recommandé en production, CSP headers, CORS, IDOR |
 | **Preuve**          | Logs structurés, timestamps sur chaque entité (created_at, updated_at) |
 
 ### Conformité OWASP Top 10
@@ -54,7 +54,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 - **XSS** → textContent côté front, Helmet CSP côté back
 - **CSRF** → JWT Bearer token (pas de cookies de session)
 - **IDOR** → Vérification userId sur chaque requête (tasks, projects, versions)
-- **Auth cassée** → bcrypt + JWT avec expiration 24h
+- **Auth cassée** → bcryptjs + JWT avec expiration 24h
 
 ### Conformité ANSSI
 
@@ -62,6 +62,10 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 - Conteneur Docker en utilisateur non-root
 - Variables sensibles dans .env (hors Git)
 - Dépendances auditées (`npm audit`)
+
+### Remarques déploiement local
+
+- Le serveur Nginx local (`frontend/nginx.conf`) écoute en HTTP sur le port 80 sans TLS. Pour un déploiement en production, il est recommandé de configurer TLS (Let's Encrypt, reverse proxy, ou termination TLS côté load balancer).
 
 ## Technologies utilisées
 

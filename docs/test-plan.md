@@ -6,9 +6,9 @@
 | ------------- | ---------- | --------------------------- | ---------- |
 | Unitaire      | Jest       | > 80%                       | Oui (CI)   |
 | Intégration   | Supertest  | Routes API critiques        | Oui (CI)   |
-| E2E           | Cypress    | Parcours utilisateur        | Manuel     |
+| E2E           | Cypress    | Parcours utilisateur        | Oui (CI)   |
 | Sécurité      | OWASP ZAP  | Top 10 OWASP                | Semi-auto  |
-| Charge        | k6         | 100 utilisateurs simultanés | Manuel     |
+| Charge        | k6         | 100 utilisateurs simultanés | Oui (CI optional) |
 | Accessibilité | Lighthouse | Score > 90                  | Manuel     |
 
 ## 2. Tests unitaires
@@ -76,7 +76,17 @@
 
 ## 5. Tests de charge (CP 9.3)
 
-Note : les scripts Cypress (E2E) et k6 (tests de charge) sont prévus dans la stratégie, mais **ne sont pas fournis dans ce dépôt**. La CI actuelle exécute les tests unitaires et d'intégration (Jest + Supertest). Pour ajouter ces suites, ajouter les dossiers `cypress/` et `tests/load/` et intégrer leur exécution dans `.github/workflows/ci.yml`.
+Note : les scripts Cypress (E2E) et k6 (tests de charge) sont fournis dans ce dépôt sous `backend/cypress/` et `backend/tests/load/`.
+La CI (`.github/workflows/ci.yml`) intègre l'exécution des tests E2E (Cypress) et des tests de charge (k6) dans des jobs dédiés. Pour lancer localement :
+
+```bash
+# Cypress (E2E)
+cd backend
+npm run test:e2e
+
+# k6 (load) - exemple heavy (100 VU, 30s)
+Get-Content backend/tests/load/heavy.js | docker run --rm -i --network taskmaster_default -e BASE_URL=http://taskmaster-api:3000 grafana/k6 run -
+```
 
 Outil : k6
 

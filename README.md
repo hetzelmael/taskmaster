@@ -12,12 +12,12 @@
 | ORM                | Sequelize 6                                         |
 | Base relationnelle | PostgreSQL 16                                       |
 | Base NoSQL (cache) | Redis 7                                             |
-| Authentification   | JWT + bcrypt                                        |
-| Tests              | Jest + Supertest (unit/integration) + Cypress (E2E) |
+| Authentification   | JWT + bcryptjs                                      |
+| Tests              | Jest + Supertest (unit/integration) + Cypress (E2E) + k6 (load) |
 | Linting            | ESLint + Prettier                                   |
 | CI/CD              | GitHub Actions                                      |
 | Conteneurisation   | Docker + Docker Compose                             |
-| Déploiement        | Render (gratuit)                                    |
+| Déploiement        | Local (Docker) — CI builds via GitHub Actions; external PaaS (Render) not configured by default |
 
 ## Démarrage rapide
 
@@ -124,8 +124,8 @@ docker compose down -v      # arrêter + supprimer volumes
 
 | Méthode | URL                 | Auth | Description                                                           |
 | ------- | ------------------- | ---- | --------------------------------------------------------------------- |
-| POST    | `/auth/register`    | non  | Créer un compte                                                       |
-| POST    | `/auth/login`       | non  | Se connecter, reçoit un JWT                                           |
+| POST    | `/api/auth/register`    | non  | Créer un compte                                                       |
+| POST    | `/api/auth/login`       | non  | Se connecter, reçoit un JWT                                           |
 | GET     | `/api/tasks`        | oui  | Lister mes tâches (filtres : statut, priorité, version, projet, page) |
 | POST    | `/api/tasks`        | oui  | Créer une tâche                                                       |
 | PUT     | `/api/tasks/:id`    | oui  | Modifier une tâche                                                    |
@@ -142,12 +142,12 @@ docker compose down -v      # arrêter + supprimer volumes
 
 ## Sécurité — mesures implémentées
 
-- Hachage des mots de passe avec bcrypt (12 rounds)
+- Hachage des mots de passe avec bcryptjs (configurable via `SALT_ROUNDS`)
 - Authentification stateless par JWT signé
 - Validation systématique des entrées avec express-validator
 - Requêtes paramétrées via Sequelize (anti-injection SQL)
 - Headers de sécurité avec Helmet (CSP, HSTS, X-Frame-Options)
-- Rate limiting global et strict sur `/auth/login`
+- Rate limiting global et limiter spécifique sur `/api/auth/login` (configurable via env vars)
 - Compte BDD applicatif à privilèges restreints (pas root)
 - CORS strict (origine unique en production)
 - Échappement systématique des sorties côté frontend (textContent)
