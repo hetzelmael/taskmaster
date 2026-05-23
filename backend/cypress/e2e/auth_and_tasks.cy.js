@@ -47,7 +47,8 @@ describe('API E2E: auth and tasks', () => {
       headers: { Authorization: `Bearer ${token}` },
     }).then((res) => {
       expect(res.status).to.eq(200);
-      const found = res.body.find((t) => t.id === taskId || t.id === String(taskId));
+      const tasks = res.body.tasks || [];
+      const found = tasks.find((t) => t.id === taskId || t.id === String(taskId));
       expect(found).to.exist;
     });
   });

@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
@@ -11,10 +11,14 @@ exports.registerValidators = [
   body('lastName').isString().trim().notEmpty().withMessage('Nom requis'),
   body('email').isEmail().withMessage('Email invalide').normalizeEmail(),
   body('password')
-    .isLength({ min: 8 }).withMessage('Au moins 8 caractères')
-    .matches(/[A-Z]/).withMessage('Au moins une majuscule')
-    .matches(/[a-z]/).withMessage('Au moins une minuscule')
-    .matches(/[0-9]/).withMessage('Au moins un chiffre'),
+    .isLength({ min: 8 })
+    .withMessage('Au moins 8 caractères')
+    .matches(/[A-Z]/)
+    .withMessage('Au moins une majuscule')
+    .matches(/[a-z]/)
+    .withMessage('Au moins une minuscule')
+    .matches(/[0-9]/)
+    .withMessage('Au moins un chiffre'),
 ];
 
 exports.loginValidators = [
@@ -57,17 +61,17 @@ exports.login = async (req, res) => {
     return res.status(401).json({ error: 'Identifiants invalides' });
   }
 
-  const token = jwt.sign(
-    { userId: user.id, role: 'user' },
-    process.env.JWT_SECRET,
-    { expiresIn: JWT_EXPIRES }
-  );
+  const token = jwt.sign({ userId: user.id, role: 'user' }, process.env.JWT_SECRET, {
+    expiresIn: JWT_EXPIRES,
+  });
   return res.json({ token, user: { id: user.id, email: user.email } });
 };
 
 exports.deleteAccount = async (req, res) => {
   const user = await User.findByPk(req.userId);
-  if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
+  if (!user) {
+    return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  }
 
   await user.destroy();
   return res.status(204).send();

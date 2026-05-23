@@ -1,4 +1,6 @@
-require('dotenv').config();
+if (!process.env.JEST_WORKER_ID && process.env.NODE_ENV !== 'test') {
+  require('dotenv').config();
+}
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');

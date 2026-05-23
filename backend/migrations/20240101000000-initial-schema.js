@@ -89,10 +89,18 @@ module.exports = {
     });
 
     // Index pour optimiser les requêtes fréquentes
-    await queryInterface.addIndex('tasks', ['user_id'],  { name: 'idx_tasks_user_id' });
-    await queryInterface.addIndex('tasks', ['status'],   { name: 'idx_tasks_status' });
-    await queryInterface.addIndex('tasks', ['priority'], { name: 'idx_tasks_priority' });
-    await queryInterface.addIndex('users', ['email'],    { name: 'idx_users_email' });
+    await queryInterface.addIndex('tasks', ['status'], {
+      name: 'idx_tasks_status',
+      ifNotExists: true,
+    });
+    await queryInterface.addIndex('tasks', ['priority'], {
+      name: 'idx_tasks_priority',
+      ifNotExists: true,
+    });
+    await queryInterface.addIndex('users', ['email'], {
+      name: 'idx_users_email',
+      ifNotExists: true,
+    });
   },
 
   async down(queryInterface) {

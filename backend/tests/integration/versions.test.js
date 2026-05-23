@@ -3,7 +3,7 @@ const app = require('../../src/app');
 const { User, Version } = require('../../src/models');
 const { client: redisClient } = require('../../src/config/redis');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 let authToken;
 let testUserId;
@@ -17,11 +17,9 @@ beforeAll(async () => {
     lastName: 'Versions',
   });
   testUserId = user.id;
-  authToken = jwt.sign(
-    { userId: user.id },
-    process.env.JWT_SECRET || 'test-secret-key',
-    { expiresIn: '1h' }
-  );
+  authToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'test-secret-key', {
+    expiresIn: '1h',
+  });
 
   // Vider le cache Redis pour cet utilisateur avant les tests
   if (redisClient.isOpen) {
@@ -47,9 +45,7 @@ describe('POST /api/versions', () => {
   });
 
   test('doit refuser sans token — statut 401', async () => {
-    const res = await request(app)
-      .post('/api/versions')
-      .send({ name: 'v2.0' });
+    const res = await request(app).post('/api/versions').send({ name: 'v2.0' });
 
     expect(res.status).toBe(401);
   });
@@ -71,9 +67,7 @@ describe('GET /api/versions — cache Redis (NoSQL)', () => {
       await redisClient.del(`versions:user:${testUserId}`);
     }
 
-    const res = await request(app)
-      .get('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -82,14 +76,10 @@ describe('GET /api/versions — cache Redis (NoSQL)', () => {
 
   test('doit retourner les versions depuis le cache Redis (cache hit)', async () => {
     // Premier appel : peuple le cache
-    await request(app)
-      .get('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`);
+    await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
 
     // Deuxième appel : doit venir du cache (même résultat)
-    const res = await request(app)
-      .get('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -113,9 +103,7 @@ describe('DELETE /api/versions/:id', () => {
     const versionId = created.body.id;
 
     // Peupler le cache
-    await request(app)
-      .get('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`);
+    await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
 
     // Supprimer
     const res = await request(app)
@@ -131,7 +119,7 @@ describe('DELETE /api/versions/:id', () => {
     }
   });
 
-  test('ne doit pas supprimer la version d\'un autre utilisateur — IDOR 404', async () => {
+  test("ne doit pas supprimer la version d'un autre utilisateur — IDOR 404", async () => {
     const other = await User.create({
       email: 'other-version@example.com',
       password: await bcrypt.hash('Other1!', 12),

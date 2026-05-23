@@ -72,7 +72,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 | ORM        | Sequelize 6      | Abstraction SQL, migrations, relations |
 | BDD        | PostgreSQL 16    | Robuste, ACID, open source             |
 | Cache      | Redis 7          | Rapide, sessions, invalidation cache   |
-| Auth       | JWT + bcrypt     | Stateless, standard, sécurisé          |
+| Auth       | JWT + bcryptjs   | Stateless, standard, cross-platform    |
 | Tests      | Jest + Supertest | Unitaires + intégration, couverture    |
 | Conteneurs | Docker + Compose | Reproductibilité, isolation            |
 | CI/CD      | GitHub Actions   | Intégré à GitHub, gratuit              |
@@ -196,7 +196,7 @@ Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas ex
 │                    ┌──────────────▼──┐   ┌────────▼───────┐ │
 │                    │ Conteneur : db  │   │Conteneur: cache│ │
 │                    │ PostgreSQL 16   │   │ Redis 7        │ │
-│                    │ Port 5432       │   │ Port 6379      │ │
+│                    │ Port 5433       │   │ Port 6379      │ │
 │                    │ Volume : pgdata │   │ Mot de passe   │ │
 │                    └─────────────────┘   └────────────────┘ │
 └─────────────────────────────────────────────────────────────┘

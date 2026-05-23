@@ -7,7 +7,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const { User, Task } = require('../../src/models');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Variables partagées entre les tests
 let authToken;
@@ -43,7 +43,6 @@ afterAll(async () => {
 // Tests de la route POST /api/tasks
 // ==========================================
 describe('POST /api/tasks', () => {
-
   test('doit créer une tâche avec un JWT valide — statut 201', async () => {
     const res = await request(app)
       .post('/api/tasks')
@@ -60,9 +59,7 @@ describe('POST /api/tasks', () => {
   });
 
   test('doit refuser sans token — statut 401', async () => {
-    const res = await request(app)
-      .post('/api/tasks')
-      .send({ title: 'Sans token' });
+    const res = await request(app).post('/api/tasks').send({ title: 'Sans token' });
 
     expect(res.status).toBe(401);
   });
@@ -81,11 +78,8 @@ describe('POST /api/tasks', () => {
 // Tests de la route GET /api/tasks
 // ==========================================
 describe('GET /api/tasks', () => {
-
-  test('doit retourner les tâches de l\'utilisateur — statut 200', async () => {
-    const res = await request(app)
-      .get('/api/tasks')
-      .set('Authorization', `Bearer ${authToken}`);
+  test("doit retourner les tâches de l'utilisateur — statut 200", async () => {
+    const res = await request(app).get('/api/tasks').set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.tasks)).toBe(true);
@@ -108,8 +102,7 @@ describe('GET /api/tasks', () => {
 // Tests de sécurité IDOR — GET /api/tasks/:id
 // ==========================================
 describe('GET /api/tasks/:id — protection IDOR', () => {
-
-  test('ne doit PAS exposer la tâche d\'un autre utilisateur', async () => {
+  test("ne doit PAS exposer la tâche d'un autre utilisateur", async () => {
     // Créer une tâche appartenant à un AUTRE utilisateur
     const otherUser = await User.create({
       email: 'other@example.com',

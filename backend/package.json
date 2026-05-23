@@ -8,7 +8,7 @@
     "dev": "nodemon src/app.js",
     "test": "jest --testPathPattern=tests/",
     "test:unit": "jest --testPathPattern=tests/unit --forceExit",
-    "test:integration": "jest --testPathPattern=tests/integration --runInBand --forceExit",
+    "test:integration": "node tests/run-integration.js",
     "test:e2e": "cypress run --config baseUrl=http://localhost:3000",
     "test:load": "k6 run tests/load/login.js",
     "lint": "eslint src/ tests/",
@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\""
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -40,6 +40,9 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/tests/jest.setup.js"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/tests/"
