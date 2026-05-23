@@ -26,7 +26,7 @@ Remarque : le fichier `docker-compose.yml` expose PostgreSQL sur le port hôte *
 
 ## Déploiement automatisé (SIT/UAT/PROD)
 
-Remarque : le pipeline GitHub Actions (`.github/workflows/ci.yml`) exécute les vérifications (lint, tests, build) et des jobs E2E/load. **Il ne déploie pas automatiquement** vers des environnements SIT/UAT/PROD dans ce dépôt — il s'agit d'une action manuelle ou externe (hébergeur) à configurer selon la cible. Les étapes ci-dessous décrivent un workflow souhaité, non appliqué automatiquement par défaut.
+Remarque : le pipeline GitHub Actions (`.github/workflows/ci.yml`) exécute les vérifications (lint, tests, audit npm, build) et **ne déploie pas automatiquement** vers des environnements SIT/UAT/PROD dans ce dépôt — il s'agit d'une action manuelle ou externe (hébergeur) à configurer selon la cible. Les étapes ci-dessous décrivent un workflow souhaité, non appliqué automatiquement par défaut.
 
 ## Migrations de base de données (CP 10.3)
 
