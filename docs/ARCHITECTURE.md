@@ -41,12 +41,12 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 
 ## Sécurité (DICP)
 
-| Critère             | Mesure appliquée                                                       |
-| ------------------- | ---------------------------------------------------------------------- |
-| **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting                |
-| **Intégrité**       | Validation des entrées (express-validator), contraintes SQL CHECK      |
+| Critère             | Mesure appliquée                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting                                          |
+| **Intégrité**       | Validation des entrées (express-validator), contraintes SQL CHECK                                |
 | **Confidentialité** | JWT signé, bcryptjs (configurable rounds), TLS recommandé en production, CSP headers, CORS, IDOR |
-| **Preuve**          | Logs structurés, timestamps sur chaque entité (created_at, updated_at) |
+| **Preuve**          | Logs structurés, timestamps sur chaque entité (created_at, updated_at)                           |
 
 ### Conformité OWASP Top 10
 

@@ -22,8 +22,7 @@
 3. Adapter les variables dans `.env`
 4. Lancer : `docker compose up -d`
 
-Remarque : le fichier `docker-compose.yml` expose PostgreSQL sur le port hôte **5433** (mappage `5433:5432`). Adapter vos outils/connexions locales en conséquence.
-5. Vérifier : `curl http://localhost:3000/health`
+Remarque : le fichier `docker-compose.yml` expose PostgreSQL sur le port hôte **5433** (mappage `5433:5432`). Adapter vos outils/connexions locales en conséquence. 5. Vérifier : `curl http://localhost:3000/health`
 
 ## Déploiement automatisé (SIT/UAT/PROD)
 

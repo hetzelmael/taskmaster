@@ -120,6 +120,8 @@ describe('DELETE /api/versions/:id', () => {
   });
 
   test("ne doit pas supprimer la version d'un autre utilisateur — IDOR 404", async () => {
+    // Cleanup stale records from any previous failed run
+    await User.destroy({ where: { email: 'other-version@example.com' } });
     const other = await User.create({
       email: 'other-version@example.com',
       password: await bcrypt.hash('Other1!', 12),

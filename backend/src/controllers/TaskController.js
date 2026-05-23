@@ -66,11 +66,19 @@ exports.update = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const task = await taskService.updateTask(req.params.id, req.userId, req.body);
-  return res.json(task);
+  try {
+    const task = await taskService.updateTask(req.params.id, req.userId, req.body);
+    return res.json(task);
+  } catch (error) {
+    return res.status(error.status || 500).json({ error: error.message || 'Erreur serveur interne' });
+  }
 };
 
 exports.remove = async (req, res) => {
-  await taskService.deleteTask(req.params.id, req.userId);
-  return res.status(204).send();
+  try {
+    await taskService.deleteTask(req.params.id, req.userId);
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(error.status || 500).json({ error: error.message || 'Erreur serveur interne' });
+  }
 };
