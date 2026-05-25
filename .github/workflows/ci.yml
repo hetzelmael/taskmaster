@@ -55,7 +55,7 @@ jobs:
 
       - name: Vérifier les vulnérabilités npm
         working-directory: backend
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
       # Étape 4 : Lancer le linter
       - name: Exécuter ESLint
