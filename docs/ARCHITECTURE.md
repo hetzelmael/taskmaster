@@ -185,7 +185,7 @@ Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas ex
 │                                                             │
 │  ┌──────────────────┐      ┌──────────────────────────────┐ │
 │  │  Navigateur      │      │   Conteneur : frontend       │ │
-│  │  (utilisateur)   │─────▶│   Nginx : alpine             │ │
+│  │  (utilisateur)   │─────▶│   Nginx : alpine            │ │
 │  │                  │ :8080│   Sert HTML/CSS/JS           │ │
 │  └──────────────────┘      │   Proxy /api → backend:3000  │ │
 │                            └──────────────┬───────────────┘ │

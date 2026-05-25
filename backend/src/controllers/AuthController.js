@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
     try {
       console.log('--- DEBUG LOGIN ---');
       console.log('Req.body:', JSON.stringify(req.body));
-    } catch (_e) {}
+    } catch (_e) { /* ignore */ }
   }
 
   const user = await User.findOne({ where: { email } });
