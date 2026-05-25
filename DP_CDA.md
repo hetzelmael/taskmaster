@@ -38,9 +38,9 @@
 
 **Exemple n°1 ► Formulaires d'authentification et gestion des projets**
 
-1. J'ai développé les formulaires de connexion, d'inscription et de gestion des projets en HTML/CSS/JS vanilla, avec validation côté client, messages d'erreur accessibles et une vue grille affichant les statistiques de tâches (todo/en cours/terminé) par projet.
+1. J'ai développé les formulaires de connexion, d'inscription et de gestion des projets en HTML/CSS/JS vanilla, avec validation côté client, messages d'erreur injectés via `role="alert"` et `aria-live="assertive"`, et une vue grille des projets affichant les statistiques de tâches par statut. L'ensemble respecte le RGAA : langue déclarée, hiérarchie de titres cohérente (`<h1>` → `<h2>`), `<label for>` explicitement associé à chaque champ, et `skip-link` permettant de sauter la navigation au clavier.
 
-2. HTML5 sémantique, CSS Flexbox/Grid, JavaScript vanilla avec appels API REST et JWT, `aria-required` et `aria-live` pour la conformité RGAA.
+2. HTML5 sémantique (`<html lang="fr">`, `<header role="banner">`, `<main id="main-content">`, `<nav aria-label="Navigation principale">`, `<section aria-labelledby>`), CSS Flexbox/Grid, JavaScript vanilla avec appels API REST et JWT ; conformité RGAA : `aria-required="true"` sur les champs obligatoires, `aria-describedby="password-hint"` pour exposer les contraintes du mot de passe aux lecteurs d'écran, `role="alert"` + `aria-live="assertive"` pour les messages d'erreur, `<label for>` systématique sur chaque input, `skip-link` rendu visible au `:focus` en CSS.
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
@@ -52,9 +52,9 @@
 
 **Exemple n°2 ► Vues Liste, Kanban et Synthèse avec filtrage par version et projet**
 
-1. J'ai développé trois vues interchangeables pour les tâches : une vue liste avec filtres (statut, priorité, version), une vue kanban avec drag & drop et transitions de statut contraintes, et une vue synthèse avec compteurs animés et calcul du temps moyen de complétion sur une période.
+1. J'ai développé trois vues interchangeables pour les tâches : une vue liste avec barre de filtres (`role="search"`), une vue kanban avec drag & drop et navigation clavier (touche `Enter` pour ouvrir une tâche, `Escape` pour fermer les modals), et une vue synthèse avec compteurs animés et calcul du temps moyen de complétion sur une période, les animations étant désactivées si l'utilisateur a activé `prefers-reduced-motion`.
 
-2. JavaScript vanilla (DOM, événements drag, `requestAnimationFrame` pour les animations, `prefersReducedMotion`), `textContent` systématique contre le XSS, `skip-link` et `focus-visible` pour la conformité RGAA.
+2. JavaScript vanilla (DOM, événements drag, `requestAnimationFrame`) ; conformité RGAA : `aria-pressed` mis à jour dynamiquement sur les boutons de bascule de vue (Liste / Kanban / Synthèse), `aria-label` descriptifs sur tous les boutons icônes, `role="list"` sur la liste des tâches, `aria-label` sur les contrôles de pagination avec `aria-live="polite"` pour annoncer la page courante, `focus-visible` CSS (outline 3px solid) pour le contour de focus visible, `@media (prefers-reduced-motion: reduce)` pour désactiver les transitions, `@media (prefers-contrast: more)` pour renforcer les contrastes, badges de priorité dont les couleurs respectent le ratio WCAG AA, `textContent` systématique contre le XSS.
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 

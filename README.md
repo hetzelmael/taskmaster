@@ -5,23 +5,24 @@
 
 ## Stack technique
 
-| Couche | Technologie |
-|--------|-------------|
-| Frontend | HTML5 + CSS3 + JavaScript vanilla |
-| Backend | Node.js 20 + Express 4 |
-| ORM | Sequelize 6 |
-| Base relationnelle | PostgreSQL 16 |
-| Base NoSQL (cache) | Redis 7 |
-| Authentification | JWT + bcrypt |
-| Tests | Jest + Supertest (unit/integration) + Cypress (E2E) |
-| Linting | ESLint + Prettier |
-| CI/CD | GitHub Actions |
-| Conteneurisation | Docker + Docker Compose |
-| Déploiement | Render (gratuit) |
+| Couche             | Technologie                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| Frontend           | HTML5 + CSS3 + JavaScript vanilla                                                               |
+| Backend            | Node.js 20 + Express 4                                                                          |
+| ORM                | Sequelize 6                                                                                     |
+| Base relationnelle | PostgreSQL 16                                                                                   |
+| Base NoSQL (cache) | Redis 7                                                                                         |
+| Authentification   | JWT + bcryptjs                                                                                  |
+| Tests              | Jest + Supertest (unit/integration) + Cypress (E2E) + k6 (load)                                 |
+| Linting            | ESLint + Prettier                                                                               |
+| CI/CD              | GitHub Actions                                                                                  |
+| Conteneurisation   | Docker + Docker Compose                                                                         |
+| Déploiement        | Local (Docker) — CI builds via GitHub Actions; external PaaS (Render) not configured by default |
 
 ## Démarrage rapide
 
 ### Prérequis
+
 - Docker Desktop installé
 - Node.js 20+ (pour développement local hors Docker)
 
@@ -54,6 +55,7 @@ npm run dev
 ```
 
 Dans un autre terminal :
+
 ```bash
 cd frontend
 npx http-server -p 8080
@@ -80,7 +82,6 @@ taskmaster/
 │   └── .eslintrc.json
 ├── frontend/
 │   ├── index.html
-│   ├── login.html
 │   ├── style.css
 │   └── app.js
 ├── db/
@@ -121,32 +122,32 @@ docker compose down -v      # arrêter + supprimer volumes
 
 ## Endpoints API
 
-| Méthode | URL | Auth | Description |
-|---------|-----|------|-------------|
-| POST | `/auth/register` | non | Créer un compte |
-| POST | `/auth/login` | non | Se connecter, reçoit un JWT |
-| GET | `/api/tasks` | oui | Lister mes tâches (filtres : statut, priorité, version, projet, page) |
-| POST | `/api/tasks` | oui | Créer une tâche |
-| PUT | `/api/tasks/:id` | oui | Modifier une tâche |
-| DELETE | `/api/tasks/:id` | oui | Supprimer une tâche |
-| GET | `/api/projects` | oui | Lister mes projets (avec stats de tâches par statut) |
-| POST | `/api/projects` | oui | Créer un projet |
-| PUT | `/api/projects/:id` | oui | Modifier un projet |
-| DELETE | `/api/projects/:id` | oui | Supprimer un projet |
-| GET | `/api/versions` | oui | Lister mes versions |
-| POST | `/api/versions` | oui | Créer une version |
-| DELETE | `/api/versions/:id` | oui | Supprimer une version |
-| DELETE | `/api/auth/me` | oui | Supprimer son compte (RGPD) |
-| GET | `/health` | non | Healthcheck |
+| Méthode | URL                  | Auth | Description                                                           |
+| ------- | -------------------- | ---- | --------------------------------------------------------------------- |
+| POST    | `/api/auth/register` | non  | Créer un compte                                                       |
+| POST    | `/api/auth/login`    | non  | Se connecter, reçoit un JWT                                           |
+| GET     | `/api/tasks`         | oui  | Lister mes tâches (filtres : statut, priorité, version, projet, page) |
+| POST    | `/api/tasks`         | oui  | Créer une tâche                                                       |
+| PUT     | `/api/tasks/:id`     | oui  | Modifier une tâche                                                    |
+| DELETE  | `/api/tasks/:id`     | oui  | Supprimer une tâche                                                   |
+| GET     | `/api/projects`      | oui  | Lister mes projets (avec stats de tâches par statut)                  |
+| POST    | `/api/projects`      | oui  | Créer un projet                                                       |
+| PUT     | `/api/projects/:id`  | oui  | Modifier un projet                                                    |
+| DELETE  | `/api/projects/:id`  | oui  | Supprimer un projet                                                   |
+| GET     | `/api/versions`      | oui  | Lister mes versions                                                   |
+| POST    | `/api/versions`      | oui  | Créer une version                                                     |
+| DELETE  | `/api/versions/:id`  | oui  | Supprimer une version                                                 |
+| DELETE  | `/api/auth/me`       | oui  | Supprimer son compte (RGPD)                                           |
+| GET     | `/health`            | non  | Healthcheck                                                           |
 
 ## Sécurité — mesures implémentées
 
-- Hachage des mots de passe avec bcrypt (12 rounds)
+- Hachage des mots de passe avec bcryptjs (configurable via `SALT_ROUNDS`)
 - Authentification stateless par JWT signé
 - Validation systématique des entrées avec express-validator
 - Requêtes paramétrées via Sequelize (anti-injection SQL)
 - Headers de sécurité avec Helmet (CSP, HSTS, X-Frame-Options)
-- Rate limiting global et strict sur `/auth/login`
+- Rate limiting global et limiter spécifique sur `/api/auth/login` (configurable via env vars)
 - Compte BDD applicatif à privilèges restreints (pas root)
 - CORS strict (origine unique en production)
 - Échappement systématique des sorties côté frontend (textContent)

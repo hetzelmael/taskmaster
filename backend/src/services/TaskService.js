@@ -6,6 +6,13 @@ const { Task, User, Version } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
+const VALID_TRANSITIONS = {
+  todo:        ['in_progress'],
+  in_progress: ['todo', 'done'],
+  done:        ['in_progress', 'archived'],
+  archived:    [],
+};
+
 class TaskService {
   // --- CRUD SÉCURISÉ (CP 8.1) ---
   // Toutes les requêtes passent par Sequelize (ORM) qui utilise
@@ -104,8 +111,14 @@ class TaskService {
       if (updates[key] !== undefined) { safeUpdates[key] = updates[key]; }
     }
 
-    // Horodatage automatique des transitions de statut
+    // Validation et horodatage automatique des transitions de statut
     if (safeUpdates.status && safeUpdates.status !== task.status) {
+      const validNext = VALID_TRANSITIONS[task.status] || [];
+      if (!validNext.includes(safeUpdates.status)) {
+        const err = new Error('Transition de statut invalide');
+        err.status = 400;
+        throw err;
+      }
       const now = new Date();
       if (safeUpdates.status === 'in_progress') {
         safeUpdates.startedAt = now;

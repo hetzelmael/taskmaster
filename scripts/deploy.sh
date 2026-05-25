@@ -65,4 +65,5 @@ echo ""
 echo "=== Déploiement terminé avec succès ==="
 echo "  API     : http://localhost:3000"
 echo "  Frontend: http://localhost:8080"
-echo "  BDD     : localhost:5432"
+DB_PORT_DISPLAY=${DB_PORT:-5433}
+echo "  BDD     : localhost:${DB_PORT_DISPLAY}"

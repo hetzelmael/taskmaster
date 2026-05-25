@@ -175,6 +175,133 @@ describe('TaskService', () => {
   });
 
   // ==========================================
+  // Tests de updateTask()
+  // ==========================================
+  describe('updateTask()', () => {
+
+    const makeTask = (status, extra = {}) => ({
+      id: 1,
+      userId: 42,
+      status,
+      startedAt: null,
+      completedAt: null,
+      ...extra,
+      update: jest.fn().mockImplementation(function (changes) {
+        return Promise.resolve({ ...this, ...changes });
+      }),
+    });
+
+    describe('Transitions de statut', () => {
+
+      test('todo → in_progress doit être acceptée', async () => {
+        Task.findOne.mockResolvedValue(makeTask('todo'));
+        await expect(
+          TaskService.updateTask(1, 42, { status: 'in_progress' })
+        ).resolves.toBeDefined();
+      });
+
+      test('in_progress → done doit être acceptée', async () => {
+        Task.findOne.mockResolvedValue(makeTask('in_progress'));
+        await expect(
+          TaskService.updateTask(1, 42, { status: 'done' })
+        ).resolves.toBeDefined();
+      });
+
+      test('in_progress → todo doit être acceptée', async () => {
+        Task.findOne.mockResolvedValue(makeTask('in_progress'));
+        await expect(
+          TaskService.updateTask(1, 42, { status: 'todo' })
+        ).resolves.toBeDefined();
+      });
+
+      test('done → archived doit être acceptée', async () => {
+        Task.findOne.mockResolvedValue(makeTask('done'));
+        await expect(
+          TaskService.updateTask(1, 42, { status: 'archived' })
+        ).resolves.toBeDefined();
+      });
+
+      test('todo → done doit être rejetée (transition invalide)', async () => {
+        Task.findOne.mockResolvedValue(makeTask('todo'));
+        await expect(
+          TaskService.updateTask(1, 42, { status: 'done' })
+        ).rejects.toThrow('Transition de statut invalide');
+      });
+    });
+
+    describe('Horodatage automatique', () => {
+
+      test('doit définir startedAt lors du passage en in_progress', async () => {
+        const task = makeTask('todo');
+        Task.findOne.mockResolvedValue(task);
+        await TaskService.updateTask(1, 42, { status: 'in_progress' });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.objectContaining({ startedAt: expect.any(Date) })
+        );
+      });
+
+      test('doit définir completedAt lors du passage en done', async () => {
+        const task = makeTask('in_progress');
+        Task.findOne.mockResolvedValue(task);
+        await TaskService.updateTask(1, 42, { status: 'done' });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.objectContaining({ completedAt: expect.any(Date) })
+        );
+      });
+
+      test('doit remettre startedAt et completedAt à null lors du retour en todo', async () => {
+        const task = makeTask('in_progress', { startedAt: new Date() });
+        Task.findOne.mockResolvedValue(task);
+        await TaskService.updateTask(1, 42, { status: 'todo' });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.objectContaining({ startedAt: null, completedAt: null })
+        );
+      });
+    });
+
+    describe('Whitelist des champs', () => {
+
+      test('doit ignorer le champ userId dans les mises à jour', async () => {
+        const task = makeTask('todo');
+        Task.findOne.mockResolvedValue(task);
+        await TaskService.updateTask(1, 42, { title: 'OK', userId: 999 });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ userId: 999 })
+        );
+      });
+
+      test('doit ignorer le champ createdAt dans les mises à jour', async () => {
+        const task = makeTask('todo');
+        Task.findOne.mockResolvedValue(task);
+        await TaskService.updateTask(1, 42, { title: 'OK', createdAt: new Date() });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.not.objectContaining({ createdAt: expect.anything() })
+        );
+      });
+
+      test('doit autoriser les champs title, description, priority, dueDate', async () => {
+        const task = makeTask('todo');
+        Task.findOne.mockResolvedValue(task);
+        const due = new Date('2025-12-31');
+        await TaskService.updateTask(1, 42, {
+          title: 'Nouveau titre',
+          description: 'Nouvelle desc',
+          priority: 'low',
+          dueDate: due,
+        });
+        expect(task.update).toHaveBeenCalledWith(
+          expect.objectContaining({
+            title: 'Nouveau titre',
+            description: 'Nouvelle desc',
+            priority: 'low',
+            dueDate: due,
+          })
+        );
+      });
+    });
+  });
+
+  // ==========================================
   // Tests de reassignAllTasks() — TRANSACTIONS
   // ==========================================
   describe('reassignAllTasks()', () => {
