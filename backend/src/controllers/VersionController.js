@@ -9,9 +9,15 @@ function cacheKey(userId) {
 }
 
 exports.createValidators = [
-  body('name').isString().trim().isLength({ min: 1, max: 100 }).withMessage('Nom requis (1 à 100 caractères)'),
+  body('name')
+    .isString()
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Nom requis (1 à 100 caractères)'),
   body('description').optional({ nullable: true }).isString().trim(),
 ];
+
+exports.removeValidators = [param('id').isInt({ min: 1 })];
 
 exports.list = async (req, res) => {
   const key = cacheKey(req.userId);
@@ -40,7 +46,9 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
   const version = await Version.create({
     name: req.body.name.trim(),
@@ -58,10 +66,14 @@ exports.create = async (req, res) => {
 
 exports.remove = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
   const version = await Version.findOne({ where: { id: req.params.id, userId: req.userId } });
-  if (!version) return res.status(404).json({ error: 'Version non trouvée' });
+  if (!version) {
+    return res.status(404).json({ error: 'Version non trouvée' });
+  }
 
   await version.destroy();
 

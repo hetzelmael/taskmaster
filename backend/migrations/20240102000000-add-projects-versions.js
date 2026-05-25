@@ -75,8 +75,14 @@ module.exports = {
       allowNull: true,
     });
 
-    await queryInterface.addIndex('tasks', ['project_id'], { name: 'idx_tasks_project_id' });
-    await queryInterface.addIndex('tasks', ['version_id'], { name: 'idx_tasks_version_id' });
+    await queryInterface.addIndex('tasks', ['project_id'], {
+      name: 'idx_tasks_project_id',
+      ifNotExists: true,
+    });
+    await queryInterface.addIndex('tasks', ['version_id'], {
+      name: 'idx_tasks_version_id',
+      ifNotExists: true,
+    });
   },
 
   async down(queryInterface) {

@@ -3,8 +3,15 @@
 // Couvre : CRUD sécurisé (8.1), Transactions (8.3), Style défensif (3.1)
 
 const { Task, User, Version } = require('../models');
-const { Sequelize, Op } = require('sequelize');
+const { Op } = require('sequelize');
 const sequelize = require('../config/database');
+
+const VALID_TRANSITIONS = {
+  todo:        ['in_progress'],
+  in_progress: ['todo', 'done'],
+  done:        ['in_progress', 'archived'],
+  archived:    [],
+};
 
 class TaskService {
   // --- CRUD SÉCURISÉ (CP 8.1) ---
@@ -54,9 +61,9 @@ class TaskService {
     } else {
       where.status = { [Op.ne]: 'archived' };
     }
-    if (priority)  where.priority  = priority;
-    if (versionId) where.versionId = parseInt(versionId);
-    if (projectId) where.projectId = parseInt(projectId);
+    if (priority)  { where.priority  = priority; }
+    if (versionId) { where.versionId = parseInt(versionId); }
+    if (projectId) { where.projectId = parseInt(projectId); }
 
     const offset = (Math.max(1, page) - 1) * Math.min(limit, 100);
 
@@ -101,11 +108,17 @@ class TaskService {
     const allowed = ['title', 'description', 'priority', 'status', 'dueDate', 'versionId'];
     const safeUpdates = {};
     for (const key of allowed) {
-      if (updates[key] !== undefined) safeUpdates[key] = updates[key];
+      if (updates[key] !== undefined) { safeUpdates[key] = updates[key]; }
     }
 
-    // Horodatage automatique des transitions de statut
+    // Validation et horodatage automatique des transitions de statut
     if (safeUpdates.status && safeUpdates.status !== task.status) {
+      const validNext = VALID_TRANSITIONS[task.status] || [];
+      if (!validNext.includes(safeUpdates.status)) {
+        const err = new Error('Transition de statut invalide');
+        err.status = 400;
+        throw err;
+      }
       const now = new Date();
       if (safeUpdates.status === 'in_progress') {
         safeUpdates.startedAt = now;
@@ -114,7 +127,7 @@ class TaskService {
       if (safeUpdates.status === 'done') {
         safeUpdates.completedAt = now;
         // Conserver startedAt si déjà défini, sinon enregistrer maintenant
-        if (!task.startedAt) safeUpdates.startedAt = now;
+        if (!task.startedAt) { safeUpdates.startedAt = now; }
       }
       if (safeUpdates.status === 'todo') {
         safeUpdates.startedAt   = null;

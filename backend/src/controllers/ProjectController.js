@@ -36,7 +36,7 @@ exports.list = async (req, res) => {
 
 exports.create = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  if (!errors.isEmpty()) { return res.status(400).json({ errors: errors.array() }); }
   const project = await Project.create({
     name: req.body.name.trim(),
     description: req.body.description?.trim() || null,
@@ -47,9 +47,9 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  if (!errors.isEmpty()) { return res.status(400).json({ errors: errors.array() }); }
   const project = await Project.findOne({ where: { id: req.params.id, userId: req.userId } });
-  if (!project) return res.status(404).json({ error: 'Projet non trouvé' });
+  if (!project) { return res.status(404).json({ error: 'Projet non trouvé' }); }
   await project.update({
     name:        req.body.name        !== undefined ? req.body.name.trim()               : project.name,
     description: req.body.description !== undefined ? (req.body.description?.trim() || null) : project.description,
@@ -59,7 +59,7 @@ exports.update = async (req, res) => {
 
 exports.remove = async (req, res) => {
   const project = await Project.findOne({ where: { id: req.params.id, userId: req.userId } });
-  if (!project) return res.status(404).json({ error: 'Projet non trouvé' });
+  if (!project) { return res.status(404).json({ error: 'Projet non trouvé' }); }
   await project.destroy();
   res.status(204).send();
 };

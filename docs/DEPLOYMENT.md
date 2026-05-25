@@ -8,12 +8,12 @@
 
 ## Environnements
 
-| Environnement | URL | Base de données | Usage |
-|--------------|-----|-----------------|-------|
-| DEV | localhost:3000 | taskmaster_dev | Développement local |
-| SIT | sit.taskmaster.dev | taskmaster_sit | Tests d'intégration système |
-| UAT | uat.taskmaster.dev | taskmaster_uat | Validation par le client |
-| PROD | taskmaster.dev | taskmaster_prod | Production |
+| Environnement | URL                | Base de données                            | Usage                       |
+| ------------- | ------------------ | ------------------------------------------ | --------------------------- |
+| DEV           | localhost:3000     | taskmaster (par défaut via `.env.example`) | Développement local         |
+| SIT           | sit.taskmaster.dev | taskmaster_sit                             | Tests d'intégration système |
+| UAT           | uat.taskmaster.dev | taskmaster_uat                             | Validation par le client    |
+| PROD          | taskmaster.dev     | taskmaster_prod                            | Production                  |
 
 ## Déploiement local (DEV)
 
@@ -21,15 +21,12 @@
 2. Copier la configuration : `cp .env.example .env`
 3. Adapter les variables dans `.env`
 4. Lancer : `docker compose up -d`
-5. Vérifier : `curl http://localhost:3000/health`
+
+Remarque : le fichier `docker-compose.yml` expose PostgreSQL sur le port hôte **5433** (mappage `5433:5432`). Adapter vos outils/connexions locales en conséquence. 5. Vérifier : `curl http://localhost:3000/health`
 
 ## Déploiement automatisé (SIT/UAT/PROD)
 
-Le pipeline GitHub Actions exécute automatiquement :
-
-1. **Push sur `develop`** → Déploiement SIT automatique
-2. **Pull Request vers `main`** → Tests complets (lint + unit + intégration)
-3. **Merge dans `main`** → Déploiement UAT, puis PROD après validation manuelle
+Remarque : le pipeline GitHub Actions (`.github/workflows/ci.yml`) exécute les vérifications (lint, tests, audit npm, build) et **ne déploie pas automatiquement** vers des environnements SIT/UAT/PROD dans ce dépôt — il s'agit d'une action manuelle ou externe (hébergeur) à configurer selon la cible. Les étapes ci-dessous décrivent un workflow souhaité, non appliqué automatiquement par défaut.
 
 ## Migrations de base de données (CP 10.3)
 
@@ -59,6 +56,7 @@ En cas de problème après un déploiement :
 
 ## Sauvegardes
 
-- Automatique : cron toutes les 6 heures via `scripts/backup.sh`
-- Rétention : 7 dernières sauvegardes conservées
-- Restauration : `gunzip -c backup.sql.gz | docker exec -i taskmaster-db psql -U postgres -d taskmaster`
+- Script : une tâche de sauvegarde existe (`scripts/backup.sh`) qui exporte la base via `pg_dump` dans `backups/`.
+- Automatisation : aucune tâche cron/systemd ou pipeline CI n'est fournie dans le dépôt ; l'exécution périodique reste à configurer par l'opérateur (cron, systemd timer, ou job CI).
+- Rétention : le script conserve par défaut les 7 dernières sauvegardes.
+- Restauration : `gunzip -c backups/taskmaster_YYYYMMDD_HHMMSS.sql.gz | docker exec -i taskmaster-db psql -U postgres -d taskmaster`
