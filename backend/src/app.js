@@ -122,7 +122,7 @@ if (process.env.DEBUG_AUTH_RAW === 'true') {
     res.on('finish', () => {
       try {
         console.log('AUTH RESP:', req.method, req.originalUrl, res.statusCode, 'reqId=', req.id);
-      } catch (_e) {}
+      } catch (_e) { /* ignore */ }
     });
     next();
   });

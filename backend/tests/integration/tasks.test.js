@@ -186,8 +186,8 @@ describe('PUT /api/tasks/:id', () => {
 
   afterAll(async () => {
     await Task.destroy({ where: { id: taskId } });
-    if (otherTaskPut) await otherTaskPut.destroy();
-    if (otherUserPut) await otherUserPut.destroy();
+    if (otherTaskPut) { await otherTaskPut.destroy(); }
+    if (otherUserPut) { await otherUserPut.destroy(); }
   });
 
   test('doit mettre à jour le titre — statut 200', async () => {
@@ -262,8 +262,8 @@ describe('DELETE /api/tasks/:id', () => {
   });
 
   afterAll(async () => {
-    if (otherTaskDelete) await otherTaskDelete.destroy().catch(() => {});
-    if (otherUserDelete) await otherUserDelete.destroy();
+    if (otherTaskDelete) { await otherTaskDelete.destroy().catch(() => {}); }
+    if (otherUserDelete) { await otherUserDelete.destroy(); }
   });
 
   test('doit supprimer une tâche appartenant à l\'utilisateur — statut 204', async () => {
