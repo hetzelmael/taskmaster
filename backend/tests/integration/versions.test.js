@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const { User, Version } = require('../../src/models');
-const { client: redisClient } = require('../../src/config/redis');
+const { client: redisClient, connectRedis } = require('../../src/config/redis');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -21,10 +21,10 @@ beforeAll(async () => {
     expiresIn: '1h',
   });
 
-  // Vider le cache Redis pour cet utilisateur avant les tests
-  if (redisClient.isOpen) {
-    await redisClient.del(`versions:user:${testUserId}`);
-  }
+  // Stocker le token dans Redis + vider le cache versions
+  const redis = await connectRedis();
+  await redis.set(`jwt:${authToken}`, String(testUserId), { EX: 3600 });
+  await redis.del(`versions:user:${testUserId}`);
 });
 
 afterAll(async () => {

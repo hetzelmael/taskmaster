@@ -4,6 +4,7 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const { User } = require('../../src/models');
+const { connectRedis } = require('../../src/config/redis');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -110,6 +111,10 @@ describe("Gestion d'erreurs", () => {
       process.env.JWT_SECRET || 'test-secret-key',
       { expiresIn: '1h' }
     );
+
+    // Stocker le token dans Redis pour que le middleware l'accepte
+    const redis = await connectRedis();
+    await redis.set(`jwt:${authToken}`, '0', { EX: 3600 });
   });
 
   test('GET /api/route-inexistante — doit retourner 404', async () => {
