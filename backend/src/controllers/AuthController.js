@@ -2,9 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const { connectRedis } = require('../config/redis');
 
 const SALT_ROUNDS = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS, 10) : 12;
 const JWT_EXPIRES = '24h';
+const JWT_TTL_SECONDS = 24 * 60 * 60;
 
 exports.registerValidators = [
   body('firstName').optional().isString().trim().notEmpty().withMessage('Prénom requis'),
@@ -82,7 +84,18 @@ exports.login = async (req, res) => {
   const token = jwt.sign({ userId: user.id, role: 'user' }, process.env.JWT_SECRET, {
     expiresIn: JWT_EXPIRES,
   });
+
+  const redis = await connectRedis();
+  await redis.set(`jwt:${token}`, String(user.id), { EX: JWT_TTL_SECONDS });
+
   return res.json({ token, user: { id: user.id, email: user.email } });
+};
+
+exports.logout = async (req, res) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const redis = await connectRedis();
+  await redis.del(`jwt:${token}`);
+  return res.status(204).send();
 };
 
 exports.deleteAccount = async (req, res) => {
