@@ -6,7 +6,7 @@
 | ------------- | ---------- | --------------------------- | ----------- |
 | Unitaire      | Jest       | > 80%                       | Oui (CI)    |
 | Intégration   | Supertest  | Routes API critiques        | Oui (CI)    |
-| E2E           | Cypress    | Parcours utilisateur        | Non (local) |
+| E2E           | Non retenu | Parcours utilisateur        | Non         |
 | Sécurité      | OWASP ZAP  | Top 10 OWASP                | Semi-auto   |
 | Charge        | k6         | 100 utilisateurs simultanés | Non (local) |
 | Accessibilité | Lighthouse | Score > 90                  | Manuel      |
@@ -76,14 +76,10 @@
 
 ## 5. Tests de charge (CP 9.3)
 
-Note : les scripts Cypress (E2E) et k6 (tests de charge) sont fournis dans ce dépôt sous `backend/cypress/` et `backend/tests/load/`.
-Ils sont conservés comme contrôles locaux et ponctuels, mais ne bloquent pas la CI afin de garder le pipeline court et lisible. Pour lancer localement :
+Note : les tests de charge k6 sont fournis dans ce dépôt sous `backend/tests/load/`.
+Les tests E2E n'ont pas été retenus dans cette version, afin d'éviter les coûts et l'infrastructure supplémentaires. Pour lancer localement :
 
 ```bash
-# Cypress (E2E)
-cd backend
-npm run test:e2e
-
 # k6 (load) - exemple heavy (100 VU, 30s)
 Get-Content backend/tests/load/heavy.js | docker run --rm -i --network taskmaster_default -e BASE_URL=http://taskmaster-api:3000 grafana/k6 run -
 ```

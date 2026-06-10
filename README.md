@@ -13,7 +13,7 @@
 | Base relationnelle | PostgreSQL 16                                                                                   |
 | Base NoSQL (cache) | Redis 7                                                                                         |
 | Authentification   | JWT + bcryptjs                                                                                  |
-| Tests              | Jest + Supertest (unit/integration) + Cypress (E2E) + k6 (load)                                 |
+| Tests              | Jest + Supertest (unit/integration) + k6 (load)                                                 |
 | Linting            | ESLint + Prettier                                                                               |
 | CI/CD              | GitHub Actions                                                                                  |
 | Conteneurisation   | Docker + Docker Compose                                                                         |

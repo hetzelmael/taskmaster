@@ -14,9 +14,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -28,9 +28,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -44,9 +44,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -58,9 +58,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -74,9 +74,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -88,9 +88,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -104,9 +104,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -118,9 +118,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -136,9 +136,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -150,9 +150,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -166,9 +166,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -180,9 +180,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -196,9 +196,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -210,9 +210,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -226,9 +226,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -240,9 +240,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -252,15 +252,15 @@
 
 **Exemple n°1 ► Rédaction du plan de tests et exécution des tests unitaires**
 
-1. J'ai rédigé un plan de tests couvrant 6 types de tests (unitaires, intégration, E2E, sécurité, charge, accessibilité) avec des cas nominaux, cas limites et cas d'erreur, puis implémenté 15 tests unitaires Jest avec mocks pour isoler le `TaskService` de la base de données.
+1. J'ai rédigé un plan de tests couvrant 5 types de tests (unitaires, intégration, sécurité, charge, accessibilité), sans E2E dans cette version en raison du coût et de l'infrastructure qu'ils impliqueraient, puis implémenté 15 tests unitaires Jest avec mocks pour isoler le `TaskService` de la base de données.
 
 2. Jest 29 (`describe`, `it`, `jest.mock`, `jest.fn`, `beforeEach`), mocks des modèles Sequelize et de la transaction, couverture de code générée avec `--coverage` (> 85% sur le service).
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -272,9 +272,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -288,9 +288,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -302,9 +302,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -318,9 +318,9 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---
 
@@ -332,8 +332,8 @@
 
 3. Seul, dans le cadre de ma formation, avec le suivi de mes formateurs.
 
-4. Nom : *(organisme de formation)*
+4. Nom : _(organisme de formation)_
    Service : Formation CDA — Projet fil rouge TaskMaster
-   Période : Du *(date)* au *(date)*
+   Période : Du _(date)_ au _(date)_
 
 ---

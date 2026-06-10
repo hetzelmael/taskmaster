@@ -305,12 +305,12 @@ button {
 **Sélectionner et manipuler le DOM** :
 
 ```js
-const form = document.querySelector("#task-form"); // un élément
-const items = document.querySelectorAll(".task"); // tous (NodeList)
-form.addEventListener("submit", handler); // écouteur d'événement
-element.classList.add("done"); // CSS classes
-element.textContent = "Hello"; // texte (sécurisé)
-element.innerHTML = "<b>x</b>"; // HTML (DANGEREUX, voir CP2.4)
+const form = document.querySelector('#task-form'); // un élément
+const items = document.querySelectorAll('.task'); // tous (NodeList)
+form.addEventListener('submit', handler); // écouteur d'événement
+element.classList.add('done'); // CSS classes
+element.textContent = 'Hello'; // texte (sécurisé)
+element.innerHTML = '<b>x</b>'; // HTML (DANGEREUX, voir CP2.4)
 ```
 
 **Async/await + fetch** :
@@ -318,13 +318,13 @@ element.innerHTML = "<b>x</b>"; // HTML (DANGEREUX, voir CP2.4)
 ```js
 async function getTasks() {
   try {
-    const res = await fetch("/api/tasks", {
+    const res = await fetch('/api/tasks', {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
-    console.error("Échec:", err);
+    console.error('Échec:', err);
     return [];
   }
 }
@@ -335,32 +335,32 @@ async function getTasks() {
 ### Code dans TaskMaster : `frontend/app.js`
 
 ```js
-const API = "http://localhost:3000/api";
-const token = localStorage.getItem("token");
+const API = 'http://localhost:3000/api';
+const token = localStorage.getItem('token');
 
-const form = document.querySelector("#task-form");
-const list = document.querySelector("#task-list");
+const form = document.querySelector('#task-form');
+const list = document.querySelector('#task-list');
 
 async function loadTasks() {
   const res = await fetch(`${API}/tasks`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const tasks = await res.json();
-  list.innerHTML = "";
+  list.innerHTML = '';
   tasks.forEach((t) => {
-    const li = document.createElement("li");
+    const li = document.createElement('li');
     li.textContent = t.title; // textContent, pas innerHTML — voir CP2.4
     list.appendChild(li);
   });
 }
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const title = form.title.value;
   await fetch(`${API}/tasks`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ title }),
@@ -432,13 +432,13 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.examp
 
 ```js
 function escapeHtml(text) {
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
 function renderTask(task) {
-  const li = document.createElement("li");
+  const li = document.createElement('li');
   // OK — textContent échappe automatiquement
   li.textContent = task.title;
   // SI vraiment besoin de HTML :
@@ -450,7 +450,7 @@ function renderTask(task) {
 Backend : ajout de **helmet** dans `app.js` (déjà dans package.json) :
 
 ```js
-const helmet = require("helmet");
+const helmet = require('helmet');
 app.use(helmet()); // ajoute CSP, X-Frame-Options, etc.
 ```
 
@@ -590,11 +590,11 @@ class TaskService {
   }
 
   async create(userId, data) {
-    if (!data.title || typeof data.title !== "string") {
-      throw new Error("Titre invalide");
+    if (!data.title || typeof data.title !== 'string') {
+      throw new Error('Titre invalide');
     }
     if (data.title.length > 200) {
-      throw new Error("Titre trop long (max 200)");
+      throw new Error('Titre trop long (max 200)');
     }
     return this.taskModel.create({
       userId,
@@ -641,22 +641,22 @@ Structure d'un JWT : `header.payload.signature` (3 parties Base64 séparées par
 ### Code dans TaskMaster : `backend/src/controllers/AuthController.js`
 
 ```js
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { body, validationResult } = require("express-validator");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 
 const SALT_ROUNDS = 12;
 const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES = "24h";
+const JWT_EXPIRES = '24h';
 
 exports.registerValidators = [
-  body("email").isEmail().normalizeEmail(),
-  body("password")
+  body('email').isEmail().normalizeEmail(),
+  body('password')
     .isLength({ min: 8 })
     .matches(/[A-Z]/)
-    .withMessage("Au moins 1 majuscule")
+    .withMessage('Au moins 1 majuscule')
     .matches(/[0-9]/)
-    .withMessage("Au moins 1 chiffre"),
+    .withMessage('Au moins 1 chiffre'),
 ];
 
 exports.register = async (req, res) => {
@@ -674,7 +674,7 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    return res.status(401).json({ error: "Identifiants invalides" });
+    return res.status(401).json({ error: 'Identifiants invalides' });
   }
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES,
@@ -686,20 +686,20 @@ exports.login = async (req, res) => {
 ### Code dans TaskMaster : `backend/src/middleware/auth.js`
 
 ```js
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   const header = req.headers.authorization;
-  if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Token manquant" });
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token manquant' });
   }
-  const token = header.split(" ")[1];
+  const token = header.split(' ')[1];
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = payload.userId;
     next();
   } catch (err) {
-    return res.status(401).json({ error: "Token invalide" });
+    return res.status(401).json({ error: 'Token invalide' });
   }
 };
 ```
@@ -757,9 +757,9 @@ Il peut générer des tokens valides pour n'importe quel utilisateur (en falsifi
 ### Code dans TaskMaster : `backend/src/tests/taskService.test.js`
 
 ```js
-const TaskService = require("../services/TaskService");
+const TaskService = require('../services/TaskService');
 
-describe("TaskService", () => {
+describe('TaskService', () => {
   let taskModel;
   let service;
 
@@ -772,37 +772,31 @@ describe("TaskService", () => {
     service = new TaskService(taskModel);
   });
 
-  describe("create", () => {
-    test("crée une tâche valide", async () => {
-      taskModel.create.mockResolvedValue({ id: 1, title: "Test" });
-      const result = await service.create(42, { title: "Test" });
+  describe('create', () => {
+    test('crée une tâche valide', async () => {
+      taskModel.create.mockResolvedValue({ id: 1, title: 'Test' });
+      const result = await service.create(42, { title: 'Test' });
       expect(taskModel.create).toHaveBeenCalledWith({
         userId: 42,
-        title: "Test",
+        title: 'Test',
         done: false,
       });
       expect(result.id).toBe(1);
     });
 
-    test("rejette un titre vide", async () => {
-      await expect(service.create(42, { title: "" })).rejects.toThrow(
-        "Titre invalide",
-      );
+    test('rejette un titre vide', async () => {
+      await expect(service.create(42, { title: '' })).rejects.toThrow('Titre invalide');
     });
 
-    test("rejette un titre trop long", async () => {
-      const long = "a".repeat(201);
-      await expect(service.create(42, { title: long })).rejects.toThrow(
-        "Titre trop long",
-      );
+    test('rejette un titre trop long', async () => {
+      const long = 'a'.repeat(201);
+      await expect(service.create(42, { title: long })).rejects.toThrow('Titre trop long');
     });
 
-    test("trim les espaces du titre", async () => {
+    test('trim les espaces du titre', async () => {
       taskModel.create.mockResolvedValue({});
-      await service.create(42, { title: "  Hello  " });
-      expect(taskModel.create).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Hello" }),
-      );
+      await service.create(42, { title: '  Hello  ' });
+      expect(taskModel.create).toHaveBeenCalledWith(expect.objectContaining({ title: 'Hello' }));
     });
   });
 });
@@ -906,7 +900,7 @@ Application de gestion de tâches collaborative.
 
 - Backend : Node.js 20, Express, Sequelize, PostgreSQL, Redis
 - Frontend : HTML/CSS/JS vanilla
-- Tests : Jest, Supertest, Cypress
+- Tests : Jest, Supertest
 - Déploiement : Docker, GitHub Actions
 
 ## Démarrage rapide
@@ -1088,11 +1082,11 @@ Parce qu'il violerait la séparation des couches. Si la BDD change (ex: passage 
 ### Pré-rempli : `backend/src/models/Task.js`
 
 ```js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
 const Task = sequelize.define(
-  "Task",
+  'Task',
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     userId: { type: DataTypes.INTEGER, allowNull: false },
@@ -1101,7 +1095,7 @@ const Task = sequelize.define(
   },
   {
     timestamps: true, // ajoute createdAt, updatedAt automatiquement
-  },
+  }
 );
 
 module.exports = Task;
@@ -1148,9 +1142,9 @@ Avantages : code plus lisible, sécurité (requêtes paramétrées par défaut �
 
 ```js
 // app.js
-const express = require("express");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+const express = require('express');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -1162,10 +1156,10 @@ app.use(
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:"],
+        imgSrc: ["'self'", 'data:'],
       },
     },
-  }),
+  })
 );
 
 // 2. Rate limiting global
@@ -1173,24 +1167,24 @@ app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // 100 requêtes par IP
-  }),
+  })
 );
 
 // 3. Rate limiting strict sur l'auth
 app.use(
-  "/auth/login",
+  '/auth/login',
   rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5, // 5 tentatives de login par 15 min
-  }),
+  })
 );
 
 // 4. Body parser avec limite de taille
-app.use(express.json({ limit: "10kb" }));
+app.use(express.json({ limit: '10kb' }));
 
 // 5. CORS strict (autorise seulement votre frontend)
-const cors = require("cors");
-app.use(cors({ origin: "https://taskmaster.example.com" }));
+const cors = require('cors');
+app.use(cors({ origin: 'https://taskmaster.example.com' }));
 ```
 
 ### Mini-exercice (20 min)
@@ -1501,7 +1495,7 @@ const sql = `SELECT * FROM users WHERE email = '${req.body.email}'`;
 User.findOne({ where: { email: req.body.email } });
 
 // AVEC SQL BRUT (utiliser des paramètres, JAMAIS de concaténation)
-sequelize.query("SELECT * FROM users WHERE email = :email", {
+sequelize.query('SELECT * FROM users WHERE email = :email', {
   replacements: { email: req.body.email },
 });
 ```
@@ -1516,33 +1510,32 @@ sequelize.query("SELECT * FROM users WHERE email = :email", {
 **Validation des entrées** :
 
 ```js
-const { body, validationResult } = require("express-validator");
+const { body, validationResult } = require('express-validator');
 
 router.post(
-  "/tasks",
-  body("title").isString().trim().isLength({ min: 1, max: 200 }),
-  body("done").optional().isBoolean(),
+  '/tasks',
+  body('title').isString().trim().isLength({ min: 1, max: 200 }),
+  body('done').optional().isBoolean(),
   (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     // ... créer la tâche
-  },
+  }
 );
 ```
 
 ### Code dans TaskMaster : `backend/src/controllers/TaskController.js`
 
 ```js
-const { body, validationResult } = require("express-validator");
-const Task = require("../models/Task");
+const { body, validationResult } = require('express-validator');
+const Task = require('../models/Task');
 
 exports.createValidators = [
-  body("title")
+  body('title')
     .isString()
     .trim()
     .isLength({ min: 1, max: 200 })
-    .withMessage("Titre requis (1-200 caractères)"),
+    .withMessage('Titre requis (1-200 caractères)'),
 ];
 
 exports.create = async (req, res) => {
@@ -1562,19 +1555,19 @@ exports.create = async (req, res) => {
 exports.list = async (req, res) => {
   const tasks = await Task.findAll({
     where: { userId: req.userId }, // RG1 : un user voit que ses tâches
-    order: [["createdAt", "DESC"]],
+    order: [['createdAt', 'DESC']],
   });
   res.json(tasks);
 };
 
 exports.update = async (req, res) => {
   const id = parseInt(req.params.id);
-  if (isNaN(id)) return res.status(400).json({ error: "ID invalide" });
+  if (isNaN(id)) return res.status(400).json({ error: 'ID invalide' });
 
   const task = await Task.findOne({
     where: { id, userId: req.userId }, // protection IDOR
   });
-  if (!task) return res.status(404).json({ error: "Tâche introuvable" });
+  if (!task) return res.status(404).json({ error: 'Tâche introuvable' });
 
   if (req.body.title !== undefined) task.title = req.body.title;
   if (req.body.done !== undefined) task.done = req.body.done;
@@ -1587,8 +1580,7 @@ exports.remove = async (req, res) => {
   const deleted = await Task.destroy({
     where: { id, userId: req.userId },
   });
-  if (deleted === 0)
-    return res.status(404).json({ error: "Tâche introuvable" });
+  if (deleted === 0) return res.status(404).json({ error: 'Tâche introuvable' });
   res.status(204).send();
 };
 ```
@@ -1715,7 +1707,7 @@ BEFORE INSERT s'exécute avant l'insertion : on peut modifier les valeurs (NEW.t
 ### Code dans TaskMaster : transfert de tâche entre 2 listes
 
 ```js
-const { sequelize } = require("../models");
+const { sequelize } = require('../models');
 
 exports.transferTask = async (req, res) => {
   const t = await sequelize.transaction();
@@ -1726,17 +1718,17 @@ exports.transferTask = async (req, res) => {
     });
     if (!task) {
       await t.rollback();
-      return res.status(404).json({ error: "Tâche introuvable" });
+      return res.status(404).json({ error: 'Tâche introuvable' });
     }
 
     // Décrémenter compteur de l'ancienne liste
-    await List.decrement("taskCount", {
+    await List.decrement('taskCount', {
       where: { id: task.listId },
       transaction: t,
     });
 
     // Incrémenter compteur de la nouvelle liste
-    await List.increment("taskCount", {
+    await List.increment('taskCount', {
       where: { id: req.body.targetListId },
       transaction: t,
     });
@@ -1749,7 +1741,7 @@ exports.transferTask = async (req, res) => {
     res.json(task);
   } catch (err) {
     await t.rollback(); // tout annuler
-    res.status(500).json({ error: "Échec du transfert" });
+    res.status(500).json({ error: 'Échec du transfert' });
   }
 };
 ```
@@ -1810,13 +1802,13 @@ Toutes les lignes verrouillées restent inaccessibles aux autres requêtes → l
 ### Code dans TaskMaster : `backend/src/config/redis.js`
 
 ```js
-const { createClient } = require("redis");
+const { createClient } = require('redis');
 
 const client = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
 
-client.on("error", (err) => console.error("Redis error", err));
+client.on('error', (err) => console.error('Redis error', err));
 client.connect();
 
 module.exports = client;
@@ -1824,7 +1816,7 @@ module.exports = client;
 
 ```js
 // utilisation : cache des résultats fréquents
-const redis = require("../config/redis");
+const redis = require('../config/redis');
 
 exports.list = async (req, res) => {
   const cacheKey = `tasks:user:${req.userId}`;
@@ -1918,11 +1910,11 @@ Différence cruciale :
 ### Code dans TaskMaster : `backend/src/tests/integration/tasks.test.js`
 
 ```js
-const request = require("supertest");
-const app = require("../../app");
-const { sequelize, User, Task } = require("../../models");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const request = require('supertest');
+const app = require('../../app');
+const { sequelize, User, Task } = require('../../models');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 let token;
 let userId;
@@ -1931,8 +1923,8 @@ beforeAll(async () => {
   // BDD de test (config différente)
   await sequelize.sync({ force: true });
   const user = await User.create({
-    email: "test@example.com",
-    passwordHash: await bcrypt.hash("Test123!", 10),
+    email: 'test@example.com',
+    passwordHash: await bcrypt.hash('Test123!', 10),
   });
   userId = user.id;
   token = jwt.sign({ userId }, process.env.JWT_SECRET);
@@ -1942,47 +1934,45 @@ afterAll(async () => {
   await sequelize.close();
 });
 
-describe("POST /api/tasks", () => {
-  test("crée une tâche valide", async () => {
+describe('POST /api/tasks', () => {
+  test('crée une tâche valide', async () => {
     const res = await request(app)
-      .post("/api/tasks")
-      .set("Authorization", `Bearer ${token}`)
-      .send({ title: "Test task" });
+      .post('/api/tasks')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Test task' });
 
     expect(res.status).toBe(201);
-    expect(res.body.title).toBe("Test task");
+    expect(res.body.title).toBe('Test task');
     expect(res.body.userId).toBe(userId);
 
     const task = await Task.findByPk(res.body.id);
     expect(task).not.toBeNull();
   });
 
-  test("rejette sans authentification", async () => {
-    const res = await request(app).post("/api/tasks").send({ title: "Test" });
+  test('rejette sans authentification', async () => {
+    const res = await request(app).post('/api/tasks').send({ title: 'Test' });
     expect(res.status).toBe(401);
   });
 
-  test("rejette un titre vide", async () => {
+  test('rejette un titre vide', async () => {
     const res = await request(app)
-      .post("/api/tasks")
-      .set("Authorization", `Bearer ${token}`)
-      .send({ title: "" });
+      .post('/api/tasks')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: '' });
     expect(res.status).toBe(400);
   });
 });
 
-describe("GET /api/tasks", () => {
-  test("retourne uniquement les tâches du user authentifié", async () => {
+describe('GET /api/tasks', () => {
+  test('retourne uniquement les tâches du user authentifié', async () => {
     // Créer une tâche pour un autre user
     const otherUser = await User.create({
-      email: "other@example.com",
-      passwordHash: "x",
+      email: 'other@example.com',
+      passwordHash: 'x',
     });
-    await Task.create({ userId: otherUser.id, title: "Pas la mienne" });
+    await Task.create({ userId: otherUser.id, title: 'Pas la mienne' });
 
-    const res = await request(app)
-      .get("/api/tasks")
-      .set("Authorization", `Bearer ${token}`);
+    const res = await request(app).get('/api/tasks').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
     expect(res.body.every((t) => t.userId === userId)).toBe(true);
@@ -2041,30 +2031,30 @@ Pour partir d'une BDD vide à chaque exécution des tests. force: true drop puis
 ### Code dans TaskMaster : `tests/load/login.js` (k6)
 
 ```js
-import http from "k6/http";
-import { check, sleep } from "k6";
+import http from 'k6/http';
+import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: "30s", target: 20 }, // monte à 20 users
-    { duration: "1m", target: 20 }, // tient 1 minute
-    { duration: "30s", target: 0 }, // descend
+    { duration: '30s', target: 20 }, // monte à 20 users
+    { duration: '1m', target: 20 }, // tient 1 minute
+    { duration: '30s', target: 0 }, // descend
   ],
   thresholds: {
-    http_req_duration: ["p(95)<500"], // 95% < 500ms
-    http_req_failed: ["rate<0.01"], // < 1% d'échecs
+    http_req_duration: ['p(95)<500'], // 95% < 500ms
+    http_req_failed: ['rate<0.01'], // < 1% d'échecs
   },
 };
 
 export default function () {
   const res = http.post(
-    "http://localhost:3000/auth/login",
-    JSON.stringify({ email: "test@example.com", password: "Test123!" }),
-    { headers: { "Content-Type": "application/json" } },
+    'http://localhost:3000/auth/login',
+    JSON.stringify({ email: 'test@example.com', password: 'Test123!' }),
+    { headers: { 'Content-Type': 'application/json' } }
   );
   check(res, {
-    "status 200": (r) => r.status === 200,
-    "has token": (r) => r.json("token") !== undefined,
+    'status 200': (r) => r.status === 200,
+    'has token': (r) => r.json('token') !== undefined,
   });
   sleep(1);
 }
@@ -2102,7 +2092,7 @@ p50 = médiane = 50% des requêtes répondent en moins de cette valeur. p99 = 99
 
 **Tests E2E (End-to-End)** : pilotent un vrai navigateur pour tester comme un utilisateur. Outils :
 
-- **Cypress** (recommandé pour débuter) : moderne, gratuit, excellente DX
+- Outil de test E2E par navigateur (au choix) : moderne, gratuit, excellente DX
 - **Playwright** : multi-browser, performant
 - **Selenium** : référence historique, plus verbeux
 
@@ -2117,35 +2107,35 @@ p50 = médiane = 50% des requêtes répondent en moins de cette valeur. p99 = 99
 - Données de test isolées (chaque test crée et nettoie ses données)
 - Lancement dans la CI sur chaque PR
 
-### Code dans TaskMaster : `cypress/e2e/login.cy.js`
+### Code dans TaskMaster : un fichier de test E2E dédié
 
 ```js
-describe("Login flow", () => {
+describe('Login flow', () => {
   beforeEach(() => {
-    cy.visit("/login.html");
+    cy.visit('/login.html');
   });
 
-  it("connecte un utilisateur valide", () => {
-    cy.get("#email").type("test@example.com");
-    cy.get("#password").type("Test123!");
+  it('connecte un utilisateur valide', () => {
+    cy.get('#email').type('test@example.com');
+    cy.get('#password').type('Test123!');
     cy.get('button[type="submit"]').click();
 
-    cy.url().should("include", "/index.html");
-    cy.get("#task-list").should("be.visible");
+    cy.url().should('include', '/index.html');
+    cy.get('#task-list').should('be.visible');
   });
 
-  it("affiche une erreur sur identifiants invalides", () => {
-    cy.get("#email").type("wrong@example.com");
-    cy.get("#password").type("wrong");
+  it('affiche une erreur sur identifiants invalides', () => {
+    cy.get('#email').type('wrong@example.com');
+    cy.get('#password').type('wrong');
     cy.get('button[type="submit"]').click();
 
-    cy.get("#error-zone").should("contain", "Identifiants invalides");
+    cy.get('#error-zone').should('contain', 'Identifiants invalides');
   });
 
-  it("est accessible au clavier", () => {
-    cy.get("#email").focus().type("test@example.com");
-    cy.realPress("Tab");
-    cy.focused().should("have.id", "password");
+  it('est accessible au clavier', () => {
+    cy.get('#email').focus().type('test@example.com');
+    cy.realPress('Tab');
+    cy.focused().should('have.id', 'password');
   });
 });
 ```
@@ -2158,7 +2148,7 @@ describe("Login flow", () => {
 Pre-commit : tests unitaires uniquement (rapides, immédiat). CI sur push : tous (unitaires + intégration + smoke E2E des parcours critiques). Pre-production : tous + tests E2E complets + tests de charge. La règle : plus c'est lent et coûteux, plus tard dans le pipeline.
 </details>
 
-**Q2** : Un test E2E `cy.wait(5000)` est-il une bonne pratique ?
+**Q2** : Un test E2E avec attente fixe de 5 secondes est-il une bonne pratique ?
 
 <details><summary>Réponse</summary>
 Non, anti-pattern. Les délais fixes rendent les tests lents (toujours 5s même quand l'élément apparaît à 100ms) ET fragiles (5s pas assez sur un CI lent). Préférer `cy.get('#element').should('be.visible')` qui attend dynamiquement (jusqu'au timeout configuré, par défaut 4s).
@@ -2199,15 +2189,15 @@ backend/.env.production      → prod (jamais commité, géré par hébergeur)
 
 ```js
 // backend/src/config/database.js
-const { Sequelize } = require("sequelize");
+const { Sequelize } = require('sequelize');
 
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const configs = {
   development: {
-    url: "postgres://localhost/taskmaster_dev",
+    url: 'postgres://localhost/taskmaster_dev',
     logging: console.log,
   },
-  test: { url: "postgres://localhost/taskmaster_test", logging: false },
+  test: { url: 'postgres://localhost/taskmaster_test', logging: false },
   production: { url: process.env.DATABASE_URL, logging: false, ssl: true },
 };
 
@@ -2378,23 +2368,23 @@ Sans set -e, si une commande échoue, le script continue. Avec set -e, le script
 ### Code dans TaskMaster : `backend/migrations/20240120-add-priority-to-tasks.js`
 
 ```js
-"use strict";
+'use strict';
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("tasks", "priority", {
-      type: Sequelize.ENUM("low", "medium", "high"),
-      defaultValue: "medium",
+    await queryInterface.addColumn('tasks', 'priority', {
+      type: Sequelize.ENUM('low', 'medium', 'high'),
+      defaultValue: 'medium',
       allowNull: false,
     });
-    await queryInterface.addIndex("tasks", ["user_id", "priority"], {
-      name: "idx_tasks_user_priority",
+    await queryInterface.addIndex('tasks', ['user_id', 'priority'], {
+      name: 'idx_tasks_user_priority',
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeIndex("tasks", "idx_tasks_user_priority");
-    await queryInterface.removeColumn("tasks", "priority");
+    await queryInterface.removeIndex('tasks', 'idx_tasks_user_priority');
+    await queryInterface.removeColumn('tasks', 'priority');
   },
 };
 ```
@@ -2475,7 +2465,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: test
           POSTGRES_DB: taskmaster_test
-        ports: ["5432:5432"]
+        ports: ['5432:5432']
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -2488,8 +2478,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm'
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
@@ -2563,7 +2553,7 @@ Pour ne déployer qu'à partir de la branche main, jamais depuis une PR ou une f
 ### Code dans TaskMaster : `docker-compose.yml`
 
 ```yaml
-version: "3.9"
+version: '3.9'
 
 services:
   backend:
@@ -2571,7 +2561,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DATABASE_URL: postgres://taskmaster:secret@db:5432/taskmaster
       REDIS_URL: redis://cache:6379
@@ -2593,9 +2583,9 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taskmaster"]
+      test: ['CMD-SHELL', 'pg_isready -U taskmaster']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -2605,14 +2595,14 @@ services:
   cache:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     networks:
       - taskmaster-net
 
   frontend:
     image: nginx:alpine
     ports:
-      - "8080:80"
+      - '8080:80'
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     networks:
@@ -2790,7 +2780,7 @@ Compte tenu de votre profil, voici le séquencement optimal :
 **Après-midi (4h)**
 
 - 1.5h : CP3.3 + CP9.2 Tests unitaires & intégration (Jest + Supertest)
-- 1h : CP9.3 Tests sécurité et charge (k6, npm audit) + CP9.4 E2E (Cypress)
+- 1h : CP9.3 Tests sécurité et charge (k6, npm audit) + CP9.4 E2E
 - 0.5h : CP2.5 Accessibilité RGAA (Lighthouse audit)
 - 1h : CP8.3 Transactions + CP8.4 NoSQL (Redis/MongoDB)
 
@@ -2829,7 +2819,6 @@ Compte tenu de votre profil, voici le séquencement optimal :
 - **Express** : https://expressjs.com/fr/
 - **Sequelize** : https://sequelize.org/docs/v6/
 - **Jest** : https://jestjs.io/docs/getting-started
-- **Cypress** : https://docs.cypress.io/guides/overview/why-cypress
 - **Docker** : https://docs.docker.com/get-started/
 - **GitHub Actions** : https://docs.github.com/fr/actions
 - **OWASP Top 10** : https://owasp.org/Top10/fr/

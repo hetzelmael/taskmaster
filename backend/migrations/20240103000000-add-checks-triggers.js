@@ -50,6 +50,16 @@ module.exports = {
         ) THEN
           EXECUTE 'CREATE TRIGGER trg_tasks_updated_at BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE FUNCTION update_updated_at();';
         END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_trigger WHERE tgname = 'trg_projects_updated_at'
+        ) THEN
+          EXECUTE 'CREATE TRIGGER trg_projects_updated_at BEFORE UPDATE ON projects FOR EACH ROW EXECUTE FUNCTION update_updated_at();';
+        END IF;
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_trigger WHERE tgname = 'trg_versions_updated_at'
+        ) THEN
+          EXECUTE 'CREATE TRIGGER trg_versions_updated_at BEFORE UPDATE ON versions FOR EACH ROW EXECUTE FUNCTION update_updated_at();';
+        END IF;
       EXCEPTION WHEN undefined_table THEN
         NULL;
       END$$;
@@ -59,6 +69,12 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     // Supprimer triggers et fonction
     await queryInterface.sequelize.query('DROP TRIGGER IF EXISTS trg_tasks_updated_at ON tasks;');
+    await queryInterface.sequelize.query(
+      'DROP TRIGGER IF EXISTS trg_projects_updated_at ON projects;'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TRIGGER IF EXISTS trg_versions_updated_at ON versions;'
+    );
     await queryInterface.sequelize.query('DROP TRIGGER IF EXISTS trg_users_updated_at ON users;');
     await queryInterface.sequelize.query('DROP FUNCTION IF EXISTS update_updated_at();');
 

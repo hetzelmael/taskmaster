@@ -15,7 +15,7 @@ RUN npm ci && npm prune --omit=dev
 COPY src/ ./src/
 
 # Étape 2 : image d'exécution minimale et non-root
-FROM node:20-alpine AS runtime
+FROM node:20-alpine AS production
 
 WORKDIR /app
 

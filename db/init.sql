@@ -113,6 +113,18 @@ CREATE OR REPLACE TRIGGER trg_tasks_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at();
 
+-- Trigger sur la table projects
+CREATE OR REPLACE TRIGGER trg_projects_updated_at
+    BEFORE UPDATE ON projects
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+
+-- Trigger sur la table versions
+CREATE OR REPLACE TRIGGER trg_versions_updated_at
+    BEFORE UPDATE ON versions
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+
 -- =============================================
 -- 4. PROCÉDURE STOCKÉE : archiver les anciennes tâches (CP 8.2)
 -- =============================================
