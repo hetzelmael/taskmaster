@@ -19,7 +19,7 @@ if (REDIS_HOST) {
 }
 
 async function connectRedis() {
-  if (!REDIS_HOST) return null;
+  if (!REDIS_HOST) { return null; }
   if (!client.isOpen) { await client.connect(); }
   return client;
 }
