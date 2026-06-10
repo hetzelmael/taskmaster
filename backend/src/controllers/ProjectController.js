@@ -1,5 +1,5 @@
 const { body, param, validationResult } = require('express-validator');
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, fn, col } = require('sequelize');
 const sequelize = require('../config/database');
 const { Project, Task } = require('../models');
 
