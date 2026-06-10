@@ -36,7 +36,7 @@ describe('POST /api/versions', () => {
   test('doit créer une version — statut 201', async () => {
     const res = await request(app)
       .post('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ name: 'v1.0', description: 'Première version' });
 
     expect(res.status).toBe(201);
@@ -53,7 +53,7 @@ describe('POST /api/versions', () => {
   test('doit refuser un nom vide — statut 400', async () => {
     const res = await request(app)
       .post('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ name: '' });
 
     expect(res.status).toBe(400);
@@ -67,7 +67,7 @@ describe('GET /api/versions — cache Redis (NoSQL)', () => {
       await redisClient.del(`versions:user:${testUserId}`);
     }
 
-    const res = await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/versions').set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -76,10 +76,10 @@ describe('GET /api/versions — cache Redis (NoSQL)', () => {
 
   test('doit retourner les versions depuis le cache Redis (cache hit)', async () => {
     // Premier appel : peuple le cache
-    await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
+    await request(app).get('/api/versions').set('Cookie', `auth_token=${authToken}`);
 
     // Deuxième appel : doit venir du cache (même résultat)
-    const res = await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/versions').set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -97,18 +97,18 @@ describe('DELETE /api/versions/:id', () => {
     // Créer une version à supprimer
     const created = await request(app)
       .post('/api/versions')
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ name: 'v-à-supprimer' });
 
     const versionId = created.body.id;
 
     // Peupler le cache
-    await request(app).get('/api/versions').set('Authorization', `Bearer ${authToken}`);
+    await request(app).get('/api/versions').set('Cookie', `auth_token=${authToken}`);
 
     // Supprimer
     const res = await request(app)
       .delete(`/api/versions/${versionId}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(204);
 
@@ -135,7 +135,7 @@ describe('DELETE /api/versions/:id', () => {
 
     const res = await request(app)
       .delete(`/api/versions/${otherVersion.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(404);
 

@@ -51,7 +51,7 @@ describe('POST /api/tasks', () => {
   test('doit créer une tâche avec un JWT valide — statut 201', async () => {
     const res = await request(app)
       .post('/api/tasks')
-      .set('Authorization', `Bearer ${authToken}`) // Header JWT
+      .set('Cookie', `auth_token=${authToken}`) // Header JWT
       .send({
         title: 'Tâche de test intégration',
         description: 'Ceci est un test',
@@ -72,7 +72,7 @@ describe('POST /api/tasks', () => {
   test('doit refuser un titre vide — statut 400', async () => {
     const res = await request(app)
       .post('/api/tasks')
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ title: '' });
 
     expect(res.status).toBe(400);
@@ -84,7 +84,7 @@ describe('POST /api/tasks', () => {
 // ==========================================
 describe('GET /api/tasks', () => {
   test("doit retourner les tâches de l'utilisateur — statut 200", async () => {
-    const res = await request(app).get('/api/tasks').set('Authorization', `Bearer ${authToken}`);
+    const res = await request(app).get('/api/tasks').set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.tasks)).toBe(true);
@@ -93,7 +93,7 @@ describe('GET /api/tasks', () => {
   test('doit filtrer par priorité', async () => {
     const res = await request(app)
       .get('/api/tasks?priority=high')
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(200);
     // Toutes les tâches retournées doivent être "high"
@@ -117,7 +117,7 @@ describe('GET /api/tasks/:id — protection IDOR', () => {
 
     const res = await request(app)
       .get(`/api/tasks/${ownedTask.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBe(ownedTask.id);
@@ -145,7 +145,7 @@ describe('GET /api/tasks/:id — protection IDOR', () => {
     // Essayer d'y accéder avec le token du premier utilisateur
     const res = await request(app)
       .get(`/api/tasks/${otherTask.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     // Doit recevoir 404, PAS 200
     expect(res.status).toBe(404);
@@ -198,7 +198,7 @@ describe('PUT /api/tasks/:id', () => {
   test('doit mettre à jour le titre — statut 200', async () => {
     const res = await request(app)
       .put(`/api/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ title: 'Titre modifié' });
 
     expect(res.status).toBe(200);
@@ -208,7 +208,7 @@ describe('PUT /api/tasks/:id', () => {
   test('doit accepter une transition de statut valide (todo → in_progress)', async () => {
     const res = await request(app)
       .put(`/api/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ status: 'in_progress' });
 
     expect(res.status).toBe(200);
@@ -225,7 +225,7 @@ describe('PUT /api/tasks/:id', () => {
 
     const res = await request(app)
       .put(`/api/tasks/${newTask.id}`)
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ status: 'done' });
 
     expect(res.status).toBe(400);
@@ -236,7 +236,7 @@ describe('PUT /api/tasks/:id', () => {
   test('ne doit pas modifier la tâche d\'un autre utilisateur — statut 404', async () => {
     const res = await request(app)
       .put(`/api/tasks/${otherTaskPut.id}`)
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Cookie', `auth_token=${authToken}`)
       .send({ title: 'Tentative de modification' });
 
     expect(res.status).toBe(404);
@@ -281,7 +281,7 @@ describe('DELETE /api/tasks/:id', () => {
 
     const res = await request(app)
       .delete(`/api/tasks/${task.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(204);
   });
@@ -289,7 +289,7 @@ describe('DELETE /api/tasks/:id', () => {
   test('ne doit pas supprimer la tâche d\'un autre utilisateur — statut 404', async () => {
     const res = await request(app)
       .delete(`/api/tasks/${otherTaskDelete.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(404);
   });

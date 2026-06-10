@@ -36,13 +36,14 @@ describe('Authentification', () => {
     expect(res.status).toBe(409);
   });
 
-  test('POST /api/auth/login — doit retourner un token JWT — statut 200', async () => {
+  test('POST /api/auth/login — doit poser le cookie auth_token — statut 200', async () => {
     const res = await request(app)
       .post('/api/auth/login')
       .send({ email, password });
 
     expect(res.status).toBe(200);
-    expect(res.body.token).toBeDefined();
+    expect(res.headers['set-cookie']).toBeDefined();
+    expect(res.headers['set-cookie'][0]).toMatch(/auth_token=/);
     expect(res.body.user.email).toBe(email);
   });
 
@@ -126,7 +127,7 @@ describe("Gestion d'erreurs", () => {
   test('DELETE /api/tasks/99999 — tâche inexistante doit retourner 404', async () => {
     const res = await request(app)
       .delete('/api/tasks/99999')
-      .set('Authorization', `Bearer ${authToken}`);
+      .set('Cookie', `auth_token=${authToken}`);
 
     expect(res.status).toBe(404);
   });
