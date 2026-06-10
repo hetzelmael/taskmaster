@@ -1,3 +1,3 @@
-# Proxy API vers le backend Render — remplace le reverse-proxy Nginx
-# Mettre à jour l'URL si le nom du service Render diffère de "taskmaster-api"
-/api/*  https://taskmaster-api.onrender.com/api/:splat  200
+# Proxy API vers le backend Railway
+# Remplacer RAILWAY_BACKEND_URL par l'URL générée dans le dashboard Railway
+/api/*  https://RAILWAY_BACKEND_URL/api/:splat  200
