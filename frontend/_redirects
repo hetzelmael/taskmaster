@@ -1,0 +1,3 @@
+# Proxy API vers le backend Render — remplace le reverse-proxy Nginx
+# Mettre à jour l'URL si le nom du service Render diffère de "taskmaster-api"
+/api/*  https://taskmaster-api.onrender.com/api/:splat  200

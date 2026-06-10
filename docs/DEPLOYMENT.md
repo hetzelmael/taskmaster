@@ -5,58 +5,148 @@
 - Docker Engine 24+ et Docker Compose v2
 - Git
 - Accès au dépôt GitHub
+- Certbot (Let's Encrypt) ou certificat TLS existant
 
 ## Environnements
 
-| Environnement | URL                | Base de données                            | Usage                       |
-| ------------- | ------------------ | ------------------------------------------ | --------------------------- |
-| DEV           | localhost:3000     | taskmaster (par défaut via `.env.example`) | Développement local         |
-| SIT           | sit.taskmaster.dev | taskmaster_sit                             | Tests d'intégration système |
-| UAT           | uat.taskmaster.dev | taskmaster_uat                             | Validation par le client    |
-| PROD          | taskmaster.dev     | taskmaster_prod                            | Production                  |
+| Environnement | Compose file              | URL                | Usage                       |
+| ------------- | ------------------------- | ------------------ | --------------------------- |
+| DEV           | `docker-compose.yml`      | localhost:8080     | Développement local         |
+| PROD          | `docker-compose.prod.yml` | https://domaine    | Production                  |
+
+---
 
 ## Déploiement local (DEV)
 
-1. Cloner le dépôt : `git clone https://github.com/user/taskmaster.git`
-2. Copier la configuration : `cp .env.example .env`
-3. Adapter les variables dans `.env`
-4. Lancer : `docker compose up -d`
-
-Remarque : le fichier `docker-compose.yml` expose PostgreSQL sur le port hôte **5433** (mappage `5433:5432`). Adapter vos outils/connexions locales en conséquence. 5. Vérifier : `curl http://localhost:3000/health`
-
-## Déploiement automatisé (SIT/UAT/PROD)
-
-Remarque : le pipeline GitHub Actions (`.github/workflows/ci.yml`) exécute les vérifications (lint, tests, audit npm, build) et **ne déploie pas automatiquement** vers des environnements SIT/UAT/PROD dans ce dépôt — il s'agit d'une action manuelle ou externe (hébergeur) à configurer selon la cible. Les étapes ci-dessous décrivent un workflow souhaité, non appliqué automatiquement par défaut.
-
-## Migrations de base de données (CP 10.3)
-
-Les migrations sont gérées par Sequelize CLI :
-
 ```bash
-# Créer une migration
-npx sequelize-cli migration:generate --name add-column-priority
-
-# Appliquer les migrations
-npx sequelize-cli db:migrate
-
-# Annuler la dernière migration (rollback)
-npx sequelize-cli db:migrate:undo
+git clone https://github.com/user/taskmaster.git
+cp .env.example .env          # adapter les variables
+docker compose up -d
+curl http://localhost:8080/api/health
 ```
 
-Chaque migration contient un `up` (appliquer) et un `down` (annuler).
+Ports hôte exposés en dev : PostgreSQL sur `5433`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
+
+---
+
+## Déploiement production
+
+### 1. Certificats TLS
+
+Les certificats doivent être placés dans `./certs/` **avant** de démarrer le stack.
+Ce dossier est dans `.gitignore` — ne jamais commiter les certificats.
+
+```bash
+# Option A — Let's Encrypt (serveur avec domaine public)
+sudo apt install certbot
+sudo certbot certonly --standalone -d ton-domaine.com
+mkdir -p ./certs
+sudo cp /etc/letsencrypt/live/ton-domaine.com/fullchain.pem ./certs/
+sudo cp /etc/letsencrypt/live/ton-domaine.com/privkey.pem   ./certs/
+sudo chown $USER:$USER ./certs/*.pem
+
+# Option B — Certificat auto-signé (test interne uniquement)
+mkdir -p ./certs
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout ./certs/privkey.pem \
+  -out    ./certs/fullchain.pem \
+  -subj "/CN=localhost"
+```
+
+### 2. Variables d'environnement
+
+```bash
+cp .env.example .env
+# Éditer .env — remplacer TOUS les CHANGE_ME par des valeurs fortes
+# Générer JWT_SECRET :
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+Variables obligatoires : `DB_ADMIN_PASSWORD`, `DB_APP_PASSWORD`, `REDIS_PASSWORD`, `JWT_SECRET`.
+
+### 3. Construire et démarrer
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+En production aucun port hôte n'est ouvert pour db, Redis ou le backend.
+Seul Nginx est accessible sur `80` (redirect HTTPS) et `443`.
+
+### 4. Appliquer les migrations
+
+```bash
+docker compose -f docker-compose.prod.yml exec backend npm run db:migrate
+```
+
+### 5. Vérifier
+
+```bash
+# Health via Nginx (seul point d'entrée public)
+curl https://ton-domaine.com/api/health
+
+# Vérifier les healthchecks Docker
+docker compose -f docker-compose.prod.yml ps
+```
+
+---
+
+## Pipeline CI/CD
+
+Le pipeline GitHub Actions (`.github/workflows/ci.yml`) se déclenche sur push `main`/`develop`
+et pull request vers `main`. Il exécute dans l'ordre :
+
+1. **Lint** — ESLint + `npm audit --audit-level=high` (bloque sur vulnérabilité high/critical)
+2. **Tests unitaires** — Jest avec couverture
+3. **Tests d'intégration** — Supertest contre PostgreSQL + Redis réels
+4. **Build Docker** — `docker build --target production`
+
+Le pipeline **ne déploie pas** automatiquement ; le déploiement reste une action manuelle.
+
+---
+
+## Authentification — cookie HttpOnly
+
+Le token JWT est transmis via un cookie `auth_token` (HttpOnly, Secure, SameSite=Strict).
+Il n'est **jamais** exposé dans le corps des réponses ni accessible depuis JavaScript.
+
+- Login → `POST /api/auth/login` : pose le cookie
+- Logout → `POST /api/auth/logout` : supprime le cookie côté serveur et côté client
+- Toutes les requêtes authentifiées incluent le cookie automatiquement (`credentials: 'include'`)
+
+---
+
+## Migrations de base de données
+
+```bash
+# Via npm (depuis le conteneur backend en prod)
+docker compose -f docker-compose.prod.yml exec backend npm run db:migrate
+
+# En local (hors Docker)
+cd backend && npx sequelize-cli db:migrate
+
+# Rollback de la dernière migration
+cd backend && npx sequelize-cli db:migrate:undo
+```
+
+---
 
 ## Procédure de rollback
 
-En cas de problème après un déploiement :
+1. Consulter les logs : `docker compose -f docker-compose.prod.yml logs --tail 50 backend`
+2. Revenir à l'image précédente : `docker compose -f docker-compose.prod.yml up -d --force-recreate backend`
+3. Si la BDD a été modifiée : `docker compose -f docker-compose.prod.yml exec backend npx sequelize-cli db:migrate:undo`
+4. Restaurer une sauvegarde si nécessaire : voir `scripts/backup.sh`
 
-1. Identifier le problème dans les logs : `docker compose logs --tail 50 backend`
-2. Revenir à l'image précédente : `docker compose up -d --force-recreate backend`
-3. Si la BDD a été modifiée : `npx sequelize-cli db:migrate:undo`
-4. Restaurer la sauvegarde si nécessaire : voir `scripts/backup.sh`
+---
 
 ## Sauvegardes
 
-- Script : une tâche de sauvegarde existe (`scripts/backup.sh`) qui exporte la base via `pg_dump` dans `backups/`.
-- Automatisation : aucune tâche cron/systemd ou pipeline CI n'est fournie dans le dépôt ; l'exécution périodique reste à configurer par l'opérateur (cron, systemd timer, ou job CI).
-- Rétention : le script conserve par défaut les 7 dernières sauvegardes.
-- Restauration : `gunzip -c backups/taskmaster_YYYYMMDD_HHMMSS.sql.gz | docker exec -i taskmaster-db psql -U postgres -d taskmaster`
+- Script : `scripts/backup.sh` — exporte la base via `pg_dump` dans `backups/`
+- Rétention : 7 dernières sauvegardes conservées par défaut
+- Restauration :
+  ```bash
+  gunzip -c backups/taskmaster_YYYYMMDD_HHMMSS.sql.gz | \
+    docker exec -i taskmaster-db psql -U postgres -d taskmaster
+  ```
+- Automatisation : à configurer par l'opérateur (cron, systemd timer, ou job CI)

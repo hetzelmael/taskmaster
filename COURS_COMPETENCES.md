@@ -17,6 +17,7 @@ pas juste "installer Node et coder". L'idée clé : n'importe quel développeur 
 reprendre ton projet en 5 minutes sur n'importe quelle machine.
 
 **Notions à maîtriser**
+
 - **Gestionnaire de versions** : Git (commits atomiques, branches, .gitignore)
 - **Variables d'environnement** : pourquoi on ne committe jamais les secrets,
   différence `.env` / `.env.example`
@@ -29,6 +30,7 @@ reprendre ton projet en 5 minutes sur n'importe quelle machine.
 - **CI/CD** : pipeline qui s'exécute automatiquement à chaque push pour éviter les régressions
 
 **Pièges à éviter à l'oral**
+
 - Dire "j'ai installé Node" sans expliquer pourquoi une version précise (`.nvmrc`)
 - Confondre `npm install` (résout les versions) et `npm ci` (installe exactement le lock file)
 - Ne pas savoir pourquoi le `.env` est dans le `.gitignore`
@@ -46,6 +48,7 @@ Tu dois montrer que tu sais construire une interface **accessible, responsive et
 pas juste visuellement jolie. Le jury insistera sur l'accessibilité et la prévention du XSS.
 
 **Notions à maîtriser**
+
 - **HTML sémantique** : `<header>`, `<main>`, `<section>`, `<nav>` ont un sens pour les
   lecteurs d'écran ; un `<div>` n'en a pas
 - **Accessibilité RGAA/WCAG** :
@@ -62,6 +65,7 @@ pas juste visuellement jolie. Le jury insistera sur l'accessibilité et la prév
 - **Séparation HTML/CSS/JS** : pas de style inline, pas d'événements `onclick=""` dans le HTML
 
 **Pièges à éviter à l'oral**
+
 - Confondre `aria-label` (texte alternatif) et `aria-labelledby` (pointe vers un élément)
 - Oublier que `aria-live="assertive"` interrompt le lecteur d'écran (à réserver aux erreurs)
 - Dire "je n'utilise pas innerHTML" sans expliquer pourquoi c'est une faille XSS
@@ -79,6 +83,7 @@ Tu dois montrer que tu séparés la **logique métier** des contrôleurs HTTP. U
 ne connaît pas Express, ne lit pas `req.body` — il reçoit des données propres et retourne un résultat.
 
 **Notions à maîtriser**
+
 - **Architecture en couches** : Routeur → Contrôleur → Service → Repository/Modèle
   - Le contrôleur gère le HTTP (req, res, codes de statut)
   - Le service contient les règles métier (ex : on ne peut pas assigner une tâche à un utilisateur
@@ -94,6 +99,7 @@ ne connaît pas Express, ne lit pas `req.body` — il reçoit des données propr
   un utilisateur ne voit que ses propres tâches
 
 **Pièges à éviter à l'oral**
+
 - Confondre authentification (qui es-tu ?) et autorisation (as-tu le droit ?)
 - Ne pas savoir expliquer pourquoi bcrypt est préférable à SHA256 pour les mots de passe
   (bcrypt est lent intentionnellement, a un salt intégré)
@@ -113,6 +119,7 @@ Tu dois montrer que tu travailles avec une méthodologie structurée, pas en cod
 Le jury cherche : user stories, découpage en tâches, suivi d'avancement.
 
 **Notions à maîtriser**
+
 - **Méthodes agiles** : Scrum (sprints, backlog, daily, review, rétrospective),
   Kanban (colonnes todo/doing/done, limite de WIP)
 - **User story** : format "En tant que [rôle], je veux [action] afin de [bénéfice]"
@@ -123,6 +130,7 @@ Le jury cherche : user stories, découpage en tâches, suivi d'avancement.
 - **Suivi** : outil de ticketing (GitHub Issues, Jira, Trello)
 
 **Pièges à éviter à l'oral**
+
 - Ne pas connaître la différence entre Scrum et Kanban
 - Confondre une user story et une tâche technique
 - Ne pas avoir de README exploitable
@@ -144,6 +152,7 @@ Tu dois montrer que tu pars des besoins utilisateurs (pas de la technique) et qu
 les formaliser avant de coder. La maquette est une preuve que tu as réfléchi avant d'agir.
 
 **Notions à maîtriser**
+
 - **Recueil des besoins** : entretiens, observation, questionnaires → besoins fonctionnels
   vs non-fonctionnels (performance, sécurité, accessibilité)
 - **User stories** avec critères d'acceptation (Given/When/Then)
@@ -155,6 +164,7 @@ les formaliser avant de coder. La maquette est une preuve que tu as réfléchi a
   (flux d'une fonctionnalité)
 
 **Pièges à éviter à l'oral**
+
 - Confondre wireframe (squelette) et maquette (design finalisé)
 - Oublier les besoins non-fonctionnels (sécurité, performance, accessibilité)
 - Ne pas avoir de critères d'acceptation dans les user stories
@@ -172,6 +182,7 @@ Tu dois justifier tes choix techniques (pourquoi Node.js ? pourquoi PostgreSQL ?
 et montrer que tu comprends les patterns architecturaux que tu utilises.
 
 **Notions à maîtriser**
+
 - **Architectures** :
   - Monolithique vs microservices (avantages/inconvénients)
   - Architecture 3-tiers : Présentation / Métier / Données
@@ -185,6 +196,7 @@ et montrer que tu comprends les patterns architecturaux que tu utilises.
   OWASP Top 10
 
 **Pièges à éviter à l'oral**
+
 - Ne pas pouvoir justifier un choix technologique
 - Confondre MVC et architecture 3-tiers (MVC est un pattern, 3-tiers est une architecture)
 - Méconnaître les verbes HTTP et les codes de statut
@@ -202,6 +214,7 @@ Tu dois montrer que tu sais modéliser des données (MCD → MLD → SQL) et que
 les concepts fondamentaux des bases relationnelles.
 
 **Notions à maîtriser**
+
 - **MCD** (Modèle Conceptuel des Données) : entités, associations, cardinalités (1,1 / 1,n / n,n)
 - **MLD** (Modèle Logique) : transformation en tables, clés primaires, clés étrangères
 - **Normalisation** : 1NF (atomicité), 2NF (dépendance pleine), 3NF (pas de dépendance transitive)
@@ -213,6 +226,7 @@ les concepts fondamentaux des bases relationnelles.
   requêtes paramétrées (anti-injection SQL)
 
 **Pièges à éviter à l'oral**
+
 - Ne pas savoir expliquer les formes normales
 - Confondre clé primaire et clé étrangère
 - Ne pas savoir ce qu'est une transaction et pourquoi c'est utile
@@ -231,6 +245,7 @@ Tu dois montrer que tu sais interagir avec une BDD de façon sécurisée (requê
 et que tu connais la différence entre SQL et NoSQL, et quand utiliser l'un ou l'autre.
 
 **Notions à maîtriser**
+
 - **ORM** (Object-Relational Mapper) : Sequelize mappe les tables en objets JS ;
   avantages (abstraction, sécurité) et inconvénients (N+1, overhead)
 - **Requêtes paramétrées** : `WHERE email = $1` avec valeur séparée → impossible d'injecter du SQL
@@ -244,6 +259,7 @@ et que tu connais la différence entre SQL et NoSQL, et quand utiliser l'un ou l
 - **CRUD** : Create (INSERT/POST), Read (SELECT/GET), Update (UPDATE/PUT), Delete (DELETE)
 
 **Pièges à éviter à l'oral**
+
 - Ne pas savoir ce qu'est une injection SQL et comment la prévenir
 - Confondre Redis (cache mémoire) et MongoDB (base documentaire)
 - Ne pas pouvoir expliquer le problème N+1 avec un ORM
@@ -265,10 +281,11 @@ Tu dois montrer que tu testes de façon structurée et que tu distingues les niv
 Le jury insistera sur : qu'est-ce qu'un bon test ? comment tu choisis ce que tu testes ?
 
 **Notions à maîtriser**
+
 - **Pyramide des tests** (de bas en haut) :
   - Tests unitaires : une seule unité isolée (fonction, méthode), rapides, nombreux
   - Tests d'intégration : plusieurs couches ensemble (contrôleur + BDD réelle)
-  - Tests E2E : simulation utilisateur réel (Cypress), lents, moins nombreux
+  - Tests E2E : simulation utilisateur réel, lents, moins nombreux
 - **Plan de tests** : cas nominaux (ça marche), cas limites (valeurs extrêmes),
   cas d'erreur (mauvaise entrée, droits insuffisants)
 - **Jest** : `describe`, `it`, `expect`, mocks (`jest.fn()`), `beforeEach`/`afterEach`
@@ -277,6 +294,7 @@ Le jury insistera sur : qu'est-ce qu'un bon test ? comment tu choisis ce que tu 
 - **TDD** (Test Driven Development) : écrire le test avant le code → Red → Green → Refactor
 
 **Pièges à éviter à l'oral**
+
 - Confondre test unitaire et test d'intégration
 - Ne pas avoir de cas d'erreur dans le plan de tests
 - Dire "j'ai 100% de couverture" sans préciser que la couverture ne garantit pas l'absence de bugs
@@ -294,6 +312,7 @@ Tu dois montrer que tu sais passer d'un environnement de développement à un en
 de production de façon maîtrisée, documentée et réversible.
 
 **Notions à maîtriser**
+
 - **Environnements** : développement / test (staging) / production — pourquoi les séparer
 - **Documentation de déploiement** : prérequis, étapes pas à pas, commandes exactes,
   vérification post-déploiement (healthcheck)
@@ -304,6 +323,7 @@ de production de façon maîtrisée, documentée et réversible.
 - **Logs** : centralisation, rotation, niveaux (debug/info/warn/error)
 
 **Pièges à éviter à l'oral**
+
 - Ne pas avoir de procédure de rollback
 - Oublier de parler de la sauvegarde avant déploiement
 - Confondre un healthcheck (est-ce que l'app répond ?) et un test (est-ce que l'app est correcte ?)
@@ -322,6 +342,7 @@ Tu dois montrer que tu comprends la philosophie DevOps (Dev + Ops = collaboratio
 et que tu sais automatiser le cycle de vie d'une application.
 
 **Notions à maîtriser**
+
 - **DevOps** : décloisonner développeurs et opérationnels, automatiser tout ce qui peut l'être,
   livrer en continu en petits incréments
 - **CI (Intégration Continue)** : à chaque commit, le pipeline vérifie automatiquement
@@ -335,6 +356,7 @@ et que tu sais automatiser le cycle de vie d'une application.
 - **Monitoring** : logs applicatifs, healthchecks, alertes
 
 **Pièges à éviter à l'oral**
+
 - Confondre CI et CD
 - Ne pas savoir expliquer concrètement ce que fait chaque job du pipeline
 - Penser que DevOps = juste Docker
@@ -346,6 +368,7 @@ Dockerfile multi-stage, Docker Compose, `scripts/deploy.sh`, déploiement sur Re
 ---
 
 > **Conseil général pour l'oral** : pour chaque CP, structure ta réponse ainsi :
+>
 > 1. Ce que j'ai fait (la tâche concrète)
 > 2. Pourquoi je l'ai fait comme ça (le choix technique justifié)
 > 3. Ce que j'aurais fait différemment avec plus de temps (montre ta prise de recul)

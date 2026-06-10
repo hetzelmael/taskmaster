@@ -1,7 +1,6 @@
 // === TaskMaster — Frontend JavaScript ===
 
 const API_URL = '/api';
-let authToken      = null;
 let currentUser    = null;
 let currentProject = null;
 let editingProjectId = null;
@@ -105,9 +104,14 @@ function refuseCookies() {
 // ==========================================
 async function apiFetch(endpoint, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
-  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-  const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+  const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers, credentials: 'include' });
   if (response.status === 204) return null;
+  if (response.status === 401) {
+    currentUser = null; currentProject = null;
+    sessionStorage.removeItem('user');
+    showLoginSection();
+    throw new Error('Session expirée');
+  }
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || data.message || `Erreur ${response.status}`);
   return data;
@@ -123,10 +127,8 @@ async function handleLogin() {
   if (!email || !password) { showError(errorEl, 'Veuillez remplir tous les champs.'); return; }
   try {
     const data = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
-    authToken   = data.token;
     currentUser = data.user;
     currentProject = null;
-    sessionStorage.setItem('token', authToken);
     sessionStorage.setItem('user', JSON.stringify(currentUser));
     showProjectsSection();
     loadProjects();
@@ -151,11 +153,11 @@ async function handleRegister() {
   } catch (err) { showError(errorEl, err.message); }
 }
 
-function handleLogout() {
-  authToken = null; currentUser = null; currentProject = null;
-  sessionStorage.removeItem('token');
+async function handleLogout() {
+  currentUser = null; currentProject = null;
   sessionStorage.removeItem('user');
   showLoginSection();
+  try { await apiFetch('/auth/logout', { method: 'POST' }); } catch (_e) { /* cookie déjà expiré */ }
 }
 
 // ==========================================
@@ -1316,12 +1318,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Restaurer session
-  const savedToken = sessionStorage.getItem('token');
-  const savedUser  = sessionStorage.getItem('user');
-  if (savedToken) {
-    authToken      = savedToken;
-    currentUser    = savedUser ? JSON.parse(savedUser) : null;
+  // Restaurer session — le token JWT est dans un cookie HttpOnly, seul l'user est en sessionStorage
+  const savedUser = sessionStorage.getItem('user');
+  if (savedUser) {
+    currentUser    = JSON.parse(savedUser);
     currentProject = null;
     showProjectsSection();
     loadProjects();

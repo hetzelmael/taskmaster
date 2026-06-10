@@ -1,0 +1,51 @@
+## === render.yaml — Blueprint de déploiement Render ===
+## Importe ce fichier via : Render Dashboard → New → Blueprint
+
+services:
+  # --- Backend API (Docker) ---
+  - type: web
+    name: taskmaster-api
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SALT_ROUNDS
+        value: 12
+      - key: JWT_SECRET
+        generateValue: true        # Render génère une valeur aléatoire sécurisée
+      # DATABASE_URL et DATABASE_ADMIN_URL pointent vers la même base Render
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taskmaster-db
+          property: connectionString
+      - key: DATABASE_ADMIN_URL
+        fromDatabase:
+          name: taskmaster-db
+          property: connectionString
+      # Redis désactivé — dégradation gracieuse déjà en place dans le code
+      - key: REDIS_HOST
+        value: ""
+      - key: REDIS_PASSWORD
+        value: ""
+
+  # --- Frontend (site statique) ---
+  - type: web
+    name: taskmaster-frontend
+    runtime: static
+    staticPublishPath: frontend
+    plan: free
+    routes:
+      # Proxy /api/* vers le backend — remplace le rôle de Nginx
+      - type: rewrite
+        source: /api/*
+        destination: https://taskmaster-api.onrender.com/api/*
+
+databases:
+  - name: taskmaster-db
+    plan: free              # Gratuit 90 jours, puis ~7$/mois
+    databaseName: taskmaster
+    user: taskmaster

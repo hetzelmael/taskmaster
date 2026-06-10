@@ -62,29 +62,7 @@ CREATE INDEX IF NOT EXISTS idx_users_email      ON users(email);
 
 -- =============================================
 -- 2. SÉCURITÉ BDD : Utilisateur applicatif (CP 7.3)
--- =============================================
--- Principe ANSSI : l'application ne doit PAS se connecter
--- avec le compte administrateur (postgres).
--- On crée un utilisateur avec des droits LIMITÉS.
-
-DO $$
-BEGIN
-    -- Créer l'utilisateur applicatif s'il n'existe pas
-    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'taskmaster_app') THEN
-        CREATE ROLE taskmaster_app WITH LOGIN PASSWORD 'app_secret';
-    END IF;
-END
-$$;
-
--- Droits limités : SELECT, INSERT, UPDATE, DELETE uniquement sur nos tables
--- PAS de CREATE TABLE, DROP, ALTER (principe du moindre privilège)
-GRANT CONNECT ON DATABASE taskmaster TO taskmaster_app;
-GRANT USAGE ON SCHEMA public TO taskmaster_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON users, projects, tasks, versions TO taskmaster_app;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO taskmaster_app;
-
--- Interdire la suppression de tables
-REVOKE CREATE ON SCHEMA public FROM taskmaster_app;
+-- Utilisateur applicatif créé par db/create-app-user.sh (lit DB_APP_PASSWORD depuis l'env)
 
 -- =============================================
 -- 3. TRIGGER : mise à jour automatique de updated_at (CP 8.2)
@@ -110,6 +88,18 @@ CREATE OR REPLACE TRIGGER trg_users_updated_at
 -- Trigger sur la table tasks
 CREATE OR REPLACE TRIGGER trg_tasks_updated_at
     BEFORE UPDATE ON tasks
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+
+-- Trigger sur la table projects
+CREATE OR REPLACE TRIGGER trg_projects_updated_at
+    BEFORE UPDATE ON projects
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at();
+
+-- Trigger sur la table versions
+CREATE OR REPLACE TRIGGER trg_versions_updated_at
+    BEFORE UPDATE ON versions
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at();
 

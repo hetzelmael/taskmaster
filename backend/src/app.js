@@ -4,6 +4,7 @@ if (!process.env.JEST_WORKER_ID && process.env.NODE_ENV !== 'test') {
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const { randomUUID } = require('crypto');
@@ -36,6 +37,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(cookieParser());
 
 // Capture raw body for debugging when needed (verify stores raw in req.rawBody)
 app.use(
