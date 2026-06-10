@@ -16,9 +16,11 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_ADMIN_USER}
       POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/create-app-user.sh:/docker-entrypoint-initdb.d/02-create-app-user.sh
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_ADMIN_USER}']
       interval: 10s
@@ -55,6 +57,7 @@ services:
       DB_USER: ${DB_APP_USER}
       DB_PASSWORD: ${DB_APP_PASSWORD}
       DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${DB_NAME}
+      DATABASE_ADMIN_URL: postgres://${DB_ADMIN_USER}:${DB_ADMIN_PASSWORD}@db:5432/${DB_NAME}
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}

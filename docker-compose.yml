@@ -18,13 +18,13 @@ services:
       POSTGRES_DB: ${DB_NAME:-taskmaster}
       POSTGRES_USER: ${DB_ADMIN_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:-changeme}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
     ports:
       - '5433:5432'
     volumes:
-      # Persistance des données (survit au redémarrage du conteneur)
       - pgdata:/var/lib/postgresql/data
-      # Script d'initialisation (créé les tables et l'utilisateur applicatif)
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db/create-app-user.sh:/docker-entrypoint-initdb.d/02-create-app-user.sh
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_ADMIN_USER:-postgres}']
       interval: 10s
@@ -68,6 +68,7 @@ services:
       DB_USER: ${DB_APP_USER:-taskmaster_app}
       DB_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
       DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${DB_NAME}
+      DATABASE_ADMIN_URL: postgres://${DB_ADMIN_USER:-postgres}:${DB_ADMIN_PASSWORD:-changeme}@db:5432/${DB_NAME:-taskmaster}
       REDIS_HOST: cache
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_secret}

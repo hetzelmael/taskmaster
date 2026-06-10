@@ -13,6 +13,8 @@ COPY package.json package-lock.json ./
 RUN npm ci && npm prune --omit=dev
 
 COPY src/ ./src/
+COPY migrations/ ./migrations/
+COPY .sequelizerc ./
 
 # Étape 2 : image d'exécution minimale et non-root
 FROM node:20-alpine AS production
@@ -27,8 +29,12 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/package-lock.json ./package-lock.json
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/.sequelizerc ./.sequelizerc
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
-RUN chown -R appuser:appgroup /app
+RUN chown -R appuser:appgroup /app \
+  && chmod +x /app/docker-entrypoint.sh
 
 USER appuser
 
@@ -37,4 +43,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-CMD ["node", "src/app.js"]
+CMD ["sh", "/app/docker-entrypoint.sh"]
