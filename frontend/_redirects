@@ -1,3 +1,0 @@
-# Proxy API vers le backend Railway
-# Remplacer RAILWAY_BACKEND_URL par l'URL générée dans le dashboard Railway
-/api/*  https://RAILWAY_BACKEND_URL/api/:splat  200
