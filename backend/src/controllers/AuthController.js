@@ -96,7 +96,7 @@ exports.login = async (req, res) => {
     sameSite: 'strict',
     maxAge: JWT_TTL_SECONDS * 1000,
   });
-  return res.json({ user: { id: user.id, email: user.email } });
+  return res.json({ user: { id: user.id, email: user.email, firstName: user.firstName || '', lastName: user.lastName || '' } });
 };
 
 exports.logout = async (req, res) => {
@@ -107,6 +107,12 @@ exports.logout = async (req, res) => {
   }
   res.clearCookie('auth_token');
   return res.status(204).send();
+};
+
+exports.getMe = async (req, res) => {
+  const user = await User.findByPk(req.userId, { attributes: ['id', 'email', 'firstName', 'lastName'] });
+  if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  return res.json({ id: user.id, email: user.email, firstName: user.firstName || '', lastName: user.lastName || '' });
 };
 
 exports.deleteAccount = async (req, res) => {

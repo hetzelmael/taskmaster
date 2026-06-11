@@ -65,16 +65,11 @@ function formatMs(ms) {
   return `${s}s`;
 }
 
-function formatElapsed(startIso, endIso) {
-  const ms      = new Date(endIso) - new Date(startIso);
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours   = Math.floor(minutes / 60);
-  const days    = Math.floor(hours / 24);
-  if (days    > 0) return `${days}j ${hours   % 24}h ${minutes % 60}min`;
-  if (hours   > 0) return `${hours}h ${minutes % 60}min ${seconds % 60}s`;
-  if (minutes > 0) return `${minutes}min ${seconds % 60}s`;
-  return `${seconds}s`;
+function iconEl(name) {
+  const i = document.createElement('i');
+  i.setAttribute('data-lucide', name);
+  i.className = 'icon';
+  return i;
 }
 
 function isOverdue(task) {
@@ -176,7 +171,7 @@ function showProjectsSection() {
   document.getElementById('projects-section').hidden = false;
   document.getElementById('tasks-section').hidden    = true;
   document.getElementById('nav-user').hidden         = false;
-  document.getElementById('nav-username').textContent = currentUser?.email || '';
+  document.getElementById('nav-username').textContent = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || currentUser?.email || '';
 }
 function showTasksSection() {
   document.getElementById('login-section').hidden    = true;
@@ -184,7 +179,7 @@ function showTasksSection() {
   document.getElementById('projects-section').hidden = true;
   document.getElementById('tasks-section').hidden    = false;
   document.getElementById('nav-user').hidden         = false;
-  document.getElementById('nav-username').textContent = currentUser?.email || '';
+  document.getElementById('nav-username').textContent = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || currentUser?.email || '';
   const breadcrumb  = document.getElementById('project-breadcrumb');
   const projectName = document.getElementById('breadcrumb-project-name');
   breadcrumb.hidden = !currentProject;
@@ -198,12 +193,30 @@ function toggleAuthSection(target) {
 // ==========================================
 // Profil
 // ==========================================
-function openProfile() {
-  document.getElementById('profile-email').textContent = currentUser?.email || '—';
-  document.getElementById('profile-id').textContent    = `#${currentUser?.id || '—'}`;
+async function openProfile() {
+  try {
+    const fresh = await apiFetch('/auth/me');
+    currentUser = { ...currentUser, ...fresh };
+    sessionStorage.setItem('user', JSON.stringify(currentUser));
+  } catch (_e) { /* utilise les données en cache si la requête échoue */ }
+  document.getElementById('profile-firstname').textContent = currentUser?.firstName || '—';
+  document.getElementById('profile-lastname').textContent  = currentUser?.lastName  || '—';
+  document.getElementById('profile-email').textContent     = currentUser?.email     || '—';
   document.getElementById('profile-modal').hidden = false;
 }
 function closeProfile() { document.getElementById('profile-modal').hidden = true; }
+
+async function handleDeleteAccount() {
+  if (!confirm('Supprimer définitivement votre compte ? Toutes vos données seront effacées. Cette action est irréversible.')) return;
+  try {
+    await apiFetch('/auth/me', { method: 'DELETE' });
+    currentUser = null;
+    currentProject = null;
+    sessionStorage.removeItem('user');
+    closeProfile();
+    showLoginSection();
+  } catch (err) { alert(err.message); }
+}
 
 // ==========================================
 // Bascule Liste / Kanban / Synthèse
@@ -330,7 +343,7 @@ function renderTasks(tasks) {
     // Date d'échéance — rouge si dépassée
     if (task.dueDate) {
       const dateEl = document.createElement('span');
-      dateEl.textContent = '📅 ' + new Date(task.dueDate).toLocaleDateString('fr-FR');
+      dateEl.append(iconEl('calendar'), ' ', new Date(task.dueDate).toLocaleDateString('fr-FR'));
       if (isOverdue(task)) dateEl.classList.add('date-overdue');
       meta.appendChild(dateEl);
     }
@@ -347,13 +360,13 @@ function renderTasks(tasks) {
     if (task.startedAt && task.status === 'in_progress') {
       const t = document.createElement('span');
       t.className = 'timing-badge';
-      t.textContent = '▶ ' + formatDateTime(task.startedAt);
+      t.append(iconEl('play'), ' ', formatDateTime(task.startedAt));
       meta.appendChild(t);
     }
     if (task.startedAt && task.completedAt && task.status === 'done') {
       const t = document.createElement('span');
       t.className = 'timing-badge';
-      t.textContent = '⏱ ' + formatElapsed(task.startedAt, task.completedAt);
+      t.append(iconEl('timer'), ' ', formatMs(new Date(task.completedAt) - new Date(task.startedAt)));
       meta.appendChild(t);
     }
 
@@ -362,13 +375,14 @@ function renderTasks(tasks) {
     // Bouton supprimer
     const delBtn = document.createElement('button');
     delBtn.className = 'btn btn-sm btn-danger-outline';
-    delBtn.textContent = '🗑';
+    delBtn.appendChild(iconEl('trash-2'));
     delBtn.setAttribute('aria-label', `Supprimer ${task.title}`);
     delBtn.addEventListener('click', e => { e.stopPropagation(); deleteTask(task.id); });
 
     card.append(cb, info, delBtn);
     container.appendChild(card);
   });
+  lucide.createIcons();
 }
 
 // ==========================================
@@ -389,6 +403,7 @@ function renderKanban(tasks) {
     cols[status].count.textContent = list.length;
     list.forEach((task, idx) => cols[status].cards.appendChild(createKanbanCard(task, idx)));
   });
+  lucide.createIcons();
 }
 
 function createKanbanCard(task, idx = 0) {
@@ -460,13 +475,13 @@ function createKanbanCard(task, idx = 0) {
   if (task.startedAt && task.status === 'in_progress') {
     const t = document.createElement('div');
     t.className = 'timing-badge';
-    t.textContent = '▶ ' + formatDateTime(task.startedAt);
+    t.append(iconEl('play'), ' ', formatDateTime(task.startedAt));
     card.appendChild(t);
   }
   if (task.startedAt && task.completedAt && task.status === 'done') {
     const t = document.createElement('div');
     t.className = 'timing-badge';
-    t.textContent = '⏱ ' + formatElapsed(task.startedAt, task.completedAt);
+    t.append(iconEl('timer'), ' ', formatMs(new Date(task.completedAt) - new Date(task.startedAt)));
     card.appendChild(t);
   }
 
@@ -575,7 +590,7 @@ function openTaskModal(task = null) {
   }
   if (task?.startedAt && task?.completedAt) {
     elapsedRow.hidden = false;
-    document.getElementById('timing-elapsed-value').textContent = formatElapsed(task.startedAt, task.completedAt);
+    document.getElementById('timing-elapsed-value').textContent = formatMs(new Date(task.completedAt) - new Date(task.startedAt));
   }
 
   document.getElementById('task-error').hidden = true;
@@ -656,13 +671,13 @@ function renderProjects(projects) {
 
     const editBtn = document.createElement('button');
     editBtn.className = 'btn btn-sm btn-secondary';
-    editBtn.textContent = '✏️';
+    editBtn.appendChild(iconEl('pencil'));
     editBtn.setAttribute('aria-label', `Modifier ${project.name}`);
     editBtn.addEventListener('click', e => { e.stopPropagation(); openProjectModal(project); });
 
     const delBtn = document.createElement('button');
     delBtn.className = 'btn btn-sm btn-danger-outline';
-    delBtn.textContent = '🗑';
+    delBtn.appendChild(iconEl('trash-2'));
     delBtn.setAttribute('aria-label', `Supprimer ${project.name}`);
     delBtn.addEventListener('click', e => { e.stopPropagation(); deleteProject(project.id); });
 
@@ -703,6 +718,7 @@ function renderProjects(projects) {
     card.addEventListener('click', () => enterProject(project));
     grid.appendChild(card);
   });
+  lucide.createIcons();
 }
 
 function enterProject(project) {
@@ -828,13 +844,14 @@ function renderVersionsList() {
 
     const del = document.createElement('button');
     del.className = 'btn btn-sm btn-danger-outline';
-    del.textContent = '🗑';
+    del.appendChild(iconEl('trash-2'));
     del.setAttribute('aria-label', `Supprimer ${v.name}`);
     del.addEventListener('click', () => deleteVersion(v.id));
 
     item.append(info, del);
     container.appendChild(item);
   });
+  lucide.createIcons();
 }
 
 async function handleCreateVersion() {
@@ -1240,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('profile-btn').addEventListener('click', openProfile);
   document.getElementById('close-profile').addEventListener('click', closeProfile);
   document.getElementById('profile-logout').addEventListener('click', () => { closeProfile(); handleLogout(); });
+  document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 
   // Versions
   document.getElementById('versions-btn').addEventListener('click', openVersionsModal);
@@ -1308,6 +1326,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // DnD Kanban
   initKanbanDnD();
 
+  // Lucide — icônes statiques du HTML
+  lucide.createIcons();
+
   // Escape pour fermer
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
@@ -1326,5 +1347,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showProjectsSection();
     loadProjects();
     loadVersions();
+    // Rafraîchir les données profil (firstName/lastName) en arrière-plan
+    apiFetch('/auth/me').then(fresh => {
+      currentUser = { ...currentUser, ...fresh };
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      document.getElementById('nav-username').textContent =
+        [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') || currentUser.email || '';
+    }).catch(() => {});
   }
 });
