@@ -199,12 +199,32 @@ async function openProfile() {
     currentUser = { ...currentUser, ...fresh };
     sessionStorage.setItem('user', JSON.stringify(currentUser));
   } catch (_e) { /* utilise les données en cache si la requête échoue */ }
-  document.getElementById('profile-firstname').textContent = currentUser?.firstName || '—';
-  document.getElementById('profile-lastname').textContent  = currentUser?.lastName  || '—';
-  document.getElementById('profile-email').textContent     = currentUser?.email     || '—';
+  document.getElementById('profile-firstname').value   = currentUser?.firstName || '';
+  document.getElementById('profile-lastname').value    = currentUser?.lastName  || '';
+  document.getElementById('profile-email').textContent = currentUser?.email     || '—';
+  document.getElementById('profile-save-error').hidden = true;
   document.getElementById('profile-modal').hidden = false;
 }
 function closeProfile() { document.getElementById('profile-modal').hidden = true; }
+
+async function handleSaveProfile() {
+  const firstName = document.getElementById('profile-firstname').value.trim();
+  const lastName  = document.getElementById('profile-lastname').value.trim();
+  const errorEl   = document.getElementById('profile-save-error');
+  if (!firstName || !lastName) { showError(errorEl, 'Prénom et nom sont requis.'); return; }
+  try {
+    const updated = await apiFetch('/auth/me', { method: 'PUT', body: JSON.stringify({ firstName, lastName }) });
+    currentUser = { ...currentUser, ...updated };
+    sessionStorage.setItem('user', JSON.stringify(currentUser));
+    const name = [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') || currentUser.email || '';
+    document.getElementById('nav-username').textContent = name;
+    showError(errorEl, '');
+    errorEl.textContent = 'Profil mis à jour.';
+    errorEl.className = 'error-msg success';
+    errorEl.hidden = false;
+    setTimeout(() => { errorEl.hidden = true; errorEl.className = 'error-msg'; }, 2000);
+  } catch (err) { showError(errorEl, err.message); }
+}
 
 async function handleDeleteAccount() {
   if (!confirm('Supprimer définitivement votre compte ? Toutes vos données seront effacées. Cette action est irréversible.')) return;
@@ -1256,6 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Profil
   document.getElementById('profile-btn').addEventListener('click', openProfile);
   document.getElementById('close-profile').addEventListener('click', closeProfile);
+  document.getElementById('profile-save-btn').addEventListener('click', handleSaveProfile);
   document.getElementById('profile-logout').addEventListener('click', () => { closeProfile(); handleLogout(); });
   document.getElementById('delete-account-btn').addEventListener('click', handleDeleteAccount);
 

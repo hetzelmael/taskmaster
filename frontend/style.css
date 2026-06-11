@@ -510,6 +510,7 @@ main {
    PROFIL
    ========================================== */
 .profile-content { display: flex; flex-direction: column; gap: 0.875rem; }
+.profile-content .form-group { margin-bottom: 0; }
 .profile-avatar {
   display: flex;
   justify-content: center;

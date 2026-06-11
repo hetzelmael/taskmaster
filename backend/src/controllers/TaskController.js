@@ -26,15 +26,19 @@ exports.getByIdValidators = [param('id').isInt({ min: 1 })];
 
 exports.list = async (req, res) => {
   const { status, priority, versionId, projectId, page = 1, limit = 20 } = req.query;
-  const result = await taskService.getTasksByUser(req.userId, {
-    status,
-    priority,
-    versionId,
-    projectId,
-    page: parseInt(page),
-    limit: parseInt(limit),
-  });
-  return res.json(result);
+  try {
+    const result = await taskService.getTasksByUser(req.userId, {
+      status,
+      priority,
+      versionId,
+      projectId,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
+    return res.json(result);
+  } catch (err) {
+    return res.status(500).json({ error: 'Erreur serveur interne' });
+  }
 };
 
 exports.getById = async (req, res) => {
@@ -57,8 +61,12 @@ exports.create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const task = await taskService.createTask(req.body, req.userId);
-  return res.status(201).json(task);
+  try {
+    const task = await taskService.createTask(req.body, req.userId);
+    return res.status(201).json(task);
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'Erreur serveur interne' });
+  }
 };
 
 exports.update = async (req, res) => {

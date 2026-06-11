@@ -363,18 +363,22 @@
           <div class="profile-avatar" aria-hidden="true">
             <i data-lucide="user-circle" class="icon"></i>
           </div>
-          <div class="profile-field">
-            <span class="profile-label">Prénom</span>
-            <span id="profile-firstname" class="profile-value"></span>
+          <div class="form-group">
+            <label for="profile-firstname">Prénom</label>
+            <input type="text" id="profile-firstname" autocomplete="given-name" maxlength="100">
           </div>
-          <div class="profile-field">
-            <span class="profile-label">Nom</span>
-            <span id="profile-lastname" class="profile-value"></span>
+          <div class="form-group">
+            <label for="profile-lastname">Nom</label>
+            <input type="text" id="profile-lastname" autocomplete="family-name" maxlength="100">
           </div>
           <div class="profile-field">
             <span class="profile-label">Email</span>
             <span id="profile-email" class="profile-value"></span>
           </div>
+          <div id="profile-save-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+          <button id="profile-save-btn" class="btn btn-primary btn-full">
+            <i data-lucide="save" class="icon"></i> Enregistrer
+          </button>
           <button id="profile-logout" class="btn btn-full">
             <i data-lucide="log-out" class="icon"></i> Se déconnecter
           </button>

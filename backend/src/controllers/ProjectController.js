@@ -1,7 +1,7 @@
 const { body, param, validationResult } = require('express-validator');
-const { QueryTypes, fn, col } = require('sequelize');
+const { QueryTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { Project, Task } = require('../models');
+const { Project } = require('../models');
 
 exports.createValidators = [
   body('name').isString().trim().isLength({ min: 1, max: 255 }).withMessage('Nom requis'),
@@ -15,26 +15,48 @@ exports.updateValidators = [
 ];
 
 exports.list = async (req, res) => {
-  const projects = await Project.findAll({
-    where: { userId: req.userId },
-    order: [['createdAt', 'DESC']],
-  });
-
-  const result = await Promise.all(
-    projects.map(async (p) => {
-      const stats = await Task.findAll({
-        where: { projectId: p.id },
-        attributes: ['status', [fn('COUNT', col('id')), 'count']],
-        group: ['status'],
-        raw: true,
-      });
-      const taskCounts = { todo: 0, in_progress: 0, done: 0, archived: 0 };
-      stats.forEach((s) => {
-        taskCounts[s.status] = parseInt(s.count);
-      });
-      return { ...p.toJSON(), taskCounts };
-    })
+  const projects = await sequelize.query(
+    `
+      SELECT
+        p.id,
+        p.name,
+        p.description,
+        p.user_id AS "userId",
+        p.created_at AS "createdAt",
+        p.updated_at AS "updatedAt",
+        COUNT(t.id)::int AS "totalTasks",
+        COUNT(t.id) FILTER (WHERE t.status = 'todo')::int AS "todoTasks",
+        COUNT(t.id) FILTER (WHERE t.status = 'in_progress')::int AS "inProgressTasks",
+        COUNT(t.id) FILTER (WHERE t.status = 'done')::int AS "doneTasks",
+        COUNT(t.id) FILTER (WHERE t.status = 'archived')::int AS "archivedTasks"
+      FROM projects p
+      LEFT JOIN tasks t ON t.project_id = p.id
+      WHERE p.user_id = :userId
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `,
+    {
+      replacements: { userId: req.userId },
+      type: QueryTypes.SELECT,
+      raw: true,
+    }
   );
+
+  const result = projects.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    userId: p.userId,
+    createdAt: p.createdAt,
+    updatedAt: p.updatedAt,
+    taskCounts: {
+      total: Number(p.totalTasks) || 0,
+      todo: Number(p.todoTasks) || 0,
+      in_progress: Number(p.inProgressTasks) || 0,
+      done: Number(p.doneTasks) || 0,
+      archived: Number(p.archivedTasks) || 0,
+    },
+  }));
 
   res.json(result);
 };
@@ -72,48 +94,10 @@ exports.update = async (req, res) => {
 };
 
 exports.remove = async (req, res) => {
-  const projects = await sequelize.query(
-    `
-      SELECT
-        p.id,
-        p.name,
-        p.description,
-        p.user_id AS "userId",
-        p.created_at AS "createdAt",
-        p.updated_at AS "updatedAt",
-        COUNT(t.id)::int AS "totalTasks",
-        COUNT(t.id) FILTER (WHERE t.status = 'todo')::int AS "todoTasks",
-        COUNT(t.id) FILTER (WHERE t.status = 'in_progress')::int AS "inProgressTasks",
-        COUNT(t.id) FILTER (WHERE t.status = 'done')::int AS "doneTasks",
-        COUNT(t.id) FILTER (WHERE t.status = 'archived')::int AS "archivedTasks"
-      FROM projects p
-      LEFT JOIN tasks t ON t.project_id = p.id
-      WHERE p.user_id = :userId
-      GROUP BY p.id
-      ORDER BY p.created_at DESC
-    `,
-    {
-      replacements: { userId: req.userId },
-      type: QueryTypes.SELECT,
-      raw: true,
-    }
-  );
-
-  const result = projects.map((project) => ({
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    userId: project.userId,
-    createdAt: project.createdAt,
-    updatedAt: project.updatedAt,
-    taskCounts: {
-      total: Number(project.totalTasks) || 0,
-      todo: Number(project.todoTasks) || 0,
-      in_progress: Number(project.inProgressTasks) || 0,
-      done: Number(project.doneTasks) || 0,
-      archived: Number(project.archivedTasks) || 0,
-    },
-  }));
-
-  res.json(result);
+  const project = await Project.findOne({ where: { id: req.params.id, userId: req.userId } });
+  if (!project) {
+    return res.status(404).json({ error: 'Projet non trouvé' });
+  }
+  await project.destroy();
+  return res.status(204).send();
 };
