@@ -6,7 +6,7 @@ module.exports = {
     password: process.env.DB_APP_PASSWORD || 'app_secret',
     database: process.env.DB_NAME || 'taskmaster',
     host: process.env.DB_HOST || '127.0.0.1',
-    port: parseInt(process.env.DB_PORT) || 5433,
+    port: parseInt(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
   },
   test: {
@@ -14,7 +14,7 @@ module.exports = {
     password: process.env.DB_PASSWORD || 'app_secret',
     database: process.env.DB_NAME || 'taskmaster_test',
     host: process.env.DB_HOST || '127.0.0.1',
-    port: parseInt(process.env.DB_PORT) || 5433,
+    port: parseInt(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
   },
   production: {
