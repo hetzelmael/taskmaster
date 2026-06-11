@@ -51,38 +51,12 @@ module.exports = {
       },
     });
 
-    await queryInterface.addColumn('tasks', 'project_id', {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      references: { model: 'projects', key: 'id' },
-      onDelete: 'CASCADE',
-    });
-
-    await queryInterface.addColumn('tasks', 'version_id', {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      references: { model: 'versions', key: 'id' },
-      onDelete: 'SET NULL',
-    });
-
-    await queryInterface.addColumn('tasks', 'started_at', {
-      type: Sequelize.DATE,
-      allowNull: true,
-    });
-
-    await queryInterface.addColumn('tasks', 'completed_at', {
-      type: Sequelize.DATE,
-      allowNull: true,
-    });
-
-    await queryInterface.addIndex('tasks', ['project_id'], {
-      name: 'idx_tasks_project_id',
-      ifNotExists: true,
-    });
-    await queryInterface.addIndex('tasks', ['version_id'], {
-      name: 'idx_tasks_version_id',
-      ifNotExists: true,
-    });
+    await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE');
+    await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS version_id INTEGER REFERENCES versions(id) ON DELETE SET NULL');
+    await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS started_at TIMESTAMP');
+    await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP');
+    await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_project_id" ON "tasks" ("project_id")');
+    await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_version_id" ON "tasks" ("version_id")');
   },
 
   async down(queryInterface) {
