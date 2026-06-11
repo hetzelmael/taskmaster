@@ -25,15 +25,17 @@ exports.updateValidators = [
 exports.getByIdValidators = [param('id').isInt({ min: 1 })];
 
 exports.list = async (req, res) => {
-  const { status, priority, versionId, projectId, page = 1, limit = 20 } = req.query;
+  const { status, priority, versionId, projectId } = req.query;
+  const page  = parseInt(req.query.page,  10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 20;
   try {
     const result = await taskService.getTasksByUser(req.userId, {
       status,
       priority,
       versionId,
       projectId,
-      page: parseInt(page),
-      limit: parseInt(limit),
+      page,
+      limit,
     });
     return res.json(result);
   } catch (err) {

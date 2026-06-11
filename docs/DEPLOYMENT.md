@@ -25,7 +25,7 @@ docker compose up -d
 curl http://localhost:8080/api/health
 ```
 
-Ports hôte exposés en dev : PostgreSQL sur `5433`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
+Ports hôte exposés en dev : PostgreSQL sur `5432`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
 
 ---
 

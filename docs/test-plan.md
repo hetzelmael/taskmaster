@@ -42,37 +42,73 @@
 
 ## 3. Tests d'intégration
 
-| ID  | Route                    | Méthode | Token              | Résultat attendu                              |
-| --- | ------------------------ | ------- | ------------------ | --------------------------------------------- |
-| I01 | /api/tasks               | POST    | Valide             | 201 + tâche créée                             |
-| I02 | /api/tasks               | POST    | Absent             | 401 Unauthorized                              |
-| I03 | /api/tasks               | POST    | Valide, titre vide | 400 Bad Request                               |
-| I04 | /api/tasks               | GET     | Valide             | 200 + liste tâches                            |
-| I05 | /api/tasks?priority=high | GET     | Valide             | 200 + filtre appliqué                         |
-| I06 | /api/tasks/:id           | GET     | Valide, autre user | 404 (protection IDOR)                         |
-| I07 | /health                  | GET     | Aucun              | 200 {status: "ok"}                            |
-| I08 | /api/projects            | POST    | Valide             | 201 + projet créé                             |
-| I09 | /api/projects            | POST    | Absent             | 401 Unauthorized                              |
-| I10 | /api/projects            | POST    | Valide, nom vide   | 400 Bad Request                               |
-| I11 | /api/projects            | GET     | Valide             | 200 + liste projets (uniquement les siens)    |
-| I12 | /api/projects/:id        | DELETE  | Valide, autre user | 404 (protection IDOR)                         |
-| I13 | /api/versions            | POST    | Valide             | 201 + version créée                           |
-| I14 | /api/versions            | POST    | Absent             | 401 Unauthorized                              |
-| I15 | /api/versions            | GET     | Valide             | 200 + liste versions depuis cache Redis ou PG |
-| I16 | /api/versions/:id        | DELETE  | Valide, autre user | 404 (protection IDOR)                         |
-| I17 | /api/auth/me             | DELETE  | Valide             | 204 + compte supprimé (RGPD)                  |
-| I18 | /api/auth/me             | DELETE  | Absent             | 401 Unauthorized                              |
+### Authentification
+
+| ID  | Route                | Méthode | Scénario                                     | Résultat attendu                    |
+| --- | -------------------- | ------- | -------------------------------------------- | ----------------------------------- |
+| I01 | /api/auth/register   | POST    | Données valides (prénom, nom, email, mdp)    | 201 + `{ id, email }`               |
+| I02 | /api/auth/register   | POST    | Prénom absent                                | 400 "Prénom requis"                 |
+| I03 | /api/auth/register   | POST    | Nom absent                                   | 400 "Nom requis"                    |
+| I04 | /api/auth/register   | POST    | Email déjà utilisé                           | 409 "Email déjà utilisé"            |
+| I05 | /api/auth/login      | POST    | Identifiants valides                         | 200 + cookie `auth_token` posé      |
+| I06 | /api/auth/login      | POST    | Mauvais mot de passe                         | 401 "Identifiants invalides"        |
+| I07 | /api/auth/me         | GET     | Token valide                                 | 200 + profil courant                |
+| I08 | /api/auth/me         | GET     | Token absent                                 | 401 Unauthorized                    |
+| I09 | /api/auth/me         | PUT     | Prénom et nom valides                        | 200 + profil mis à jour             |
+| I10 | /api/auth/me         | PUT     | Prénom absent                                | 400 "Prénom requis"                 |
+| I11 | /api/auth/me         | DELETE  | Token valide                                 | 204 + compte supprimé (RGPD)        |
+| I12 | /api/auth/me         | DELETE  | Token absent                                 | 401 Unauthorized                    |
+
+### Tâches
+
+| ID  | Route                    | Méthode | Scénario                            | Résultat attendu                    |
+| --- | ------------------------ | ------- | ----------------------------------- | ----------------------------------- |
+| I13 | /api/tasks               | POST    | Token valide, données valides       | 201 + tâche créée                   |
+| I14 | /api/tasks               | POST    | Token absent                        | 401 Unauthorized                    |
+| I15 | /api/tasks               | POST    | Titre vide                          | 400 Bad Request                     |
+| I16 | /api/tasks               | GET     | Token valide                        | 200 + liste tâches paginée          |
+| I17 | /api/tasks?priority=high | GET     | Token valide                        | 200 + filtre priorité appliqué      |
+| I18 | /api/tasks/:id           | GET     | Token autre user (IDOR)             | 404                                 |
+
+### Projets
+
+| ID  | Route             | Méthode | Scénario                            | Résultat attendu                              |
+| --- | ----------------- | ------- | ----------------------------------- | --------------------------------------------- |
+| I19 | /api/projects     | POST    | Token valide, nom valide            | 201 + projet créé                             |
+| I20 | /api/projects     | POST    | Token absent                        | 401 Unauthorized                              |
+| I21 | /api/projects     | POST    | Nom vide                            | 400 Bad Request                               |
+| I22 | /api/projects     | GET     | Token valide                        | 200 + liste projets avec `taskCounts`         |
+| I23 | /api/projects/:id | DELETE  | Token valide, propriétaire          | 204 + projet supprimé                         |
+| I24 | /api/projects/:id | DELETE  | Token autre user (IDOR)             | 404                                           |
+
+### Versions
+
+| ID  | Route               | Méthode | Scénario                            | Résultat attendu                              |
+| --- | ------------------- | ------- | ----------------------------------- | --------------------------------------------- |
+| I25 | /api/versions       | POST    | Token valide                        | 201 + version créée                           |
+| I26 | /api/versions       | POST    | Token absent                        | 401 Unauthorized                              |
+| I27 | /api/versions       | GET     | Token valide                        | 200 + liste versions (cache Redis ou PG)      |
+| I28 | /api/versions/:id   | DELETE  | Token autre user (IDOR)             | 404                                           |
+
+### Santé
+
+| ID  | Route   | Méthode | Scénario | Résultat attendu          |
+| --- | ------- | ------- | -------- | ------------------------- |
+| I29 | /health | GET     | —        | 200 `{ status: "ok", ... }` |
 
 ## 4. Tests de sécurité (CP 9.3)
 
-| ID  | Test              | Entrée                             | Attendu             |
-| --- | ----------------- | ---------------------------------- | ------------------- |
-| S01 | Injection SQL     | title: "'; DROP TABLE tasks; --"   | Pas d'exécution SQL |
-| S02 | XSS stocké        | title: "<script>alert(1)</script>" | Encodé, pas exécuté |
-| S03 | IDOR              | GET /api/tasks/1 avec token user 2 | 404                 |
-| S04 | Brute force login | 100 tentatives en 1 min            | Rate limited        |
-| S05 | JWT expiré        | Token expiré                       | 401                 |
-| S06 | JWT modifié       | Signature altérée                  | 401                 |
+| ID  | Test                       | Entrée                             | Attendu                          |
+| --- | -------------------------- | ---------------------------------- | -------------------------------- |
+| S01 | Injection SQL               | title: "'; DROP TABLE tasks; --"   | 201 sans exécution SQL           |
+| S02 | XSS stocké                  | title: "<script>alert(1)</script>" | Encodé via `textContent`, non exécuté |
+| S03 | IDOR tâche                  | GET /api/tasks/1 avec token user 2 | 404                              |
+| S04 | IDOR projet (suppression)   | DELETE /api/projects/1 autre user  | 404                              |
+| S05 | Brute force login           | 6 tentatives en 15 min             | 429 Too Many Requests            |
+| S06 | JWT expiré                  | Token expiré                       | 401                              |
+| S07 | JWT modifié                 | Signature altérée                  | 401                              |
+| S08 | Cookie absent               | Requête sans cookie                | 401 "Token manquant"             |
+| S09 | Headers logs               | Vérifier les logs serveur          | Aucun header `cookie` ni body d'auth dans les logs |
 
 ## 5. Tests de charge (CP 9.3)
 

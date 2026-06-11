@@ -36,9 +36,10 @@ function animateNumber(from, to, duration, callback) {
 }
 
 const ADJACENT = {
-  todo:        ['todo', 'in_progress'],
-  in_progress: ['todo', 'in_progress', 'done'],
-  done:        ['in_progress', 'done'],
+  todo:        ['in_progress'],
+  in_progress: ['todo', 'done'],
+  done:        ['in_progress', 'archived'],
+  archived:    [],
 };
 function canMoveTo(from, to) {
   return ADJACENT[from]?.includes(to) ?? false;

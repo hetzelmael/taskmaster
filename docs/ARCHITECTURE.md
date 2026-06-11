@@ -27,41 +27,42 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 
 ### Couche Métier (Backend)
 
-- **Routes** (`src/routes/`) — Définissent les endpoints API (auth, tasks, projects, versions)
-- **Controllers** (`src/controllers/`) — Reçoivent les requêtes, valident les entrées
-- **Services** (`src/services/`) — Contiennent la logique métier pure (TaskService)
-- **Middleware** (`src/middleware/`) — Auth JWT, validation, rate limiting
+- **Routes** (`src/routes/`) — Définissent les endpoints API (auth, tasks, projects, versions) et branchent les validateurs `express-validator`
+- **Controllers** (`src/controllers/`) — Reçoivent les requêtes HTTP, délèguent la logique aux services, gèrent les réponses et les erreurs avec `try/catch`
+- **Services** (`src/services/`) — Contiennent la logique métier pure (TaskService : CRUD, transitions de statut, transactions ; VersionService : cache Redis)
+- **Middleware** (`src/middleware/`) — Auth JWT + vérification session Redis, rate limiting
 
 ### Couche Données
 
 - **Models** (`src/models/`) — Mappent les tables via Sequelize (User, Task, Project, Version)
-- **PostgreSQL** — Base relationnelle principale
-- **Redis** — Cache NoSQL (utilisé principalement pour le cache des `versions`; peut être étendu aux sessions)
+- **PostgreSQL** — Base relationnelle principale (ACID, contraintes CHECK, triggers `updated_at`, index sur `user_id`, `project_id`, `version_id`, `status`, `priority`)
+- **Redis** — Cache NoSQL optionnel : cache des `versions` (TTL 60s), stockage des sessions JWT (invalidation à la déconnexion). Le serveur fonctionne sans Redis en dégradé gracieux.
 - **Note de synchronisation** : les contraintes `CHECK` (status, priority) et la fonction/trigger `update_updated_at` sont présentes dans `db/init.sql` et ont été ajoutées aux migrations Sequelize (voir `backend/migrations/20240103000000-add-checks-triggers.js`) afin d'assurer la cohérence entre initialisation Docker et migrations.
 
 ## Sécurité (DICP)
 
-| Critère             | Mesure appliquée                                                                                 |
-| ------------------- | ------------------------------------------------------------------------------------------------ |
-| **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting                                          |
-| **Intégrité**       | Validation des entrées (express-validator), contraintes SQL CHECK                                |
-| **Confidentialité** | JWT signé, bcryptjs (configurable rounds), TLS recommandé en production, CSP headers, CORS, IDOR |
-| **Preuve**          | Logs structurés, timestamps sur chaque entité (created_at, updated_at)                           |
+| Critère             | Mesure appliquée                                                                                                       |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Disponibilité**   | Healthchecks Docker, restart automatique, rate limiting, `process.exit(1)` sur `uncaughtException` en production       |
+| **Intégrité**       | Validation des entrées (express-validator sur toutes les routes), contraintes SQL CHECK, transitions de statut contraintes côté service |
+| **Confidentialité** | JWT signé en cookie `httpOnly, Secure, SameSite=Strict`, bcryptjs (rounds configurables), TLS en production, CSP headers, CORS strict, IDOR, logs sans cookies ni corps de requête |
+| **Preuve**          | Logs structurés avec `X-Request-Id` sur chaque requête, timestamps automatiques sur chaque entité (`created_at`, `updated_at`, `started_at`, `completed_at`) |
 
 ### Conformité OWASP Top 10
 
-- **Injection SQL** → Requêtes préparées via Sequelize ORM
-- **XSS** → textContent côté front, Helmet CSP côté back
-- **CSRF** → JWT Bearer token (pas de cookies de session)
-- **IDOR** → Vérification userId sur chaque requête (tasks, projects, versions)
-- **Auth cassée** → bcryptjs + JWT avec expiration 24h
+- **Injection SQL** → Requêtes préparées via Sequelize ORM + SQL paramétré nommé (`:param`) pour les requêtes raw
+- **XSS** → `textContent` côté front (jamais `innerHTML`), Helmet CSP côté back
+- **CSRF** → Cookie `SameSite=Strict` — les requêtes cross-site ne transmettent pas le cookie
+- **IDOR** → Vérification `userId` sur chaque requête (tasks, projects, versions) ; les projets vérifient `userId` avant toute modification ou suppression
+- **Auth cassée** → bcryptjs + JWT avec expiration 24h, révocation via Redis, `try/catch` sur toutes les opérations d'auth
 
 ### Conformité ANSSI
 
 - Utilisateur applicatif PostgreSQL avec droits restreints (pas de root)
 - Conteneur Docker en utilisateur non-root
-- Variables sensibles dans .env (hors Git)
+- Variables sensibles dans `.env` (hors Git — utiliser `.env.example` comme modèle)
 - Dépendances auditées (`npm audit`)
+- Les logs HTTP n'exposent ni les headers (cookies JWT) ni le corps des requêtes d'authentification
 
 ### Remarques déploiement local
 
@@ -76,7 +77,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 | ORM        | Sequelize 6      | Abstraction SQL, migrations, relations |
 | BDD        | PostgreSQL 16    | Robuste, ACID, open source             |
 | Cache      | Redis 7          | Rapide, sessions, invalidation cache   |
-| Auth       | JWT + bcryptjs   | Stateless, standard, cross-platform    |
+| Auth       | JWT + bcryptjs + Redis | JWT signé côté serveur, session stockée dans Redis pour révocation à la déconnexion |
 | Tests      | Jest + Supertest | Unitaires + intégration, couverture    |
 | Conteneurs | Docker + Compose | Reproductibilité, isolation            |
 | CI/CD      | GitHub Actions   | Intégré à GitHub, gratuit              |
@@ -170,12 +171,12 @@ Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas ex
 
 ## Vues frontend
 
-| Vue          | Description                                                              |
-| ------------ | ------------------------------------------------------------------------ |
-| **Projets**  | Grille de cartes avec stats de tâches par statut (todo/in_progress/done) |
-| **Liste**    | Tableau paginé avec filtres (statut, priorité, version)                  |
-| **Kanban**   | 3 colonnes drag & drop, transitions de statut contraintes                |
-| **Synthèse** | Analyse sur période : compteurs animés, temps moyen de complétion        |
+| Vue          | Description                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| **Projets**  | Grille de cartes avec compteurs de tâches par statut, chargés en une seule requête SQL (`LEFT JOIN`) |
+| **Liste**    | Tableau paginé (20 items/page) avec filtres statut, priorité, version                             |
+| **Kanban**   | 3 colonnes drag & drop (todo / in_progress / done), transitions de statut validées côté serveur   |
+| **Synthèse** | Dashboard analytique : KPIs animés, répartition statut/priorité, temps moyen de complétion, filtre par période |
 
 ## Diagramme de déploiement
 
@@ -200,7 +201,7 @@ Les clés primaires sont simples (un seul attribut `id`), donc il ne peut pas ex
 │                    ┌──────────────▼──┐   ┌────────▼───────┐ │
 │                    │ Conteneur : db  │   │Conteneur: cache│ │
 │                    │ PostgreSQL 16   │   │ Redis 7        │ │
-│                    │ Port 5433       │   │ Port 6379      │ │
+│                    │ Port 5432       │   │ Port 6379      │ │
 │                    │ Volume : pgdata │   │ Mot de passe   │ │
 │                    └─────────────────┘   └────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
@@ -214,7 +215,8 @@ Flux réseau :
 ## Écoconception
 
 - Images Docker Alpine (taille minimale)
-- Pagination des requêtes (pas de chargement de toutes les données)
-- Cache Redis pour éviter les requêtes BDD répétitives
-- Index SQL pour optimiser les performances
+- Pagination des requêtes (20 items/page par défaut, max 100 — pas de chargement total)
+- Cache Redis pour éviter les requêtes BDD répétitives (versions, TTL 60s)
+- Requête SQL unique avec `LEFT JOIN` pour la liste des projets (remplace N+1 requêtes)
+- Index SQL sur les colonnes fréquemment filtrées (`user_id`, `project_id`, `version_id`, `status`, `priority`)
 - Compression des réponses HTTP (gzip via Express `compression` middleware ou Nginx)
