@@ -86,7 +86,9 @@ exports.login = async (req, res) => {
   });
 
   const redis = await connectRedis();
-  await redis.set(`jwt:${token}`, String(user.id), { EX: JWT_TTL_SECONDS });
+  if (redis) {
+    await redis.set(`jwt:${token}`, String(user.id), { EX: JWT_TTL_SECONDS });
+  }
 
   res.cookie('auth_token', token, {
     httpOnly: true,
@@ -100,7 +102,9 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
   const token = req.cookies.auth_token;
   const redis = await connectRedis();
-  await redis.del(`jwt:${token}`);
+  if (redis) {
+    await redis.del(`jwt:${token}`);
+  }
   res.clearCookie('auth_token');
   return res.status(204).send();
 };

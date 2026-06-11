@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:-changeme}
       DB_APP_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
     ports:
-      - '5433:5432'
+      - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql

@@ -2,7 +2,7 @@ const { execSync } = require('child_process');
 const { Client } = require('pg');
 
 const DB_HOST = process.env.DB_HOST || '127.0.0.1';
-const DB_PORT = process.env.DB_PORT || '5433';
+const DB_PORT = process.env.DB_PORT || '5432';
 const ADMIN_USER = process.env.DB_ADMIN_USER || process.env.DB_USER || 'postgres';
 const ADMIN_PASSWORD = process.env.DB_ADMIN_PASSWORD || process.env.DB_PASSWORD || 'changeme';
 const APP_USER = process.env.DB_APP_USER || 'taskmaster_app';

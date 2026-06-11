@@ -88,19 +88,9 @@ module.exports = {
       },
     });
 
-    // Index pour optimiser les requêtes fréquentes
-    await queryInterface.addIndex('tasks', ['status'], {
-      name: 'idx_tasks_status',
-      ifNotExists: true,
-    });
-    await queryInterface.addIndex('tasks', ['priority'], {
-      name: 'idx_tasks_priority',
-      ifNotExists: true,
-    });
-    await queryInterface.addIndex('users', ['email'], {
-      name: 'idx_users_email',
-      ifNotExists: true,
-    });
+    await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_status" ON "tasks" ("status")');
+    await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_priority" ON "tasks" ("priority")');
+    await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_users_email" ON "users" ("email")');
   },
 
   async down(queryInterface) {
