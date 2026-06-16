@@ -33,10 +33,10 @@ module.exports = {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
       name: { type: Sequelize.STRING(100), allowNull: false },
       description: { type: Sequelize.TEXT, allowNull: true },
-      user_id: {
+      project_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'users', key: 'id' },
+        references: { model: 'projects', key: 'id' },
         onDelete: 'CASCADE',
       },
       created_at: {

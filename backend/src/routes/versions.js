@@ -5,7 +5,7 @@ const ctrl = require('../controllers/VersionController');
 const router = express.Router();
 router.use(auth);
 
-router.get('/', ctrl.list);
+router.get('/', ctrl.listValidators, ctrl.list);
 router.post('/', ctrl.createValidators, ctrl.create);
 router.delete('/:id', ctrl.removeValidators, ctrl.remove);
 

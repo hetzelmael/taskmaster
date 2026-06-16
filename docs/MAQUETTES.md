@@ -23,20 +23,21 @@
               │     │───┼─▶│  Créer tâche    │                        │
               │     │   │  │  Lister tâches  │                        │
               │     │   │  │  Modifier tâche │                        │
+              │     │   │  │  Supprimer tâche│                        │
               │     │   │  │  Filtrer tâches │                        │
               │     │   │  │  Changer statut │                        │
-              └─────┘   │  └─────────────────┘                        │
-                        │                                             │
-                        │  ┌─────────────────┐                        │
-                        │  │  Créer version  │                        │
-                        │  │  Lister versions│                        │
-                        │  │  Supprimer vers.│                        │
-                        │  └─────────────────┘                        │
-                        │                                             │
-                        │  ┌─────────────────┐                        │
-                        │  │  Vue Liste      │                        │
-                        │  │  Vue Kanban     │                        │
-                        │  │  Vue Synthèse   │                        │
+              │     │   │  └─────────────────┘                        │
+              │     │   │                                             │
+              │     │   │  ┌─────────────────┐                        │
+              │     │───┼─▶│  Créer version  │                        │
+              │     │   │  │  Lister versions│                        │
+              │     │   │  │  Supprimer vers.│                        │
+              │     │   │  └─────────────────┘                        │
+              │     │   │                                             │
+              │     │   │  ┌─────────────────┐                        │
+              │     │───┼─▶│  Vue Liste      │                        │
+              │     │   │  │  Vue Kanban     │                        │
+              └─────┘   │  │  Vue Synthèse   │                        │
                         │  └─────────────────┘                        │
                         └─────────────────────────────────────────────┘
 ```
