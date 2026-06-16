@@ -17,8 +17,8 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-taskmaster}
       POSTGRES_USER: ${DB_ADMIN_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:-changeme}
-      DB_APP_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD}
     ports:
       - '5432:5432'
     volumes:
@@ -38,9 +38,9 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
-    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_secret}
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-redis_secret}', 'ping']
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', 'ping']
       interval: 10s
       timeout: 3s
       retries: 5
@@ -68,11 +68,12 @@ services:
       DB_USER: ${DB_APP_USER:-taskmaster_app}
       DB_PASSWORD: ${DB_APP_PASSWORD:-app_secret}
       DATABASE_URL: postgres://${DB_APP_USER}:${DB_APP_PASSWORD}@db:5432/${DB_NAME}
-      DATABASE_ADMIN_URL: postgres://${DB_ADMIN_USER:-postgres}:${DB_ADMIN_PASSWORD:-changeme}@db:5432/${DB_NAME:-taskmaster}
+      DATABASE_ADMIN_URL: postgres://${DB_ADMIN_USER}:${DB_ADMIN_PASSWORD}@db:5432/${DB_NAME}
       REDIS_HOST: cache
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_secret}
-      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
     depends_on:
       db:
         condition: service_healthy # Attend que la BDD soit prête

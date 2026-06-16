@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="TaskMaster — Gestionnaire de tâches collaboratif">
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self'">
+        content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self'">
   <title>TaskMaster — Gestion de tâches</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -38,7 +38,7 @@
     <section id="projects-section" aria-labelledby="projects-heading" hidden>
       <div class="projects-header">
         <h2 id="projects-heading">Mes projets</h2>
-        <button id="add-project-btn" class="btn btn-primary btn-sm">+ Nouveau projet</button>
+        <button id="add-project-btn" class="btn btn-primary btn-sm"><i data-lucide="plus" class="icon"></i> Nouveau projet</button>
       </div>
       <div id="projects-grid" class="projects-grid"></div>
     </section>
@@ -105,20 +105,20 @@
     <!-- Tâches -->
     <section id="tasks-section" aria-labelledby="tasks-heading" hidden>
       <div id="project-breadcrumb" class="project-breadcrumb" hidden>
-        <button id="back-to-projects" class="btn btn-sm btn-secondary">← Projets</button>
+        <button id="back-to-projects" class="btn btn-sm btn-secondary"><i data-lucide="arrow-left" class="icon"></i> Projets</button>
         <span id="breadcrumb-project-name" class="breadcrumb-project-name"></span>
       </div>
       <div class="tasks-header">
         <h2 id="tasks-heading">Mes tâches</h2>
         <div class="tasks-controls">
           <div class="view-toggle" role="group" aria-label="Mode d'affichage">
-            <button id="btn-list-view" class="btn btn-sm active" aria-pressed="true">☰ Liste</button>
-            <button id="btn-kanban-view" class="btn btn-sm" aria-pressed="false">▦ Kanban</button>
-            <button id="btn-synthesis-view" class="btn btn-sm" aria-pressed="false">▤ Synthèse</button>
+            <button id="btn-list-view" class="btn btn-sm active" aria-pressed="true"><i data-lucide="list" class="icon"></i> Liste</button>
+            <button id="btn-kanban-view" class="btn btn-sm" aria-pressed="false"><i data-lucide="layout-dashboard" class="icon"></i> Kanban</button>
+            <button id="btn-synthesis-view" class="btn btn-sm" aria-pressed="false"><i data-lucide="bar-chart-2" class="icon"></i> Synthèse</button>
           </div>
-          <button id="versions-btn" class="btn btn-sm btn-secondary" aria-label="Gérer les versions">🏷 Versions</button>
+          <button id="versions-btn" class="btn btn-sm btn-secondary" aria-label="Gérer les versions"><i data-lucide="tag" class="icon"></i> Versions</button>
           <button id="add-task-btn" class="btn btn-primary btn-sm" aria-label="Ajouter une nouvelle tâche">
-            + Nouvelle tâche
+            <i data-lucide="plus" class="icon"></i> Nouvelle tâche
           </button>
         </div>
       </div>
@@ -360,17 +360,30 @@
           <button id="close-profile" class="close-btn" aria-label="Fermer">&times;</button>
         </div>
         <div class="profile-content">
-          <div class="profile-avatar" aria-hidden="true">👤</div>
+          <div class="profile-avatar" aria-hidden="true">
+            <i data-lucide="user-circle" class="icon"></i>
+          </div>
+          <div class="form-group">
+            <label for="profile-firstname">Prénom</label>
+            <input type="text" id="profile-firstname" autocomplete="given-name" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label for="profile-lastname">Nom</label>
+            <input type="text" id="profile-lastname" autocomplete="family-name" maxlength="100">
+          </div>
           <div class="profile-field">
             <span class="profile-label">Email</span>
             <span id="profile-email" class="profile-value"></span>
           </div>
-          <div class="profile-field">
-            <span class="profile-label">Identifiant</span>
-            <span id="profile-id" class="profile-value"></span>
-          </div>
+          <div id="profile-save-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+          <button id="profile-save-btn" class="btn btn-primary btn-full">
+            <i data-lucide="save" class="icon"></i> Enregistrer
+          </button>
           <button id="profile-logout" class="btn btn-full">
-            Se déconnecter
+            <i data-lucide="log-out" class="icon"></i> Se déconnecter
+          </button>
+          <button id="delete-account-btn" class="btn btn-full btn-danger">
+            <i data-lucide="trash-2" class="icon"></i> Supprimer mon compte
           </button>
         </div>
       </div>
@@ -383,6 +396,7 @@
     <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
   </footer>
 
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

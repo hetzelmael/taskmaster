@@ -17,7 +17,7 @@
 | Linting            | ESLint + Prettier                                                                               |
 | CI/CD              | GitHub Actions                                                                                  |
 | Conteneurisation   | Docker + Docker Compose                                                                         |
-| Déploiement        | Local (Docker) — CI builds via GitHub Actions; external PaaS (Render) not configured by default |
+| Déploiement        | Local (Docker) + Railway (PaaS production) — CI via GitHub Actions                             |
 
 ## Démarrage rapide
 
@@ -94,6 +94,7 @@ taskmaster/
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── DEPLOYMENT.md
+│   ├── MAQUETTES.md
 │   ├── test-plan.md
 │   └── user-stories.md
 ├── docker-compose.yml
@@ -122,37 +123,67 @@ docker compose down -v      # arrêter + supprimer volumes
 
 ## Endpoints API
 
-| Méthode | URL                  | Auth | Description                                                           |
-| ------- | -------------------- | ---- | --------------------------------------------------------------------- |
-| POST    | `/api/auth/register` | non  | Créer un compte                                                       |
-| POST    | `/api/auth/login`    | non  | Se connecter, reçoit un JWT                                           |
-| GET     | `/api/tasks`         | oui  | Lister mes tâches (filtres : statut, priorité, version, projet, page) |
-| POST    | `/api/tasks`         | oui  | Créer une tâche                                                       |
-| PUT     | `/api/tasks/:id`     | oui  | Modifier une tâche                                                    |
-| DELETE  | `/api/tasks/:id`     | oui  | Supprimer une tâche                                                   |
-| GET     | `/api/projects`      | oui  | Lister mes projets (avec stats de tâches par statut)                  |
-| POST    | `/api/projects`      | oui  | Créer un projet                                                       |
-| PUT     | `/api/projects/:id`  | oui  | Modifier un projet                                                    |
-| DELETE  | `/api/projects/:id`  | oui  | Supprimer un projet                                                   |
-| GET     | `/api/versions`      | oui  | Lister mes versions                                                   |
-| POST    | `/api/versions`      | oui  | Créer une version                                                     |
-| DELETE  | `/api/versions/:id`  | oui  | Supprimer une version                                                 |
-| DELETE  | `/api/auth/me`       | oui  | Supprimer son compte (RGPD)                                           |
-| GET     | `/health`            | non  | Healthcheck                                                           |
+### Authentification
+
+| Méthode | URL                  | Auth | Description                                              |
+| ------- | -------------------- | ---- | -------------------------------------------------------- |
+| POST    | `/api/auth/register` | non  | Créer un compte (prénom, nom, email, mot de passe requis)|
+| POST    | `/api/auth/login`    | non  | Se connecter — pose un cookie httpOnly `auth_token`      |
+| POST    | `/api/auth/logout`   | oui  | Se déconnecter — invalide le cookie et la session Redis  |
+| GET     | `/api/auth/me`       | oui  | Récupérer le profil courant                              |
+| PUT     | `/api/auth/me`       | oui  | Modifier le prénom et le nom                             |
+| DELETE  | `/api/auth/me`       | oui  | Supprimer son compte (RGPD)                              |
+
+### Tâches
+
+| Méthode | URL              | Auth | Description                                                            |
+| ------- | ---------------- | ---- | ---------------------------------------------------------------------- |
+| GET     | `/api/tasks`     | oui  | Lister mes tâches (filtres : statut, priorité, version, projet, page)  |
+| POST    | `/api/tasks`     | oui  | Créer une tâche                                                        |
+| GET     | `/api/tasks/:id` | oui  | Récupérer une tâche par id                                             |
+| PUT     | `/api/tasks/:id` | oui  | Modifier une tâche (transitions de statut contraintes)                 |
+| DELETE  | `/api/tasks/:id` | oui  | Supprimer une tâche                                                    |
+
+### Projets
+
+| Méthode | URL                 | Auth | Description                                                           |
+| ------- | ------------------- | ---- | --------------------------------------------------------------------- |
+| GET     | `/api/projects`     | oui  | Lister mes projets avec compteurs de tâches par statut (1 requête SQL)|
+| POST    | `/api/projects`     | oui  | Créer un projet                                                       |
+| PUT     | `/api/projects/:id` | oui  | Modifier un projet                                                    |
+| DELETE  | `/api/projects/:id` | oui  | Supprimer un projet (cascade sur les tâches)                          |
+
+### Versions
+
+| Méthode | URL                 | Auth | Description                                  |
+| ------- | ------------------- | ---- | -------------------------------------------- |
+| GET     | `/api/versions`     | oui  | Lister mes versions (cache Redis 60s)        |
+| POST    | `/api/versions`     | oui  | Créer une version                            |
+| DELETE  | `/api/versions/:id` | oui  | Supprimer une version (SET NULL sur tâches)  |
+
+### Santé
+
+| Méthode | URL       | Auth | Description                               |
+| ------- | --------- | ---- | ----------------------------------------- |
+| GET     | `/health` | non  | État du serveur, version, statut Redis    |
 
 ## Sécurité — mesures implémentées
 
 - Hachage des mots de passe avec bcryptjs (configurable via `SALT_ROUNDS`)
-- Authentification stateless par JWT signé
-- Validation systématique des entrées avec express-validator
-- Requêtes paramétrées via Sequelize (anti-injection SQL)
+- Authentification stateless par JWT signé, transmis via cookie `httpOnly, Secure, SameSite=Strict`
+- Validation systématique des entrées avec `express-validator` sur toutes les routes, y compris `PUT /auth/me`
+- Protection IDOR : chaque requête filtre par `userId` (impossible d'accéder aux données d'un autre utilisateur)
+- Transitions de statut des tâches contraintes côté serveur (`VALID_TRANSITIONS`)
+- Requêtes paramétrées via Sequelize et SQL nommé (`:param`) — anti-injection SQL
 - Headers de sécurité avec Helmet (CSP, HSTS, X-Frame-Options)
-- Rate limiting global et limiter spécifique sur `/api/auth/login` (configurable via env vars)
+- Rate limiting global (100 req/15min) et spécifique sur `/api/auth/login` (5 req/15min), désactivables via env vars
 - Compte BDD applicatif à privilèges restreints (pas root)
-- CORS strict (origine unique en production)
-- Échappement systématique des sorties côté frontend (textContent)
-- Conformité RGPD : consentement cookies, droit à l'effacement
+- CORS strict (origine unique en production, configurable via `FRONTEND_URL`)
+- Logs HTTP sans exposition des cookies ni du corps des requêtes sensibles
+- Échappement systématique des sorties côté frontend (`textContent`, jamais `innerHTML`)
+- Conformité RGPD : consentement cookies, droit à l'effacement (`DELETE /auth/me`)
 - Audit des dépendances en CI (`npm audit`)
+- `uncaughtException` déclenche `process.exit(1)` en production pour éviter un état serveur corrompu
 
 ## Licence
 

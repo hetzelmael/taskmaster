@@ -9,8 +9,8 @@ const JWT_EXPIRES = '24h';
 const JWT_TTL_SECONDS = 24 * 60 * 60;
 
 exports.registerValidators = [
-  body('firstName').optional().isString().trim().notEmpty().withMessage('Prénom requis'),
-  body('lastName').optional().isString().trim().notEmpty().withMessage('Nom requis'),
+  body('firstName').isString().trim().notEmpty().withMessage('Prénom requis'),
+  body('lastName').isString().trim().notEmpty().withMessage('Nom requis'),
   body('email')
     .trim()
     .matches(/^[^\s@]+@[^\s@]+$/)
@@ -39,17 +39,19 @@ exports.register = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { firstName = '', lastName = '', email, password } = req.body;
-
-  const existing = await User.findOne({ where: { email } });
-  if (existing) {
-    return res.status(409).json({ error: 'Email déjà utilisé' });
+  const { firstName, lastName, email, password } = req.body;
+  try {
+    const existing = await User.findOne({ where: { email } });
+    if (existing) {
+      return res.status(409).json({ error: 'Email déjà utilisé' });
+    }
+    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+    const user = await User.create({ email, password: hashed, firstName, lastName });
+    return res.status(201).json({ id: user.id, email: user.email });
+  } catch (err) {
+    console.error('register error', err);
+    return res.status(500).json({ error: 'Erreur serveur interne' });
   }
-
-  const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ email, password: hashed, firstName, lastName });
-
-  return res.status(201).json({ id: user.id, email: user.email });
 };
 
 exports.login = async (req, res) => {
@@ -58,45 +60,37 @@ exports.login = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { email, password } = req.body;
-  if (process.env.DEBUG_AUTH_RAW === 'true') {
-    try {
-      console.log('--- DEBUG LOGIN ---');
-      console.log('Req.body:', JSON.stringify(req.body));
-    } catch (_e) { /* ignore */ }
-  }
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ error: 'Identifiants invalides' });
+    }
 
-  const user = await User.findOne({ where: { email } });
-  if (process.env.DEBUG_AUTH_RAW === 'true') {
-    console.log('Found user:', user ? { id: user.id, email: user.email } : null);
-  }
-  if (!user) {
-    return res.status(401).json({ error: 'Identifiants invalides' });
-  }
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) {
+      return res.status(401).json({ error: 'Identifiants invalides' });
+    }
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (process.env.DEBUG_AUTH_RAW === 'true') {
-    console.log('Password compare result:', valid);
-  }
-  if (!valid) {
-    return res.status(401).json({ error: 'Identifiants invalides' });
-  }
+    const token = jwt.sign({ userId: user.id, role: 'user' }, process.env.JWT_SECRET, {
+      expiresIn: JWT_EXPIRES,
+    });
 
-  const token = jwt.sign({ userId: user.id, role: 'user' }, process.env.JWT_SECRET, {
-    expiresIn: JWT_EXPIRES,
-  });
+    const redis = await connectRedis();
+    if (redis) {
+      await redis.set(`jwt:${token}`, String(user.id), { EX: JWT_TTL_SECONDS });
+    }
 
-  const redis = await connectRedis();
-  if (redis) {
-    await redis.set(`jwt:${token}`, String(user.id), { EX: JWT_TTL_SECONDS });
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: JWT_TTL_SECONDS * 1000,
+    });
+    return res.json({ user: { id: user.id, email: user.email, firstName: user.firstName || '', lastName: user.lastName || '' } });
+  } catch (err) {
+    console.error('login error', err);
+    return res.status(500).json({ error: 'Erreur serveur interne' });
   }
-
-  res.cookie('auth_token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: JWT_TTL_SECONDS * 1000,
-  });
-  return res.json({ user: { id: user.id, email: user.email } });
 };
 
 exports.logout = async (req, res) => {
@@ -107,6 +101,34 @@ exports.logout = async (req, res) => {
   }
   res.clearCookie('auth_token');
   return res.status(204).send();
+};
+
+exports.getMe = async (req, res) => {
+  const user = await User.findByPk(req.userId, { attributes: ['id', 'email', 'firstName', 'lastName'] });
+  if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
+  return res.json({ id: user.id, email: user.email, firstName: user.firstName || '', lastName: user.lastName || '' });
+};
+
+exports.updateMeValidators = [
+  body('firstName').isString().trim().notEmpty().withMessage('Prénom requis'),
+  body('lastName').isString().trim().notEmpty().withMessage('Nom requis'),
+];
+
+exports.updateMe = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { firstName, lastName } = req.body;
+  try {
+    const user = await User.findByPk(req.userId);
+    if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
+    await user.update({ firstName: firstName.trim(), lastName: lastName.trim() });
+    return res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
+  } catch (err) {
+    console.error('updateMe error', err);
+    return res.status(500).json({ error: 'Erreur serveur interne' });
+  }
 };
 
 exports.deleteAccount = async (req, res) => {

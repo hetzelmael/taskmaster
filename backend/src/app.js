@@ -131,12 +131,11 @@ if (process.env.DEBUG_AUTH_RAW === 'true') {
   });
 }
 
-// Response logging middleware: captures duration, request headers, raw body and a preview of response
+// Response logging middleware: captures duration and a preview of response (no headers/cookies)
 app.use((req, res, next) => {
   const start = Date.now();
   const oldSend = res.send;
   res.send = function (body) {
-    // capture body for logging
     res.__body = body;
     return oldSend.call(this, body);
   };
@@ -157,13 +156,11 @@ app.use((req, res, next) => {
                 ? res.__body.slice(0, 300)
                 : JSON.stringify(res.__body).slice(0, 300);
           }
-        } catch (e) {
+        } catch (_e) {
           respPreview = '[unable to stringify response]';
         }
         console.log(
-          `[REQLOG] reqId=${req.id} ${req.method} ${path} ${status} ${duration}ms headers=${JSON.stringify(
-            req.headers
-          )} rawBody=${req.rawBody} respPreview=${respPreview}`
+          `[REQLOG] reqId=${req.id} ${req.method} ${path} ${status} ${duration}ms respPreview=${respPreview}`
         );
       }
     } catch (e) {
@@ -215,13 +212,12 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 
-// Global process-level handlers to capture unhandled errors during load tests
 process.on('unhandledRejection', (reason, p) => {
   console.error('UNHANDLED_REJECTION', { reason, promise: !!p });
 });
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT_EXCEPTION', err && err.stack ? err.stack : err);
-  // do not exit in debug runs; still log the stack
+  if (process.env.NODE_ENV === 'production') { process.exit(1); }
 });
 
 module.exports = app;

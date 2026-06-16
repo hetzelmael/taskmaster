@@ -10,8 +10,8 @@ function buildDbUrl({ user, password, host, port, database }) {
 const developmentUrl =
   process.env.DATABASE_URL ||
   buildDbUrl({
-    user: process.env.DB_APP_USER || 'taskmaster_app',
-    password: process.env.DB_APP_PASSWORD || 'app_secret',
+    user: process.env.DB_APP_USER || process.env.DB_USER || 'taskmaster_app',
+    password: process.env.DB_APP_PASSWORD || process.env.DB_PASSWORD || 'app_secret',
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     database: process.env.DB_NAME || 'taskmaster',
@@ -20,8 +20,8 @@ const developmentUrl =
 const testUrl =
   process.env.TEST_DATABASE_URL ||
   buildDbUrl({
-    user: process.env.DB_USER || process.env.DB_APP_USER || 'taskmaster_app',
-    password: process.env.DB_PASSWORD || process.env.DB_APP_PASSWORD || 'app_secret',
+    user: process.env.DB_APP_USER || process.env.DB_USER || 'taskmaster_app',
+    password: process.env.DB_APP_PASSWORD || process.env.DB_PASSWORD || 'app_secret',
     host: process.env.DB_HOST || '127.0.0.1',
     port: parseInt(process.env.DB_PORT || '5432', 10),
     database: process.env.DB_NAME || 'taskmaster_test',

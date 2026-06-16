@@ -25,7 +25,7 @@ docker compose up -d
 curl http://localhost:8080/api/health
 ```
 
-Ports hôte exposés en dev : PostgreSQL sur `5433`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
+Ports hôte exposés en dev : PostgreSQL sur `5432`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
 
 ---
 
@@ -87,6 +87,63 @@ curl https://ton-domaine.com/api/health
 
 # Vérifier les healthchecks Docker
 docker compose -f docker-compose.prod.yml ps
+```
+
+---
+
+## Déploiement Railway (environnement de démonstration)
+
+Railway est la plateforme PaaS utilisée pour héberger TaskMaster en production. Elle gère le réseau, le TLS et le routage sans nécessiter de serveur dédié ni de nom de domaine propre.
+
+### Architecture des services Railway
+
+| Service | Type | Rôle |
+|---------|------|------|
+| `backend` | Service Dockerfile | Node.js 20 / Express — détecté via `backend/Dockerfile` |
+| `db` | Plugin PostgreSQL 16 | Base de données managée (backups automatiques) |
+| `cache` | Plugin Redis 7 | Cache sessions JWT et versions |
+
+### Variables d'environnement
+
+Les secrets sont injectés via le dashboard Railway (chiffrés au repos) — jamais commitées. Les clés correspondent exactement au `.env.example` :
+
+```
+DB_HOST         → fourni automatiquement par Railway (lien interne)
+DB_APP_PASSWORD → généré lors de la création du plugin PostgreSQL
+REDIS_HOST      → fourni automatiquement par Railway (lien interne)
+REDIS_PASSWORD  → généré lors de la création du plugin Redis
+JWT_SECRET      → généré manuellement (crypto.randomBytes)
+FRONTEND_URL    → URL Railway du frontend (*.up.railway.app)
+NODE_ENV        → production
+```
+
+### Déploiement depuis GitHub
+
+Railway est connecté au dépôt GitHub. Chaque push sur `main` déclenche automatiquement un redéploiement du service backend après validation du pipeline CI.
+
+```
+push main → GitHub Actions (lint + tests + build) → Railway redéploie
+```
+
+### TLS et domaine
+
+Railway fournit automatiquement un certificat Let's Encrypt sur le domaine `*.up.railway.app`. Le TLS est terminé au niveau de la plateforme — aucune configuration Nginx requise côté application.
+
+### Migrations après déploiement
+
+```bash
+# Depuis la CLI Railway
+railway run --service backend npm run db:migrate
+
+# Ou via le shell Railway
+railway shell --service backend
+npm run db:migrate
+```
+
+### Vérification
+
+```bash
+curl https://<nom-du-projet>.up.railway.app/api/health
 ```
 
 ---
