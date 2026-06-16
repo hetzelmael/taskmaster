@@ -181,28 +181,72 @@ VALUES
    'Alice', 'Martin')
 ON CONFLICT (email) DO NOTHING;
 
-INSERT INTO tasks (title, description, status, priority, due_date, user_id)
+INSERT INTO projects (name, description, user_id)
+VALUES
+  ('TaskMaster Backend',
+   'API Node.js/Express : authentification, tâches, projets, versions',
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Interface Web',
+   'Frontend HTML/CSS/JS : vues liste, kanban et synthèse',
+   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+  ('Documentation',
+   'Rédaction des docs techniques et guides de déploiement',
+   (SELECT id FROM users WHERE email = 'alice@taskmaster.dev'))
+ON CONFLICT DO NOTHING;
+
+INSERT INTO versions (name, description, project_id)
+VALUES
+  ('v1.0 - Infrastructure',
+   'Mise en place Docker, BDD et pipeline CI/CD',
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev'))),
+  ('v1.1 - Auth & Sécurité',
+   'JWT, bcrypt, Redis, rate limiting et IDOR',
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')))
+ON CONFLICT DO NOTHING;
+
+INSERT INTO tasks (title, description, status, priority, due_date, user_id, project_id, version_id)
 VALUES
   ('Configurer Docker',
    'Mettre en place docker-compose avec PostgreSQL et Redis',
    'done', 'high', CURRENT_DATE - 5,
-   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM users   WHERE email = 'demo@taskmaster.dev'),
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM versions WHERE name = 'v1.0 - Infrastructure')),
+
   ('Implémenter l''authentification JWT',
    'Créer les routes /auth/register et /auth/login avec bcrypt',
    'done', 'high', CURRENT_DATE - 3,
-   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM users   WHERE email = 'demo@taskmaster.dev'),
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM versions WHERE name = 'v1.1 - Auth & Sécurité')),
+
   ('Ajouter le rate limiting',
    'Protéger les endpoints avec express-rate-limit',
    'in_progress', 'medium', CURRENT_DATE + 2,
-   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM users   WHERE email = 'demo@taskmaster.dev'),
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM versions WHERE name = 'v1.1 - Auth & Sécurité')),
+
   ('Rédiger les tests d''intégration',
    'Couvrir les routes /api/tasks avec Supertest',
    'todo', 'medium', CURRENT_DATE + 7,
-   (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM users   WHERE email = 'demo@taskmaster.dev'),
+   (SELECT id FROM projects WHERE name = 'TaskMaster Backend'
+      AND user_id = (SELECT id FROM users WHERE email = 'demo@taskmaster.dev')),
+   (SELECT id FROM versions WHERE name = 'v1.1 - Auth & Sécurité')),
+
   ('Préparer la documentation de déploiement',
    'Compléter DEPLOYMENT.md avec les procédures de rollback',
    'todo', 'low', CURRENT_DATE + 14,
-   (SELECT id FROM users WHERE email = 'alice@taskmaster.dev'))
+   (SELECT id FROM users   WHERE email = 'alice@taskmaster.dev'),
+   (SELECT id FROM projects WHERE name = 'Documentation'
+      AND user_id = (SELECT id FROM users WHERE email = 'alice@taskmaster.dev')),
+   NULL)
 ON CONFLICT DO NOTHING;
 
 DO $$ BEGIN RAISE NOTICE 'Base TaskMaster initialisée avec succès'; END $$;

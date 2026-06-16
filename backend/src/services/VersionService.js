@@ -10,13 +10,13 @@ function cacheKey(projectId) {
 
 async function getVersionsByProject(projectId, userId) {
   const project = await Project.findOne({ where: { id: projectId, userId } });
-  if (!project) return null;
+  if (!project) { return null; }
 
   const key = cacheKey(projectId);
 
   if (client.isOpen) {
     const cached = await client.get(key);
-    if (cached) return JSON.parse(cached);
+    if (cached) { return JSON.parse(cached); }
   }
 
   const versions = await Version.findAll({
@@ -33,7 +33,7 @@ async function getVersionsByProject(projectId, userId) {
 
 async function createVersion(data, projectId, userId) {
   const project = await Project.findOne({ where: { id: projectId, userId } });
-  if (!project) return null;
+  if (!project) { return null; }
 
   const version = await Version.create({
     name: data.name,
@@ -53,7 +53,7 @@ async function removeVersion(versionId, userId) {
     where: { id: versionId },
     include: [{ model: Project, where: { userId }, required: true }],
   });
-  if (!version) return null;
+  if (!version) { return null; }
 
   await version.destroy();
 
