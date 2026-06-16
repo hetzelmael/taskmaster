@@ -217,7 +217,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT_EXCEPTION', err && err.stack ? err.stack : err);
-  if (process.env.NODE_ENV === 'production') process.exit(1);
+  if (process.env.NODE_ENV === 'production') { process.exit(1); }
 });
 
 module.exports = app;

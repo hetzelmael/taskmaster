@@ -105,7 +105,7 @@ exports.logout = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   const user = await User.findByPk(req.userId, { attributes: ['id', 'email', 'firstName', 'lastName'] });
-  if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
   return res.json({ id: user.id, email: user.email, firstName: user.firstName || '', lastName: user.lastName || '' });
 };
 
@@ -122,7 +122,7 @@ exports.updateMe = async (req, res) => {
   const { firstName, lastName } = req.body;
   try {
     const user = await User.findByPk(req.userId);
-    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    if (!user) { return res.status(404).json({ error: 'Utilisateur non trouvé' }); }
     await user.update({ firstName: firstName.trim(), lastName: lastName.trim() });
     return res.json({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName });
   } catch (err) {
