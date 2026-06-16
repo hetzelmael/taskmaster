@@ -31,7 +31,7 @@ describe('Authentification', () => {
   test('POST /api/auth/register — doit refuser un email déjà utilisé — statut 409', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ email, password });
+      .send({ email, password, firstName: 'Test', lastName: 'Auth' });
 
     expect(res.status).toBe(409);
   });
