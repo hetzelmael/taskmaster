@@ -142,13 +142,13 @@ export const options = {
 
 ## 6. Compte rendu de tests
 
-Date d'exécution : À remplir
-Exécuteur : À remplir
+Date d'exécution : 2026-06-16
+Exécuteur : Maël Hetzel
 Version testée : v1.0.0
 
 | Catégorie   | Total | Passés | Échoués | Couverture |
 | ----------- | ----- | ------ | ------- | ---------- |
-| Unitaires   | 15    | 15     | 0       | 85%        |
-| Intégration | 7     | 7      | 0       | —          |
+| Unitaires   | 22    | 22     | 0       | 85%        |
+| Intégration | 28    | 28     | 0       | —          |
 | Sécurité    | 6     | 6      | 0       | —          |
 | Charge      | 3     | 3      | 0       | —          |

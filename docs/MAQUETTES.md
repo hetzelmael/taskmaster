@@ -53,13 +53,14 @@ Navigateur          Frontend JS         API Express       PostgreSQL
     │                    │                   │── SELECT user ──▶│
     │                    │                   │◀── user row ─────│
     │                    │                   │  bcrypt.compare  │
-    │                    │                   │── { token, user }│
-    │                    │◀── 200 { token } ──│                 │
-    │                    │  stocke token      │                 │
-    │                    │  sessionStorage    │                 │
+    │                    │                   │  jwt.sign()      │
+    │                    │◀── 200 + cookie ───│                 │
+    │                    │  auth_token posé   │                 │
+    │                    │  (httpOnly cookie) │                 │
     │                    │── GET /api/projects▶│                │
-    │                    │   Authorization:   │── SELECT proj. ─▶│
-    │                    │   Bearer <token>   │◀── rows ─────────│
+    │                    │   cookie auto.     │── SELECT proj. ─▶│
+    │                    │   (credentials:    │◀── rows ─────────│
+    │                    │    'include')      │                 │
     │                    │◀── 200 [projets] ──│                 │
     │◀── Affiche grille ─│                   │                 │
     │    projets         │                   │                 │

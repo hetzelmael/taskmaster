@@ -17,7 +17,7 @@
 | Linting            | ESLint + Prettier                                                                               |
 | CI/CD              | GitHub Actions                                                                                  |
 | Conteneurisation   | Docker + Docker Compose                                                                         |
-| Déploiement        | Local (Docker) — CI builds via GitHub Actions; external PaaS (Render) not configured by default |
+| Déploiement        | Local (Docker) + Railway (PaaS production) — CI via GitHub Actions                             |
 
 ## Démarrage rapide
 
@@ -94,6 +94,7 @@ taskmaster/
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── DEPLOYMENT.md
+│   ├── MAQUETTES.md
 │   ├── test-plan.md
 │   └── user-stories.md
 ├── docker-compose.yml
