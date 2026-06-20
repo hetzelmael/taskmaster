@@ -1,402 +1,534 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="TaskMaster — Gestionnaire de tâches collaboratif">
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self'">
-  <title>TaskMaster — Gestion de tâches</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TaskMaster — Gestionnaire de tâches collaboratif" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self'"
+    />
+    <title>TaskMaster — Gestion de tâches</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
 
-  <div id="cookie-banner" class="cookie-banner" role="alert" aria-live="polite" hidden>
-    <p>Ce site utilise des cookies strictement nécessaires au fonctionnement. Aucun cookie publicitaire ni traceur.
-       <a href="#">En savoir plus</a></p>
-    <button id="cookie-accept" class="btn btn-sm">Accepter</button>
-    <button id="cookie-refuse" class="btn btn-sm btn-secondary">Refuser</button>
-  </div>
+    <div id="cookie-banner" class="cookie-banner" role="alert" aria-live="polite" hidden>
+      <p>
+        Ce site utilise des cookies strictement nécessaires au fonctionnement. Aucun cookie
+        publicitaire ni traceur. <a href="#">En savoir plus</a>
+      </p>
+      <button id="cookie-accept" class="btn btn-sm">Accepter</button>
+      <button id="cookie-refuse" class="btn btn-sm btn-secondary">Refuser</button>
+    </div>
 
-  <header role="banner">
-    <nav aria-label="Navigation principale">
-      <div class="nav-brand">
-        <h1>TaskMaster</h1>
-      </div>
-      <div id="nav-user" class="nav-user" hidden>
-        <span id="nav-username" class="nav-username" aria-live="polite"></span>
-        <button id="profile-btn" class="btn btn-sm btn-secondary" aria-label="Voir mon profil">Profil</button>
-        <button id="logout-btn" class="btn btn-sm" aria-label="Se déconnecter">Déconnexion</button>
-      </div>
-    </nav>
-  </header>
-
-  <main id="main-content" role="main">
-
-    <!-- Projets -->
-    <section id="projects-section" aria-labelledby="projects-heading" hidden>
-      <div class="projects-header">
-        <h2 id="projects-heading">Mes projets</h2>
-        <button id="add-project-btn" class="btn btn-primary btn-sm"><i data-lucide="plus" class="icon"></i> Nouveau projet</button>
-      </div>
-      <div id="projects-grid" class="projects-grid"></div>
-    </section>
-
-    <!-- Connexion -->
-    <section id="login-section" class="auth-section" aria-labelledby="login-heading">
-      <div class="auth-card">
-        <h2 id="login-heading">Connexion</h2>
-        <div role="form" aria-labelledby="login-heading">
-          <div class="form-group">
-            <label for="login-email">Adresse email</label>
-            <input type="email" id="login-email" name="email" autocomplete="email"
-                   required aria-required="true" placeholder="votre@email.com">
-          </div>
-          <div class="form-group">
-            <label for="login-password">Mot de passe</label>
-            <input type="password" id="login-password" name="password"
-                   autocomplete="current-password" required aria-required="true"
-                   minlength="8" placeholder="Minimum 8 caractères">
-          </div>
-          <div id="login-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="login-submit" class="btn btn-primary btn-full" type="button">Se connecter</button>
-          <p class="auth-switch">Pas de compte ?
-            <button id="show-register" class="link-btn" type="button">Créer un compte</button>
-          </p>
+    <header role="banner">
+      <nav aria-label="Navigation principale">
+        <div class="nav-brand">
+          <h1>TaskMaster</h1>
         </div>
-      </div>
-    </section>
-
-    <!-- Inscription -->
-    <section id="register-section" class="auth-section" aria-labelledby="register-heading" hidden>
-      <div class="auth-card">
-        <h2 id="register-heading">Inscription</h2>
-        <div role="form" aria-labelledby="register-heading">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="reg-firstname">Prénom</label>
-              <input type="text" id="reg-firstname" required aria-required="true" autocomplete="given-name">
-            </div>
-            <div class="form-group">
-              <label for="reg-lastname">Nom</label>
-              <input type="text" id="reg-lastname" required aria-required="true" autocomplete="family-name">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="reg-email">Email</label>
-            <input type="email" id="reg-email" required aria-required="true" autocomplete="email">
-          </div>
-          <div class="form-group">
-            <label for="reg-password">Mot de passe</label>
-            <input type="password" id="reg-password" required aria-required="true"
-                   autocomplete="new-password" minlength="8" aria-describedby="password-hint">
-            <small id="password-hint" class="hint">Minimum 8 caractères, 1 majuscule, 1 chiffre</small>
-          </div>
-          <div id="register-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="register-submit" class="btn btn-primary btn-full" type="button">Créer mon compte</button>
-          <p class="auth-switch">Déjà inscrit ?
-            <button id="show-login" class="link-btn" type="button">Se connecter</button>
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Tâches -->
-    <section id="tasks-section" aria-labelledby="tasks-heading" hidden>
-      <div id="project-breadcrumb" class="project-breadcrumb" hidden>
-        <button id="back-to-projects" class="btn btn-sm btn-secondary"><i data-lucide="arrow-left" class="icon"></i> Projets</button>
-        <span id="breadcrumb-project-name" class="breadcrumb-project-name"></span>
-      </div>
-      <div class="tasks-header">
-        <h2 id="tasks-heading">Mes tâches</h2>
-        <div class="tasks-controls">
-          <div class="view-toggle" role="group" aria-label="Mode d'affichage">
-            <button id="btn-list-view" class="btn btn-sm active" aria-pressed="true"><i data-lucide="list" class="icon"></i> Liste</button>
-            <button id="btn-kanban-view" class="btn btn-sm" aria-pressed="false"><i data-lucide="layout-dashboard" class="icon"></i> Kanban</button>
-            <button id="btn-synthesis-view" class="btn btn-sm" aria-pressed="false"><i data-lucide="bar-chart-2" class="icon"></i> Synthèse</button>
-          </div>
-          <button id="versions-btn" class="btn btn-sm btn-secondary" aria-label="Gérer les versions"><i data-lucide="tag" class="icon"></i> Versions</button>
-          <button id="add-task-btn" class="btn btn-primary btn-sm" aria-label="Ajouter une nouvelle tâche">
-            <i data-lucide="plus" class="icon"></i> Nouvelle tâche
+        <div id="nav-user" class="nav-user" hidden>
+          <span id="nav-username" class="nav-username" aria-live="polite"></span>
+          <button id="profile-btn" class="btn btn-sm btn-secondary" aria-label="Voir mon profil">
+            Profil
+          </button>
+          <button id="logout-btn" class="btn btn-sm" aria-label="Se déconnecter">
+            Déconnexion
           </button>
         </div>
-      </div>
+      </nav>
+    </header>
 
-      <!-- Filtres (liste uniquement) -->
-      <div id="filters-bar" class="filters" role="search" aria-label="Filtrer les tâches">
-        <div class="form-group">
-          <label for="filter-status">Statut</label>
-          <select id="filter-status">
-            <option value="">Tous</option>
-            <option value="todo">À faire</option>
-            <option value="in_progress">En cours</option>
-            <option value="done">Terminé</option>
-            <option value="archived">Archivé</option>
-          </select>
+    <main id="main-content" role="main">
+      <!-- Projets -->
+      <section id="projects-section" aria-labelledby="projects-heading" hidden>
+        <div class="projects-header">
+          <h2 id="projects-heading">Mes projets</h2>
+          <button id="add-project-btn" class="btn btn-primary btn-sm">
+            <i data-lucide="plus" class="icon"></i> Nouveau projet
+          </button>
         </div>
-        <div class="form-group">
-          <label for="filter-priority">Priorité</label>
-          <select id="filter-priority">
-            <option value="">Toutes</option>
-            <option value="high">Haute</option>
-            <option value="medium">Moyenne</option>
-            <option value="low">Basse</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="filter-version">Version</label>
-          <select id="filter-version">
-            <option value="">Toutes</option>
-          </select>
-        </div>
-      </div>
+        <div id="projects-grid" class="projects-grid"></div>
+      </section>
 
-      <!-- Vue liste -->
-      <div id="tasks-list" role="list" aria-label="Liste des tâches"></div>
-
-      <!-- Vue Kanban -->
-      <div id="kanban-view" hidden>
-        <div class="kanban-board">
-          <div class="kanban-column">
-            <div class="kanban-col-header">
-              <span>À faire</span>
-              <span class="kanban-count" id="count-todo">0</span>
+      <!-- Connexion -->
+      <section id="login-section" class="auth-section" aria-labelledby="login-heading">
+        <div class="auth-card">
+          <h2 id="login-heading">Connexion</h2>
+          <div role="form" aria-labelledby="login-heading">
+            <div class="form-group">
+              <label for="login-email">Adresse email</label>
+              <input
+                type="email"
+                id="login-email"
+                name="email"
+                autocomplete="email"
+                required
+                aria-required="true"
+                placeholder="votre@email.com"
+              />
             </div>
-            <div class="kanban-cards" id="cards-todo"></div>
-          </div>
-          <div class="kanban-column">
-            <div class="kanban-col-header">
-              <span>En cours</span>
-              <span class="kanban-count" id="count-inprogress">0</span>
+            <div class="form-group">
+              <label for="login-password">Mot de passe</label>
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                autocomplete="current-password"
+                required
+                aria-required="true"
+                minlength="8"
+                placeholder="Minimum 8 caractères"
+              />
             </div>
-            <div class="kanban-cards" id="cards-inprogress"></div>
-          </div>
-          <div class="kanban-column">
-            <div class="kanban-col-header">
-              <span>Terminé</span>
-              <span class="kanban-count" id="count-done">0</span>
-            </div>
-            <div class="kanban-cards" id="cards-done"></div>
+            <div id="login-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+            <button id="login-submit" class="btn btn-primary btn-full" type="button">
+              Se connecter
+            </button>
+            <p class="auth-switch">
+              Pas de compte ?
+              <button id="show-register" class="link-btn" type="button">Créer un compte</button>
+            </p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- Vue Synthèse -->
-      <div id="synthesis-view" hidden>
-        <div class="synth-period-bar" role="group" aria-label="Sélecteur de période">
-          <span class="synth-period-label">Période :</span>
-          <div class="synth-presets">
-            <button class="btn btn-sm period-preset" data-days="7">7 jours</button>
-            <button class="btn btn-sm period-preset active" data-days="30">30 jours</button>
-            <button class="btn btn-sm period-preset" data-days="90">3 mois</button>
-            <button class="btn btn-sm period-preset" data-days="0">Tout</button>
+      <!-- Inscription -->
+      <section id="register-section" class="auth-section" aria-labelledby="register-heading" hidden>
+        <div class="auth-card">
+          <h2 id="register-heading">Inscription</h2>
+          <div role="form" aria-labelledby="register-heading">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-firstname">Prénom</label>
+                <input
+                  type="text"
+                  id="reg-firstname"
+                  required
+                  aria-required="true"
+                  autocomplete="given-name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="reg-lastname">Nom</label>
+                <input
+                  type="text"
+                  id="reg-lastname"
+                  required
+                  aria-required="true"
+                  autocomplete="family-name"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email</label>
+              <input
+                type="email"
+                id="reg-email"
+                required
+                aria-required="true"
+                autocomplete="email"
+              />
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Mot de passe</label>
+              <input
+                type="password"
+                id="reg-password"
+                required
+                aria-required="true"
+                autocomplete="new-password"
+                minlength="8"
+                aria-describedby="password-hint"
+              />
+              <small id="password-hint" class="hint"
+                >Minimum 8 caractères, 1 majuscule, 1 chiffre</small
+              >
+            </div>
+            <div
+              id="register-error"
+              class="error-msg"
+              role="alert"
+              aria-live="assertive"
+              hidden
+            ></div>
+            <button id="register-submit" class="btn btn-primary btn-full" type="button">
+              Créer mon compte
+            </button>
+            <p class="auth-switch">
+              Déjà inscrit ?
+              <button id="show-login" class="link-btn" type="button">Se connecter</button>
+            </p>
           </div>
-          <div class="synth-version-filter">
-            <label for="synth-version-filter">Version :</label>
-            <select id="synth-version-filter" class="synth-date-input">
+        </div>
+      </section>
+
+      <!-- Tâches -->
+      <section id="tasks-section" aria-labelledby="tasks-heading" hidden>
+        <div id="project-breadcrumb" class="project-breadcrumb" hidden>
+          <button id="back-to-projects" class="btn btn-sm btn-secondary">
+            <i data-lucide="arrow-left" class="icon"></i> Projets
+          </button>
+          <span id="breadcrumb-project-name" class="breadcrumb-project-name"></span>
+        </div>
+        <div class="tasks-header">
+          <h2 id="tasks-heading">Mes tâches</h2>
+          <div class="tasks-controls">
+            <div class="view-toggle" role="group" aria-label="Mode d'affichage">
+              <button id="btn-list-view" class="btn btn-sm active" aria-pressed="true">
+                <i data-lucide="list" class="icon"></i> Liste
+              </button>
+              <button id="btn-kanban-view" class="btn btn-sm" aria-pressed="false">
+                <i data-lucide="layout-dashboard" class="icon"></i> Kanban
+              </button>
+              <button id="btn-synthesis-view" class="btn btn-sm" aria-pressed="false">
+                <i data-lucide="bar-chart-2" class="icon"></i> Synthèse
+              </button>
+            </div>
+            <button
+              id="versions-btn"
+              class="btn btn-sm btn-secondary"
+              aria-label="Gérer les versions"
+            >
+              <i data-lucide="tag" class="icon"></i> Versions
+            </button>
+            <button
+              id="add-task-btn"
+              class="btn btn-primary btn-sm"
+              aria-label="Ajouter une nouvelle tâche"
+            >
+              <i data-lucide="plus" class="icon"></i> Nouvelle tâche
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtres (liste uniquement) -->
+        <div id="filters-bar" class="filters" role="search" aria-label="Filtrer les tâches">
+          <div class="form-group">
+            <label for="filter-status">Statut</label>
+            <select id="filter-status">
+              <option value="">Tous</option>
+              <option value="todo">À faire</option>
+              <option value="in_progress">En cours</option>
+              <option value="done">Terminé</option>
+              <option value="archived">Archivé</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filter-priority">Priorité</label>
+            <select id="filter-priority">
+              <option value="">Toutes</option>
+              <option value="high">Haute</option>
+              <option value="medium">Moyenne</option>
+              <option value="low">Basse</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filter-version">Version</label>
+            <select id="filter-version">
               <option value="">Toutes</option>
             </select>
           </div>
-          <div class="synth-custom-range">
-            <label for="synth-from">Du</label>
-            <input type="date" id="synth-from" class="synth-date-input">
-            <label for="synth-to">au</label>
-            <input type="date" id="synth-to" class="synth-date-input">
-            <button id="synth-apply" class="btn btn-sm btn-primary">Appliquer</button>
+        </div>
+
+        <!-- Vue liste -->
+        <div id="tasks-list" role="list" aria-label="Liste des tâches"></div>
+
+        <!-- Vue Kanban -->
+        <div id="kanban-view" hidden>
+          <div class="kanban-board">
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <span>À faire</span>
+                <span class="kanban-count" id="count-todo">0</span>
+              </div>
+              <div class="kanban-cards" id="cards-todo"></div>
+            </div>
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <span>En cours</span>
+                <span class="kanban-count" id="count-inprogress">0</span>
+              </div>
+              <div class="kanban-cards" id="cards-inprogress"></div>
+            </div>
+            <div class="kanban-column">
+              <div class="kanban-col-header">
+                <span>Terminé</span>
+                <span class="kanban-count" id="count-done">0</span>
+              </div>
+              <div class="kanban-cards" id="cards-done"></div>
+            </div>
           </div>
         </div>
 
-        <div id="synth-kpi-row" class="synth-kpi-row" aria-label="Indicateurs clés"></div>
-
-        <div class="synth-charts-row">
-          <div class="synth-chart-card">
-            <h4 class="synth-chart-title">Répartition par statut</h4>
-            <div id="synth-status-chart" class="bar-chart"></div>
-          </div>
-          <div class="synth-chart-card">
-            <h4 class="synth-chart-title">Répartition par priorité</h4>
-            <div id="synth-priority-chart" class="bar-chart"></div>
-          </div>
-          <div class="synth-chart-card synth-chart-card--center">
-            <h4 class="synth-chart-title">Taux de complétion</h4>
-            <div id="synth-completion" class="completion-display"></div>
-          </div>
-        </div>
-
-        <div class="synth-chart-card synth-chart-card--full">
-          <h4 class="synth-chart-title">Répartition par version</h4>
-          <div id="synth-version-chart" class="bar-chart"></div>
-        </div>
-
-        <div id="synth-timing-card" class="synth-timing-card"></div>
-      </div>
-
-      <!-- Pagination (liste uniquement) -->
-      <nav id="pagination" aria-label="Pagination des tâches" hidden>
-        <button id="prev-page" class="btn btn-sm" aria-label="Page précédente">Précédent</button>
-        <span id="page-info" aria-live="polite"></span>
-        <button id="next-page" class="btn btn-sm" aria-label="Page suivante">Suivant</button>
-      </nav>
-    </section>
-
-    <!-- Modal tâche (création + édition) -->
-    <div id="task-modal" class="modal-overlay" role="dialog"
-         aria-labelledby="modal-heading" aria-modal="true" hidden>
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3 id="modal-heading">Nouvelle tâche</h3>
-          <button id="close-modal" class="close-btn" aria-label="Fermer">&times;</button>
-        </div>
-        <div role="form">
-          <div class="form-group">
-            <label for="task-title">Titre *</label>
-            <input type="text" id="task-title" required aria-required="true" maxlength="255">
-          </div>
-          <div class="form-group">
-            <label for="task-desc">Description</label>
-            <textarea id="task-desc" rows="3" placeholder="Détails optionnels..."></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="task-priority">Priorité</label>
-              <select id="task-priority">
-                <option value="low">Basse</option>
-                <option value="medium" selected>Moyenne</option>
-                <option value="high">Haute</option>
+        <!-- Vue Synthèse -->
+        <div id="synthesis-view" hidden>
+          <div class="synth-period-bar" role="group" aria-label="Sélecteur de période">
+            <span class="synth-period-label">Période :</span>
+            <div class="synth-presets">
+              <button class="btn btn-sm period-preset" data-days="7">7 jours</button>
+              <button class="btn btn-sm period-preset active" data-days="30">30 jours</button>
+              <button class="btn btn-sm period-preset" data-days="90">3 mois</button>
+              <button class="btn btn-sm period-preset" data-days="0">Tout</button>
+            </div>
+            <div class="synth-version-filter">
+              <label for="synth-version-filter">Version :</label>
+              <select id="synth-version-filter" class="synth-date-input">
+                <option value="">Toutes</option>
               </select>
             </div>
+            <div class="synth-custom-range">
+              <label for="synth-from">Du</label>
+              <input type="date" id="synth-from" class="synth-date-input" />
+              <label for="synth-to">au</label>
+              <input type="date" id="synth-to" class="synth-date-input" />
+              <button id="synth-apply" class="btn btn-sm btn-primary">Appliquer</button>
+            </div>
+          </div>
+
+          <div id="synth-kpi-row" class="synth-kpi-row" aria-label="Indicateurs clés"></div>
+
+          <div class="synth-charts-row">
+            <div class="synth-chart-card">
+              <h4 class="synth-chart-title">Répartition par statut</h4>
+              <div id="synth-status-chart" class="bar-chart"></div>
+            </div>
+            <div class="synth-chart-card">
+              <h4 class="synth-chart-title">Répartition par priorité</h4>
+              <div id="synth-priority-chart" class="bar-chart"></div>
+            </div>
+            <div class="synth-chart-card synth-chart-card--center">
+              <h4 class="synth-chart-title">Taux de complétion</h4>
+              <div id="synth-completion" class="completion-display"></div>
+            </div>
+          </div>
+
+          <div class="synth-chart-card synth-chart-card--full">
+            <h4 class="synth-chart-title">Répartition par version</h4>
+            <div id="synth-version-chart" class="bar-chart"></div>
+          </div>
+
+          <div id="synth-timing-card" class="synth-timing-card"></div>
+        </div>
+
+        <!-- Pagination (liste uniquement) -->
+        <nav id="pagination" aria-label="Pagination des tâches" hidden>
+          <button id="prev-page" class="btn btn-sm" aria-label="Page précédente">Précédent</button>
+          <span id="page-info" aria-live="polite"></span>
+          <button id="next-page" class="btn btn-sm" aria-label="Page suivante">Suivant</button>
+        </nav>
+      </section>
+
+      <!-- Modal tâche (création + édition) -->
+      <div
+        id="task-modal"
+        class="modal-overlay"
+        role="dialog"
+        aria-labelledby="modal-heading"
+        aria-modal="true"
+        hidden
+      >
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3 id="modal-heading">Nouvelle tâche</h3>
+            <button id="close-modal" class="close-btn" aria-label="Fermer">&times;</button>
+          </div>
+          <div role="form">
             <div class="form-group">
-              <label for="task-status">Statut</label>
-              <select id="task-status">
-                <option value="todo">À faire</option>
-                <option value="in_progress">En cours</option>
-                <option value="done">Terminé</option>
-                <option value="archived">Archivé</option>
+              <label for="task-title">Titre *</label>
+              <input type="text" id="task-title" required aria-required="true" maxlength="255" />
+            </div>
+            <div class="form-group">
+              <label for="task-desc">Description</label>
+              <textarea id="task-desc" rows="3" placeholder="Détails optionnels..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="task-priority">Priorité</label>
+                <select id="task-priority">
+                  <option value="low">Basse</option>
+                  <option value="medium" selected>Moyenne</option>
+                  <option value="high">Haute</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="task-status">Statut</label>
+                <select id="task-status">
+                  <option value="todo">À faire</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="done">Terminé</option>
+                  <option value="archived">Archivé</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="task-due">Échéance</label>
+              <input type="date" id="task-due" />
+            </div>
+            <div class="form-group">
+              <label for="task-version">Version</label>
+              <select id="task-version">
+                <option value="">Sans version</option>
               </select>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="task-due">Échéance</label>
-            <input type="date" id="task-due">
-          </div>
-          <div class="form-group">
-            <label for="task-version">Version</label>
-            <select id="task-version">
-              <option value="">Sans version</option>
-            </select>
-          </div>
-          <!-- Horodatage (lecture seule, visible uniquement en édition) -->
-          <div id="task-timing-info" class="task-timing-section" hidden>
-            <div id="timing-started" class="timing-row" hidden>
-              <span class="timing-label">Démarré le</span>
-              <span id="timing-started-value" class="timing-value"></span>
+            <!-- Horodatage (lecture seule, visible uniquement en édition) -->
+            <div id="task-timing-info" class="task-timing-section" hidden>
+              <div id="timing-started" class="timing-row" hidden>
+                <span class="timing-label">Démarré le</span>
+                <span id="timing-started-value" class="timing-value"></span>
+              </div>
+              <div id="timing-elapsed" class="timing-row" hidden>
+                <span class="timing-label">Temps passé</span>
+                <span id="timing-elapsed-value" class="timing-value"></span>
+              </div>
             </div>
-            <div id="timing-elapsed" class="timing-row" hidden>
-              <span class="timing-label">Temps passé</span>
-              <span id="timing-elapsed-value" class="timing-value"></span>
+            <div id="task-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
+            <button id="save-task" class="btn btn-primary btn-full" type="button">
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal versions -->
+      <div
+        id="versions-modal"
+        class="modal-overlay"
+        role="dialog"
+        aria-labelledby="versions-heading"
+        aria-modal="true"
+        hidden
+      >
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3 id="versions-heading">Gestion des versions</h3>
+            <button id="close-versions" class="close-btn" aria-label="Fermer">&times;</button>
+          </div>
+          <div id="versions-list" class="versions-list"></div>
+          <div class="versions-create">
+            <h4 class="versions-create-title">Nouvelle version</h4>
+            <div class="form-group">
+              <label for="new-version-name">Nom</label>
+              <input
+                type="text"
+                id="new-version-name"
+                maxlength="100"
+                placeholder="ex: v1.0, Sprint 1…"
+              />
             </div>
+            <div class="form-group">
+              <label for="new-version-desc">Description (optionnelle)</label>
+              <input type="text" id="new-version-desc" maxlength="255" />
+            </div>
+            <div
+              id="version-error"
+              class="error-msg"
+              role="alert"
+              aria-live="assertive"
+              hidden
+            ></div>
+            <button id="create-version-btn" class="btn btn-primary btn-full" type="button">
+              Créer
+            </button>
           </div>
-          <div id="task-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="save-task" class="btn btn-primary btn-full" type="button">Enregistrer</button>
         </div>
       </div>
-    </div>
 
-    <!-- Modal versions -->
-    <div id="versions-modal" class="modal-overlay" role="dialog"
-         aria-labelledby="versions-heading" aria-modal="true" hidden>
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3 id="versions-heading">Gestion des versions</h3>
-          <button id="close-versions" class="close-btn" aria-label="Fermer">&times;</button>
-        </div>
-        <div id="versions-list" class="versions-list"></div>
-        <div class="versions-create">
-          <h4 class="versions-create-title">Nouvelle version</h4>
-          <div class="form-group">
-            <label for="new-version-name">Nom</label>
-            <input type="text" id="new-version-name" maxlength="100" placeholder="ex: v1.0, Sprint 1…">
+      <!-- Modal projet -->
+      <div
+        id="project-modal"
+        class="modal-overlay"
+        role="dialog"
+        aria-labelledby="project-modal-heading"
+        aria-modal="true"
+        hidden
+      >
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3 id="project-modal-heading">Nouveau projet</h3>
+            <button id="close-project-modal" class="close-btn" aria-label="Fermer">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="new-version-desc">Description (optionnelle)</label>
-            <input type="text" id="new-version-desc" maxlength="255">
+          <div role="form">
+            <div class="form-group">
+              <label for="project-name">Nom *</label>
+              <input type="text" id="project-name" required aria-required="true" maxlength="255" />
+            </div>
+            <div class="form-group">
+              <label for="project-desc">Description</label>
+              <textarea id="project-desc" rows="2" placeholder="Optionnel…"></textarea>
+            </div>
+            <div
+              id="project-error"
+              class="error-msg"
+              role="alert"
+              aria-live="assertive"
+              hidden
+            ></div>
+            <button id="save-project" class="btn btn-primary btn-full" type="button">
+              Enregistrer
+            </button>
           </div>
-          <div id="version-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="create-version-btn" class="btn btn-primary btn-full" type="button">Créer</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal projet -->
-    <div id="project-modal" class="modal-overlay" role="dialog"
-         aria-labelledby="project-modal-heading" aria-modal="true" hidden>
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3 id="project-modal-heading">Nouveau projet</h3>
-          <button id="close-project-modal" class="close-btn" aria-label="Fermer">&times;</button>
-        </div>
-        <div role="form">
-          <div class="form-group">
-            <label for="project-name">Nom *</label>
-            <input type="text" id="project-name" required aria-required="true" maxlength="255">
-          </div>
-          <div class="form-group">
-            <label for="project-desc">Description</label>
-            <textarea id="project-desc" rows="2" placeholder="Optionnel…"></textarea>
-          </div>
-          <div id="project-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="save-project" class="btn btn-primary btn-full" type="button">Enregistrer</button>
         </div>
       </div>
-    </div>
 
-    <!-- Modal profil -->
-    <div id="profile-modal" class="modal-overlay" role="dialog"
-         aria-labelledby="profile-heading" aria-modal="true" hidden>
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3 id="profile-heading">Mon profil</h3>
-          <button id="close-profile" class="close-btn" aria-label="Fermer">&times;</button>
-        </div>
-        <div class="profile-content">
-          <div class="profile-avatar" aria-hidden="true">
-            <i data-lucide="user-circle" class="icon"></i>
+      <!-- Modal profil -->
+      <div
+        id="profile-modal"
+        class="modal-overlay"
+        role="dialog"
+        aria-labelledby="profile-heading"
+        aria-modal="true"
+        hidden
+      >
+        <div class="modal-card">
+          <div class="modal-header">
+            <h3 id="profile-heading">Mon profil</h3>
+            <button id="close-profile" class="close-btn" aria-label="Fermer">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="profile-firstname">Prénom</label>
-            <input type="text" id="profile-firstname" autocomplete="given-name" maxlength="100">
+          <div class="profile-content">
+            <div class="profile-avatar" aria-hidden="true">
+              <i data-lucide="user-circle" class="icon"></i>
+            </div>
+            <div class="form-group">
+              <label for="profile-firstname">Prénom</label>
+              <input type="text" id="profile-firstname" autocomplete="given-name" maxlength="100" />
+            </div>
+            <div class="form-group">
+              <label for="profile-lastname">Nom</label>
+              <input type="text" id="profile-lastname" autocomplete="family-name" maxlength="100" />
+            </div>
+            <div class="profile-field">
+              <span class="profile-label">Email</span>
+              <span id="profile-email" class="profile-value"></span>
+            </div>
+            <div
+              id="profile-save-error"
+              class="error-msg"
+              role="alert"
+              aria-live="assertive"
+              hidden
+            ></div>
+            <button id="profile-save-btn" class="btn btn-primary btn-full">
+              <i data-lucide="save" class="icon"></i> Enregistrer
+            </button>
+            <button id="profile-logout" class="btn btn-full">
+              <i data-lucide="log-out" class="icon"></i> Se déconnecter
+            </button>
+            <button id="delete-account-btn" class="btn btn-full btn-danger">
+              <i data-lucide="trash-2" class="icon"></i> Supprimer mon compte
+            </button>
           </div>
-          <div class="form-group">
-            <label for="profile-lastname">Nom</label>
-            <input type="text" id="profile-lastname" autocomplete="family-name" maxlength="100">
-          </div>
-          <div class="profile-field">
-            <span class="profile-label">Email</span>
-            <span id="profile-email" class="profile-value"></span>
-          </div>
-          <div id="profile-save-error" class="error-msg" role="alert" aria-live="assertive" hidden></div>
-          <button id="profile-save-btn" class="btn btn-primary btn-full">
-            <i data-lucide="save" class="icon"></i> Enregistrer
-          </button>
-          <button id="profile-logout" class="btn btn-full">
-            <i data-lucide="log-out" class="icon"></i> Se déconnecter
-          </button>
-          <button id="delete-account-btn" class="btn btn-full btn-danger">
-            <i data-lucide="trash-2" class="icon"></i> Supprimer mon compte
-          </button>
         </div>
       </div>
-    </div>
+    </main>
 
-  </main>
+    <footer role="contentinfo">
+      <p>&copy; 2026 TaskMaster — Application de démonstration CDA</p>
+      <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
+    </footer>
 
-  <footer role="contentinfo">
-    <p>&copy; 2024 TaskMaster — Application de démonstration CDA</p>
-    <p><a href="#">Mentions légales</a> | <a href="#">Politique de confidentialité</a></p>
-  </footer>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="app.js"></script>
-</body>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>
