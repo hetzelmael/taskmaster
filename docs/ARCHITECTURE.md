@@ -12,7 +12,8 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 │  (index.html, app.js, style.css)    │  → Ce que voit l'utilisateur
 ├─────────────────────────────────────┤
 │          COUCHE MÉTIER              │  Backend Node.js/Express
-│  (Controllers, Services, Routes)    │  → Logique de gestion
+│  (Controllers, Services, Routes,    │  → Logique de gestion
+│   Middleware)                       │
 ├─────────────────────────────────────┤
 │         COUCHE DONNÉES              │  PostgreSQL + Redis
 │  (Models Sequelize, init.sql)       │  → Stockage et persistance
@@ -53,7 +54,7 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 - **Injection SQL** → Requêtes préparées via Sequelize ORM + SQL paramétré nommé (`:param`) pour les requêtes raw
 - **XSS** → `textContent` côté front (jamais `innerHTML`), Helmet CSP côté back
 - **CSRF** → Cookie `SameSite=Strict` — les requêtes cross-site ne transmettent pas le cookie
-- **IDOR** → Vérification `userId` sur chaque requête (tasks, projects, versions) ; les projets vérifient `userId` avant toute modification ou suppression
+- **IDOR** → Vérification `userId` sur chaque requête (tasks, projects) ; les versions sont protégées via l'appartenance de leur projet à l'utilisateur (project.user_id = req.userId)
 - **Auth cassée** → bcryptjs + JWT avec expiration 24h, révocation via Redis, `try/catch` sur toutes les opérations d'auth
 
 ### Conformité ANSSI
@@ -98,40 +99,41 @@ TaskMaster utilise une **architecture multicouche** (N-tiers) organisée selon l
 │    last_name     │        │    created_at        │
 │    created_at    │        │    updated_at        │
 │    updated_at    │        └──────────────────────┘
-│                  │                  │ 1
-│                  │                  │ contient
-│                  │                  │ N
-│                  │        ┌──────────────────────┐
-│                  │  1   N │        TASKS         │
-│                  │────────├──────────────────────┤
-│                  │ possède│ PK id                │
-└──────────────────┘        │    title             │
-         │                  │    description TEXT  │
-         │ 1                │    status            │
-         │ génère           │      ∈ {todo,        │
-         │ N                │         in_progress, │
-┌──────────────────┐        │         done,        │
-│     VERSIONS     │  1   N │         archived}    │
-├──────────────────┤────────│    priority          │
-│ PK id            │ tague  │      ∈ {low,medium,  │
-│    name          │(NULL)  │         high}        │
-│    description   │        │    due_date DATE     │
-│ FK user_id→users │        │    started_at        │
-│    created_at    │        │    completed_at      │
-│    updated_at    │        │ FK user_id → users   │
-└──────────────────┘        │ FK project_id→proj.  │
-                            │ FK version_id→vers.  │
-                            │    created_at        │
-                            │    updated_at        │
-                            └──────────────────────┘
+│                  │              │ 1         │ 1
+│                  │              │ contient  │ génère
+│                  │              │ N         │ N
+│                  │  1   N  ┌────┴────────┐ ┌──────────────────┐
+│                  │─────────│    TASKS    │ │    VERSIONS      │
+│                  │ possède ├─────────────┤ ├──────────────────┤
+└──────────────────┘         │ PK id       │ │ PK id            │
+                             │ title       │ │ name             │
+                             │ description │ │ description TEXT │
+                             │ status      │ │ FK project_id    │
+                             │   ∈ {todo,  │ │    → projects    │
+                             │   in_prog., │ │ created_at       │
+                             │   done,     │ │ updated_at       │
+                             │   archived} │ └──────────────────┘
+                             │ priority    │         │ 1
+                             │   ∈ {low,   │         │ tague
+                             │   medium,   │         │ (NULL)
+                             │   high}     │◄── N ───┘
+                             │ due_date    │
+                             │ started_at  │
+                             │ completed_at│
+                             │ FK user_id  │
+                             │ FK project_id│
+                             │ FK version_id│
+                             │ created_at  │
+                             │ updated_at  │
+                             └─────────────┘
 ```
 
 ### Règles de gestion
 
-- Un utilisateur possède **0 ou plusieurs** projets (`1,N`)
-- Un projet contient **0 ou plusieurs** tâches (`1,N`) — suppression en cascade
-- Un utilisateur possède **0 ou plusieurs** versions (`1,N`)
-- Une version tague **0 ou plusieurs** tâches (`1,N`) — suppression met version_id à NULL
+- Un utilisateur possède **0 ou plusieurs** projets (`0,N`)
+- Un projet contient **0 ou plusieurs** tâches (`0,N`) — suppression en cascade
+- Un projet génère **0 ou plusieurs** versions (`0,N`) — suppression en cascade
+- Une version tague **0 ou plusieurs** tâches (`0,N`) — suppression met version_id à NULL
 - Une tâche appartient à **exactement un** utilisateur (`1,1`)
 - Le statut et la priorité sont contraints par des `CHECK` SQL
 - Le champ `updated_at` est mis à jour automatiquement par un trigger PostgreSQL
@@ -144,7 +146,7 @@ users(id, email, password, first_name, last_name, created_at, updated_at)
 
 projects(id, name, description, #user_id, created_at, updated_at)
 
-versions(id, name, description, #user_id, created_at, updated_at)
+versions(id, name, description, #project_id, created_at, updated_at)
 
 tasks(id, title, description, status, priority, due_date,
       started_at, completed_at,

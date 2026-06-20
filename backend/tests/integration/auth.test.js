@@ -100,6 +100,136 @@ describe('Rate limiting — POST /api/auth/login', () => {
 });
 
 // ==========================================
+// Validation register — I02, I03
+// ==========================================
+describe('POST /api/auth/register — validation des champs', () => {
+  test('I02 — prénom absent → 400', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'nofirstname@example.com', password: 'TestMotDePasse1!', lastName: 'Test' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e) => e.msg === 'Prénom requis')).toBe(true);
+  });
+
+  test('I03 — nom absent → 400', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'nolastname@example.com', password: 'TestMotDePasse1!', firstName: 'Test' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e) => e.msg === 'Nom requis')).toBe(true);
+  });
+});
+
+// ==========================================
+// GET et PUT /api/auth/me — I07–I10
+// ==========================================
+describe('GET /api/auth/me et PUT /api/auth/me', () => {
+  let meToken;
+  let meUserId;
+
+  beforeAll(async () => {
+    await User.destroy({ where: { email: 'test-me@example.com' } });
+    const hash = await bcrypt.hash('TestMotDePasse1!', 12);
+    const user = await User.create({
+      email: 'test-me@example.com',
+      password: hash,
+      firstName: 'Prénom',
+      lastName: 'Nom',
+    });
+    meUserId = user.id;
+    meToken = jwt.sign(
+      { userId: user.id, role: 'user' },
+      process.env.JWT_SECRET || 'test-secret-key',
+      { expiresIn: '1h' }
+    );
+    const redis = await connectRedis();
+    await redis.set(`jwt:${meToken}`, String(meUserId), { EX: 3600 });
+  });
+
+  afterAll(async () => {
+    await User.destroy({ where: { id: meUserId } });
+  });
+
+  test('I07 — GET /api/auth/me — token valide → 200 + profil', async () => {
+    const res = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', `auth_token=${meToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.email).toBe('test-me@example.com');
+    expect(res.body).toHaveProperty('firstName');
+    expect(res.body).toHaveProperty('lastName');
+  });
+
+  test('I08 — GET /api/auth/me — sans token → 401', async () => {
+    const res = await request(app).get('/api/auth/me');
+
+    expect(res.status).toBe(401);
+  });
+
+  test('I09 — PUT /api/auth/me — prénom et nom valides → 200 + profil mis à jour', async () => {
+    const res = await request(app)
+      .put('/api/auth/me')
+      .set('Cookie', `auth_token=${meToken}`)
+      .send({ firstName: 'NouveauPrénom', lastName: 'NouveauNom' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.firstName).toBe('NouveauPrénom');
+    expect(res.body.lastName).toBe('NouveauNom');
+  });
+
+  test('I10 — PUT /api/auth/me — prénom absent → 400', async () => {
+    const res = await request(app)
+      .put('/api/auth/me')
+      .set('Cookie', `auth_token=${meToken}`)
+      .send({ lastName: 'Nom' });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+// ==========================================
+// DELETE /api/auth/me — I11, I12
+// ==========================================
+describe('DELETE /api/auth/me', () => {
+  let deleteToken;
+
+  beforeAll(async () => {
+    await User.destroy({ where: { email: 'test-delete-me@example.com' } });
+    const hash = await bcrypt.hash('TestMotDePasse1!', 12);
+    const user = await User.create({
+      email: 'test-delete-me@example.com',
+      password: hash,
+      firstName: 'Delete',
+      lastName: 'Me',
+    });
+    deleteToken = jwt.sign(
+      { userId: user.id, role: 'user' },
+      process.env.JWT_SECRET || 'test-secret-key',
+      { expiresIn: '1h' }
+    );
+    const redis = await connectRedis();
+    await redis.set(`jwt:${deleteToken}`, String(user.id), { EX: 3600 });
+  });
+
+  test('I12 — sans token → 401', async () => {
+    const res = await request(app).delete('/api/auth/me');
+
+    expect(res.status).toBe(401);
+  });
+
+  test('I11 — token valide → 204 + compte supprimé (RGPD)', async () => {
+    const res = await request(app)
+      .delete('/api/auth/me')
+      .set('Cookie', `auth_token=${deleteToken}`);
+
+    expect(res.status).toBe(204);
+  });
+});
+
+// ==========================================
 // Gestion d'erreurs
 // ==========================================
 describe("Gestion d'erreurs", () => {

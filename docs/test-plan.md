@@ -40,6 +40,39 @@
 | U11 | Utilisateur cible inexistant | to=999       | Erreur + rollback        |
 | U12 | Aucune tâche à transférer    | from=999     | Erreur + rollback        |
 
+### TaskService.getTasksByUser()
+
+| ID  | Scénario                   | Données entrée          | Résultat attendu                          |
+| --- | -------------------------- | ----------------------- | ----------------------------------------- |
+| U13 | Retour paginé              | userId=42, page=1       | `{ tasks: [...], total: N }`, filtre userId appliqué |
+| U14 | Limite max 100             | limit=9999              | Requête passée avec `limit: 100`          |
+
+### TaskService.updateTask() — Transitions de statut
+
+| ID  | Scénario                        | Transition              | Résultat attendu                    |
+| --- | ------------------------------- | ----------------------- | ----------------------------------- |
+| U15 | todo → in_progress              | statut: "in_progress"   | Acceptée                            |
+| U16 | in_progress → done              | statut: "done"          | Acceptée                            |
+| U17 | in_progress → todo              | statut: "todo"          | Acceptée                            |
+| U18 | done → archived                 | statut: "archived"      | Acceptée                            |
+| U19 | todo → done (invalide)          | statut: "done"          | Erreur "Transition de statut invalide" |
+
+### TaskService.updateTask() — Horodatage automatique
+
+| ID  | Scénario                           | Transition            | Résultat attendu                            |
+| --- | ---------------------------------- | --------------------- | ------------------------------------------- |
+| U20 | Passage en in_progress             | todo → in_progress    | `startedAt` défini avec la date courante    |
+| U21 | Passage en done                    | in_progress → done    | `completedAt` défini avec la date courante  |
+| U22 | Retour en todo                     | in_progress → todo    | `startedAt` et `completedAt` remis à null   |
+
+### TaskService.updateTask() — Whitelist des champs
+
+| ID  | Scénario                              | Données entrée                         | Résultat attendu                              |
+| --- | ------------------------------------- | -------------------------------------- | --------------------------------------------- |
+| U23 | Champ `userId` ignoré                 | `{ title: "ok", userId: 999 }`         | `userId` absent de l'appel à `task.update()` |
+| U24 | Champ `createdAt` ignoré              | `{ title: "ok", createdAt: new Date }` | `createdAt` absent de l'appel à `task.update()` |
+| U25 | Champs autorisés passés intégralement | `{ title, description, priority, dueDate }` | Tous présents dans `task.update()` |
+
 ## 3. Tests d'intégration
 
 ### Authentification
@@ -80,6 +113,8 @@
 | I22 | /api/projects     | GET     | Token valide                        | 200 + liste projets avec `taskCounts`         |
 | I23 | /api/projects/:id | DELETE  | Token valide, propriétaire          | 204 + projet supprimé                         |
 | I24 | /api/projects/:id | DELETE  | Token autre user (IDOR)             | 404                                           |
+
+> Tests couverts par `backend/tests/integration/projects.test.js`
 
 ### Versions
 
@@ -142,13 +177,13 @@ export const options = {
 
 ## 6. Compte rendu de tests
 
-Date d'exécution : 2026-06-16
+Date d'exécution : 2026-06-20
 Exécuteur : Maël Hetzel
 Version testée : v1.0.0
 
 | Catégorie   | Total | Passés | Échoués | Couverture |
 | ----------- | ----- | ------ | ------- | ---------- |
-| Unitaires   | 22    | 22     | 0       | 85%        |
-| Intégration | 28    | 28     | 0       | —          |
+| Unitaires   | 25    | 25     | 0       | 85%        |
+| Intégration | 43    | 43     | 0       | —          |
 | Sécurité    | 6     | 6      | 0       | —          |
 | Charge      | 3     | 3      | 0       | —          |

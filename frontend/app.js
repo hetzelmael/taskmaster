@@ -128,7 +128,6 @@ async function handleLogin() {
     sessionStorage.setItem('user', JSON.stringify(currentUser));
     showProjectsSection();
     loadProjects();
-    loadVersions();
   } catch (err) { showError(errorEl, err.message); }
 }
 
@@ -805,8 +804,9 @@ async function deleteProject(id) {
 // Versions
 // ==========================================
 async function loadVersions() {
+  if (!currentProject) { versionsCache = []; populateVersionSelects(); return; }
   try {
-    versionsCache = await apiFetch('/versions');
+    versionsCache = await apiFetch(`/versions?projectId=${currentProject.id}`);
     populateVersionSelects();
   } catch (err) { console.error('Erreur versions:', err); }
 }
@@ -881,7 +881,7 @@ async function handleCreateVersion() {
   const errorEl = document.getElementById('version-error');
   if (!name) { showError(errorEl, 'Le nom est obligatoire.'); return; }
   try {
-    await apiFetch('/versions', { method: 'POST', body: JSON.stringify({ name, description: desc || null }) });
+    await apiFetch('/versions', { method: 'POST', body: JSON.stringify({ name, description: desc || null, projectId: currentProject.id }) });
     await loadVersions();
     renderVersionsList();
     document.getElementById('new-version-name').value = '';

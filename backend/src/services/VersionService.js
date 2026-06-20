@@ -1,24 +1,26 @@
 const Version = require('../models/Version');
+const Project = require('../models/Project');
 const { client } = require('../config/redis');
 
 const CACHE_TTL = 60;
 
-function cacheKey(userId) {
-  return `versions:user:${userId}`;
+function cacheKey(projectId) {
+  return `versions:project:${projectId}`;
 }
 
-async function getVersionsByUser(userId) {
-  const key = cacheKey(userId);
+async function getVersionsByProject(projectId, userId) {
+  const project = await Project.findOne({ where: { id: projectId, userId } });
+  if (!project) { return null; }
+
+  const key = cacheKey(projectId);
 
   if (client.isOpen) {
     const cached = await client.get(key);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+    if (cached) { return JSON.parse(cached); }
   }
 
   const versions = await Version.findAll({
-    where: { userId },
+    where: { projectId },
     order: [['createdAt', 'DESC']],
   });
 
@@ -29,30 +31,34 @@ async function getVersionsByUser(userId) {
   return versions;
 }
 
-async function createVersion(data, userId) {
+async function createVersion(data, projectId, userId) {
+  const project = await Project.findOne({ where: { id: projectId, userId } });
+  if (!project) { return null; }
+
   const version = await Version.create({
     name: data.name,
     description: data.description,
-    userId,
+    projectId,
   });
 
   if (client.isOpen) {
-    await client.del(cacheKey(userId));
+    await client.del(cacheKey(projectId));
   }
 
   return version;
 }
 
 async function removeVersion(versionId, userId) {
-  const version = await Version.findOne({ where: { id: versionId, userId } });
-  if (!version) {
-    return null;
-  }
+  const version = await Version.findOne({
+    where: { id: versionId },
+    include: [{ model: Project, where: { userId }, required: true }],
+  });
+  if (!version) { return null; }
 
   await version.destroy();
 
   if (client.isOpen) {
-    await client.del(cacheKey(userId));
+    await client.del(cacheKey(version.projectId));
   }
 
   return version;
@@ -60,7 +66,7 @@ async function removeVersion(versionId, userId) {
 
 module.exports = {
   cacheKey,
-  getVersionsByUser,
+  getVersionsByProject,
   createVersion,
   removeVersion,
 };

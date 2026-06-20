@@ -9,8 +9,8 @@ Project.belongsTo(User, { foreignKey: 'userId' });
 Project.hasMany(Task, { foreignKey: 'projectId', onDelete: 'CASCADE' });
 Task.belongsTo(Project, { foreignKey: 'projectId' });
 
-User.hasMany(Version, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Version.belongsTo(User, { foreignKey: 'userId' });
+Project.hasMany(Version, { foreignKey: 'projectId', onDelete: 'CASCADE' });
+Version.belongsTo(Project, { foreignKey: 'projectId' });
 
 Version.hasMany(Task, { foreignKey: 'versionId', onDelete: 'SET NULL' });
 Task.belongsTo(Version, { foreignKey: 'versionId' });

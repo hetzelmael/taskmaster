@@ -9,11 +9,11 @@ const Version = sequelize.define('Version', {
     validate: { notEmpty: true, len: [1, 100] },
   },
   description: { type: DataTypes.TEXT, allowNull: true },
-  userId: {
+  projectId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'user_id',
-    references: { model: 'users', key: 'id' },
+    field: 'project_id',
+    references: { model: 'projects', key: 'id' },
     onDelete: 'CASCADE',
   },
 }, { tableName: 'versions', underscored: true, timestamps: true });
