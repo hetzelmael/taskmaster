@@ -41,9 +41,11 @@ async function createVersion(data, projectId, userId) {
     projectId,
   });
 
-  if (client.isOpen) {
-    await client.del(cacheKey(projectId));
-  }
+  try {
+    if (client.isOpen) {
+      await client.del(cacheKey(projectId));
+    }
+  } catch (_redisErr) { /* dégradation gracieuse si Redis indisponible */ }
 
   return version;
 }
@@ -57,9 +59,11 @@ async function removeVersion(versionId, userId) {
 
   await version.destroy();
 
-  if (client.isOpen) {
-    await client.del(cacheKey(version.projectId));
-  }
+  try {
+    if (client.isOpen) {
+      await client.del(cacheKey(version.projectId));
+    }
+  } catch (_redisErr) { /* dégradation gracieuse si Redis indisponible */ }
 
   return version;
 }
