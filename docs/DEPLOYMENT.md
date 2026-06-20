@@ -22,7 +22,7 @@
 git clone https://github.com/user/taskmaster.git
 cp .env.example .env          # adapter les variables
 docker compose up -d
-curl http://localhost:8080/api/health
+curl http://localhost:3000/health
 ```
 
 Ports hôte exposés en dev : PostgreSQL sur `5432`, Redis sur `6379`, backend sur `3000`, frontend sur `8080`.
@@ -82,11 +82,11 @@ docker compose -f docker-compose.prod.yml exec backend npm run db:migrate
 ### 5. Vérifier
 
 ```bash
-# Health via Nginx (seul point d'entrée public)
-curl https://ton-domaine.com/api/health
-
-# Vérifier les healthchecks Docker
+# Vérifier les healthchecks Docker (la route /health n'est pas exposée via Nginx)
 docker compose -f docker-compose.prod.yml ps
+
+# Health direct sur le backend (depuis l'intérieur du réseau Docker)
+docker compose -f docker-compose.prod.yml exec backend wget -qO- http://localhost:3000/health
 ```
 
 ---
@@ -143,7 +143,7 @@ npm run db:migrate
 ### Vérification
 
 ```bash
-curl https://<nom-du-projet>.up.railway.app/api/health
+curl https://<nom-du-projet>.up.railway.app/health
 ```
 
 ---
