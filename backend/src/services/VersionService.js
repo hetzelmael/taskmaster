@@ -14,19 +14,23 @@ async function getVersionsByProject(projectId, userId) {
 
   const key = cacheKey(projectId);
 
-  if (client.isOpen) {
-    const cached = await client.get(key);
-    if (cached) { return JSON.parse(cached); }
-  }
+  try {
+    if (client.isOpen) {
+      const cached = await client.get(key);
+      if (cached) { return JSON.parse(cached); }
+    }
+  } catch (_redisErr) { /* cache indisponible, on continue vers la BDD */ }
 
   const versions = await Version.findAll({
     where: { projectId },
     order: [['createdAt', 'DESC']],
   });
 
-  if (client.isOpen) {
-    await client.set(key, JSON.stringify(versions), { EX: CACHE_TTL });
-  }
+  try {
+    if (client.isOpen) {
+      await client.set(key, JSON.stringify(versions), { EX: CACHE_TTL });
+    }
+  } catch (_redisErr) { /* échec de mise en cache, non bloquant */ }
 
   return versions;
 }
