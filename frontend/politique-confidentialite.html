@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Politique de confidentialité de TaskMaster" />
+    <title>Politique de confidentialité — TaskMaster</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .legal-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+      }
+      .legal-container h1 {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+        color: var(--primary);
+      }
+      .legal-container h2 {
+        font-size: 1.1rem;
+        margin: 1.75rem 0 0.5rem;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.4rem;
+      }
+      .legal-container h3 {
+        font-size: 1rem;
+        margin: 1rem 0 0.4rem;
+        color: var(--text);
+      }
+      .legal-container p {
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+      .legal-container ul {
+        color: var(--text-muted);
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .legal-container li {
+        margin-bottom: 0.25rem;
+      }
+      .legal-container a {
+        color: var(--primary);
+      }
+      .back-link {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .back-link:hover {
+        text-decoration: underline;
+      }
+      .placeholder {
+        background: #fef9c3;
+        border: 1px dashed #d97706;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-style: italic;
+        color: #92400e;
+        font-size: 0.9rem;
+      }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+      }
+      .data-table th {
+        background: var(--bg);
+        text-align: left;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-weight: 600;
+      }
+      .data-table td {
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        vertical-align: top;
+      }
+      .cookie-tag {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-family: monospace;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main style="padding: 1.5rem">
+      <div class="legal-container">
+        <a href="/" class="back-link">← Retour à TaskMaster</a>
+
+        <h1>Politique de confidentialité</h1>
+
+        <p>
+          TaskMaster s'engage à protéger la vie privée de ses utilisateurs conformément au Règlement
+          Général sur la Protection des Données (RGPD — Règlement UE 2016/679) et à la loi française
+          Informatique et Libertés (loi n° 78-17 du 6 janvier 1978 modifiée).
+        </p>
+
+        <!-- ============================================================ -->
+        <h2>1. Responsable du traitement</h2>
+        <p><strong>Nom :</strong> <span class="placeholder">HETZEL MAEL</span></p>
+        <p>
+          <strong>Email de contact :</strong>
+          <span class="placeholder">hetzel.mael01@gmail.com</span>
+        </p>
+
+        <!-- ============================================================ -->
+        <h2>2. Données collectées</h2>
+        <p>
+          Lors de la création de votre compte et de l'utilisation de TaskMaster, les données
+          personnelles suivantes sont collectées :
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Donnée</th>
+              <th>Finalité</th>
+              <th>Base légale</th>
+              <th>Durée de conservation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Adresse e-mail</td>
+              <td>Identification et connexion</td>
+              <td>Exécution du contrat (Art. 6.1.b RGPD)</td>
+              <td>Durée du compte</td>
+            </tr>
+            <tr>
+              <td>Prénom et nom</td>
+              <td>Personnalisation de l'interface</td>
+              <td>Exécution du contrat (Art. 6.1.b RGPD)</td>
+              <td>Durée du compte</td>
+            </tr>
+            <tr>
+              <td>Mot de passe</td>
+              <td>Authentification (stocké sous forme hachée bcrypt — jamais en clair)</td>
+              <td>Exécution du contrat (Art. 6.1.b RGPD)</td>
+              <td>Durée du compte</td>
+            </tr>
+            <tr>
+              <td>Tâches et projets créés</td>
+              <td>Fonctionnement principal de l'application</td>
+              <td>Exécution du contrat (Art. 6.1.b RGPD)</td>
+              <td>Durée du compte</td>
+            </tr>
+            <tr>
+              <td>Adresse IP</td>
+              <td>Sécurité, limitation des tentatives de connexion (rate limiting)</td>
+              <td>Intérêt légitime (Art. 6.1.f RGPD)</td>
+              <td>15 minutes (mémoire cache Redis)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Aucune donnée n'est transmise à des tiers à des fins commerciales ou publicitaires.</p>
+
+        <!-- ============================================================ -->
+        <h2>3. Cookies</h2>
+
+        <h3>Cookie utilisé</h3>
+        <p>
+          TaskMaster utilise un unique cookie strictement nécessaire au fonctionnement de
+          l'application :
+        </p>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Type</th>
+              <th>Durée</th>
+              <th>Finalité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="cookie-tag">auth_token</span></td>
+              <td>HttpOnly, Secure, SameSite=Strict</td>
+              <td>24 heures</td>
+              <td>
+                Maintien de la session authentifiée. Contient un jeton JWT signé. Inaccessible
+                depuis JavaScript (HttpOnly).
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Cookies tiers</h3>
+        <p>
+          Aucun cookie publicitaire, analytique ou de traçage tiers n'est utilisé sur TaskMaster.
+        </p>
+
+        <h3>Consentement</h3>
+        <p>
+          Le cookie <span class="cookie-tag">auth_token</span> étant strictement nécessaire au
+          fonctionnement du service, il peut être déposé sans consentement préalable conformément à
+          l'article 82 de la loi Informatique et Libertés et aux recommandations de la CNIL. Vous
+          pouvez néanmoins choisir de refuser ce cookie via la bannière affichée lors de votre
+          première visite, ce qui rendra l'application inutilisable.
+        </p>
+
+        <!-- ============================================================ -->
+        <h2>4. Vos droits (RGPD)</h2>
+        <p>
+          Conformément aux articles 15 à 22 du RGPD, vous disposez des droits suivants sur vos
+          données :
+        </p>
+        <ul>
+          <li>
+            <strong>Droit d'accès</strong> — consulter les données vous concernant (section "Profil"
+            de l'application)
+          </li>
+          <li>
+            <strong>Droit de rectification</strong> — modifier votre prénom, nom (section "Profil")
+          </li>
+          <li>
+            <strong>Droit à l'effacement</strong> — supprimer définitivement votre compte et toutes
+            vos données (bouton "Supprimer le compte" dans "Profil")
+          </li>
+          <li>
+            <strong>Droit à la portabilité</strong> — obtenir une copie de vos données dans un
+            format structuré
+          </li>
+          <li>
+            <strong>Droit d'opposition</strong> — vous opposer à un traitement fondé sur l'intérêt
+            légitime
+          </li>
+        </ul>
+        <p>
+          Pour exercer ces droits ou pour toute question relative à la protection de vos données,
+          contactez : <span class="placeholder">hetzel.mael01@gmail.com</span>
+        </p>
+
+        <!-- ============================================================ -->
+        <h2>5. Sécurité des données</h2>
+        <ul>
+          <li>
+            Les mots de passe sont hachés avec <strong>bcrypt</strong> (12 rounds de salage) — ils
+            ne sont jamais stockés en clair.
+          </li>
+          <li>Les communications sont chiffrées via <strong>HTTPS/TLS</strong>.</li>
+          <li>
+            Le cookie de session est protégé par les attributs <strong>HttpOnly</strong> (non
+            accessible depuis JavaScript), <strong>Secure</strong> (HTTPS uniquement) et
+            <strong>SameSite=Strict</strong> (protection CSRF).
+          </li>
+          <li>
+            Les tokens JWT sont invalidés côté serveur via <strong>Redis</strong> lors de la
+            déconnexion.
+          </li>
+          <li>
+            Un mécanisme de <strong>limitation des tentatives de connexion</strong> protège contre
+            les attaques par force brute (5 tentatives max par tranche de 15 minutes).
+          </li>
+        </ul>
+
+        <!-- ============================================================ -->
+        <h2>6. Hébergement des données</h2>
+        <p>
+          Les données sont hébergées par <strong>Railway Corporation</strong>, 548 Market St PMB
+          68956, San Francisco, CA 94104, États-Unis.
+        </p>
+        <p>
+          Railway dispose d'un Data Processing Agreement (DPA) conforme à l'article 28 du RGPD. Pour
+          plus d'informations :
+          <a href="https://railway.com/legal/privacy" target="_blank" rel="noopener noreferrer"
+            >railway.com/legal/privacy</a
+          >.
+        </p>
+
+        <!-- ============================================================ -->
+        <h2>7. Autorité de contrôle</h2>
+        <p>
+          Si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une
+          réclamation auprès de la <strong>CNIL</strong> (Commission Nationale de l'Informatique et
+          des Libertés) :
+        </p>
+        <p>
+          <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer"
+            >https://www.cnil.fr/fr/plaintes</a
+          >
+          — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07
+        </p>
+
+        <p style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted)">
+          Dernière mise à jour : juin 2026
+        </p>
+      </div>
+    </main>
+
+    <footer role="contentinfo" style="margin-top: auto">
+      <p>&copy; 2026 TaskMaster — Application de démonstration CDA</p>
+      <p>
+        <a href="mentions-legales.html">Mentions légales</a> |
+        <a href="politique-confidentialite.html">Politique de confidentialité</a>
+      </p>
+    </footer>
+  </body>
+</html>
