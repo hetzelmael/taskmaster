@@ -22,16 +22,18 @@ exports.list = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
-  const versions = await VersionService.getVersionsByProject(
-    parseInt(req.query.projectId),
-    req.userId
-  );
-  if (versions === null) {
-    return res.status(404).json({ error: 'Projet introuvable' });
+  try {
+    const versions = await VersionService.getVersionsByProject(
+      parseInt(req.query.projectId),
+      req.userId
+    );
+    if (versions === null) {
+      return res.status(404).json({ error: 'Projet introuvable' });
+    }
+    return res.json(versions);
+  } catch (err) {
+    return res.status(500).json({ error: 'Erreur serveur interne' });
   }
-
-  res.json(versions);
 };
 
 exports.create = async (req, res) => {
@@ -39,21 +41,22 @@ exports.create = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
-  const version = await VersionService.createVersion(
-    {
-      name: req.body.name.trim(),
-      description: req.body.description?.trim() || null,
-    },
-    parseInt(req.body.projectId),
-    req.userId
-  );
-
-  if (version === null) {
-    return res.status(404).json({ error: 'Projet introuvable' });
+  try {
+    const version = await VersionService.createVersion(
+      {
+        name: req.body.name.trim(),
+        description: req.body.description?.trim() || null,
+      },
+      parseInt(req.body.projectId),
+      req.userId
+    );
+    if (version === null) {
+      return res.status(404).json({ error: 'Projet introuvable' });
+    }
+    return res.status(201).json(version);
+  } catch (err) {
+    return res.status(500).json({ error: 'Erreur serveur interne' });
   }
-
-  res.status(201).json(version);
 };
 
 exports.remove = async (req, res) => {
@@ -61,11 +64,13 @@ exports.remove = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
-  const version = await VersionService.removeVersion(req.params.id, req.userId);
-  if (!version) {
-    return res.status(404).json({ error: 'Version non trouvée' });
+  try {
+    const version = await VersionService.removeVersion(req.params.id, req.userId);
+    if (!version) {
+      return res.status(404).json({ error: 'Version non trouvée' });
+    }
+    return res.status(204).send();
+  } catch (err) {
+    return res.status(500).json({ error: 'Erreur serveur interne' });
   }
-
-  res.status(204).send();
 };
