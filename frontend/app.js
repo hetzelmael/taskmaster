@@ -741,13 +741,13 @@ function renderProjects(projects) {
   lucide.createIcons();
 }
 
-function enterProject(project) {
+async function enterProject(project) {
   currentProject = project;
   synthVersionFilter = '';
   const sel = document.getElementById('synth-version-filter');
   if (sel) sel.value = '';
   showTasksSection();
-  loadVersions();
+  await loadVersions();
   loadTasks();
 }
 
