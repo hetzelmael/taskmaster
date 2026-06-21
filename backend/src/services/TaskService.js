@@ -37,6 +37,18 @@ class TaskService {
       throw new Error('Priorité invalide (low, medium, high)');
     }
 
+    const projectId = data.projectId ? parseInt(data.projectId, 10) : null;
+    const versionId = data.versionId ? parseInt(data.versionId, 10) : null;
+
+    if (versionId && projectId) {
+      const version = await Version.findOne({ where: { id: versionId, projectId } });
+      if (!version) {
+        const err = new Error('Version introuvable dans ce projet');
+        err.status = 400;
+        throw err;
+      }
+    }
+
     return Task.create({
       title: data.title.trim(),
       description: data.description?.trim() || null,
@@ -44,8 +56,8 @@ class TaskService {
       dueDate: data.dueDate || null,
       status: 'todo',
       userId,
-      versionId: data.versionId || null,
-      projectId: data.projectId || null,
+      versionId,
+      projectId,
     });
   }
 
@@ -109,6 +121,15 @@ class TaskService {
     const safeUpdates = {};
     for (const key of allowed) {
       if (updates[key] !== undefined) { safeUpdates[key] = updates[key]; }
+    }
+
+    if (safeUpdates.versionId && task.projectId) {
+      const version = await Version.findOne({ where: { id: safeUpdates.versionId, projectId: task.projectId } });
+      if (!version) {
+        const err = new Error('Version introuvable dans ce projet');
+        err.status = 400;
+        throw err;
+      }
     }
 
     // Validation et horodatage automatique des transitions de statut

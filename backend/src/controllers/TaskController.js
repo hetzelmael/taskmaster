@@ -10,6 +10,8 @@ exports.createValidators = [
   body('description').optional().isString().trim(),
   body('priority').optional().isIn(['low', 'medium', 'high']),
   body('dueDate').optional({ nullable: true }).isISO8601().withMessage('Date invalide'),
+  body('versionId').optional({ nullable: true }).isInt({ min: 1 }).withMessage('versionId invalide'),
+  body('projectId').optional({ nullable: true }).isInt({ min: 1 }).withMessage('projectId invalide'),
 ];
 
 exports.updateValidators = [
