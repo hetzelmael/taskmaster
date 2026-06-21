@@ -201,8 +201,12 @@ if (process.env.NODE_ENV !== 'test') {
     .then(async () => {
       console.log('Database connected');
       try {
-        await connectRedis();
-        console.log('Redis connected');
+        const redis = await connectRedis();
+        if (redis) {
+          console.log('Redis connected');
+        } else {
+          console.log('Redis disabled (REDIS_URL and REDIS_HOST not set)');
+        }
       } catch (err) {
         console.warn('Redis unavailable (non-fatal):', err.message);
       }
