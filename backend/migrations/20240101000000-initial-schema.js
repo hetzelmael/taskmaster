@@ -40,7 +40,7 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    });
+    }, { ifNotExists: true });
 
     await queryInterface.createTable('tasks', {
       id: {
@@ -86,7 +86,7 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    });
+    }, { ifNotExists: true });
 
     await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_status" ON "tasks" ("status")');
     await queryInterface.sequelize.query('CREATE INDEX IF NOT EXISTS "idx_tasks_priority" ON "tasks" ("priority")');

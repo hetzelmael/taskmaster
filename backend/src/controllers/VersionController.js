@@ -32,6 +32,7 @@ exports.list = async (req, res) => {
     }
     return res.json(versions);
   } catch (err) {
+    console.error('[VersionController.list]', err);
     return res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
@@ -55,6 +56,7 @@ exports.create = async (req, res) => {
     }
     return res.status(201).json(version);
   } catch (err) {
+    console.error('[VersionController.create]', err);
     return res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
@@ -71,6 +73,7 @@ exports.remove = async (req, res) => {
     }
     return res.status(204).send();
   } catch (err) {
+    console.error('[VersionController.remove]', err);
     return res.status(500).json({ error: 'Erreur serveur interne' });
   }
 };
