@@ -27,7 +27,7 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    });
+    }, { ifNotExists: true });
 
     await queryInterface.createTable('versions', {
       id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
@@ -49,7 +49,7 @@ module.exports = {
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    });
+    }, { ifNotExists: true });
 
     await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE');
     await queryInterface.sequelize.query('ALTER TABLE tasks ADD COLUMN IF NOT EXISTS version_id INTEGER REFERENCES versions(id) ON DELETE SET NULL');
